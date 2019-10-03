@@ -11,6 +11,14 @@
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import '../node_modules/bootstrap-vue/src/index.scss';
 
+.heading {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.txt {
+  font-family: 'Open Sans', sans-serif;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
