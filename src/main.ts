@@ -1,3 +1,4 @@
+import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
 import VueForm from 'vue-form';
 import VueMoment from 'vue-moment';
@@ -7,6 +8,7 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
+Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 Vue.use(VueForm, {
   inputClasses: {
