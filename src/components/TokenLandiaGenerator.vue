@@ -2,36 +2,40 @@
   <div class="generator-container">
     <h1>TokenLandia NFT Generator</h1>
     <hr/>
-    <h4>Unique Identifier: {{coo}}-{{initials}}-{{series}}-{{design}}-{{tokenID}}</h4>
+    <h4>Unique Identifier:
+      <span v-bind:class="{ 'text-success': this.formState.$valid }">
+        <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
+        <span>-</span>
+        <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
+        <span>-</span>
+        <span v-bind:class="{ 'text-danger': series === '{SERIES}' }">{{series}}</span>
+        <span>-</span>
+        <span v-bind:class="{ 'text-danger': design === '{DESIGN}' }">{{design}}</span>
+        <span>-</span>
+        <span v-bind:class="{ 'text-danger': tokenID === '{TOKEN_ID}' }">{{tokenID}}</span>
+      </span>
+    </h4>
     <br/>
     <vue-form :state="formState" @submit.prevent="onSubmit">
-      <validate auto-label class="form-group required-field">
+      <validate auto-label class="form-group required-field d-inline-block mr-2">
         <label for="coo">Country of Origin</label>
         <input type="text"
                name="coo"
                id="coo"
                class="form-control"
                required v-model="model.coo" />
-
-        <field-messages name="coo" show="$touched || $submitted" class="form-control-feedback">
-          <div slot="required" class="text-danger">Country of Origin is a required field</div>
-        </field-messages>
       </validate>
 
-      <validate auto-label class="form-group required-field">
+      <validate auto-label class="form-group required-field d-inline-block mr-2">
         <label for="initials">Artist Initials</label>
         <input type="text"
                name="initials"
                id="initials"
                class="form-control"
                required v-model="model.initials" />
-
-        <field-messages name="initials" show="$touched || $submitted" class="form-control-feedback">
-          <div slot="required" class="text-danger">Initials is a required field</div>
-        </field-messages>
       </validate>
 
-      <field class="form-group">
+      <field class="form-group d-inline-block mr-2">
         <label for="series">Series</label>
         <input type="number"
                name="series"
@@ -42,7 +46,7 @@
                v-model="model.series" />
       </field>
 
-      <field class="form-group">
+      <field class="form-group d-inline-block mr-2">
         <label for="design">Design</label>
         <input type="number"
                name="design"
@@ -53,8 +57,8 @@
                v-model="model.design" />
       </field>
 
-      <validate auto-label class="form-group required-field">
-        <label for="initials">Token ID</label>
+      <validate auto-label class="form-group required-field d-inline-block">
+        <label for="tokenId">Token ID</label>
         <input type="number"
                min="1"
                step="1"
@@ -62,10 +66,6 @@
                id="tokenId"
                class="form-control"
                required v-model="model.tokenId" />
-
-        <field-messages name="tokenId" show="$touched || $submitted" class="form-control-feedback">
-          <div slot="required" class="text-danger">Token ID is a required field</div>
-        </field-messages>
       </validate>
 
       <div class="py-2 text-center" v-if="!saving && !saved">
@@ -91,7 +91,7 @@ export default class TokenLandiaGenerator extends Vue {
   formState: any = {};
 
   model: Model = {
-    coo: '', initials: '', series: '1', design: '1', tokenId: '',
+    coo: '', initials: '', series: '', design: '', tokenId: '',
   };
 
   saving: boolean = false;
@@ -137,7 +137,7 @@ export default class TokenLandiaGenerator extends Vue {
 
 <style scoped>
   .generator-container {
-    width: 50%;
+    width: 70%;
     margin: 0 auto;
   }
 
