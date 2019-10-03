@@ -2,6 +2,10 @@
 node_modules
 /dist
 
+.firebase
+.firebase/*
+.firebase/hosting.ZGlzdA.cache
+
 # local env files
 .env.local
 .env.*.local
@@ -14,6 +18,7 @@ yarn-error.log*
 # Editor directories and files
 .idea
 .vscode
+*.iml
 *.suo
 *.ntvs*
 *.njsproj
