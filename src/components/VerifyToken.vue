@@ -14,6 +14,10 @@
         <div>
           <p>Description: {{tokenData.description}}</p>
         </div>
+        <div>
+          <span>Purchase Date: {{tokenData.purchase.date}} </span>&nbsp;
+          <span>Purchase Location: {{tokenData.purchase.location}}</span>
+        </div>
       </div>
       <div class="col">
         <h4 class="heading">Unique Identifier: {{tokenData.uniqueItemId}}</h4>
@@ -36,6 +40,10 @@ export default class VerifyToken extends Vue {
       uniqueItemId: 'JPN-JSH-004-0002-1',
       name: 'Shogos Sneakers',
       description: 'Legendary Shogo puts his stamp on a classic',
+      purchase: {
+        date: '02/9/19',
+        location: 'London',
+      },
     };
   }
 }
