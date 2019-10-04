@@ -8,10 +8,10 @@
         </div>
 
         <ul class="list-unstyled components">
-          <li class="active">
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/' }">
             <router-link to="/">Mint</router-link>
           </li>
-          <li>
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/verify' }">
             <router-link to="/verify">Verify</router-link>
           </li>
         </ul>
@@ -19,7 +19,7 @@
 
       <!-- Page Content  -->
       <div id="content">
-        <div id="collapse-container">
+        <div id="collapse-btn-container">
           <b-button
             id="sidebarCollapse"
             variant="outline-warning"
@@ -27,7 +27,7 @@
             <font-awesome-icon icon="bars" />
           </b-button>
         </div>
-        <router-view />
+        <router-view class="view" />
       </div>
     </div>
   </div>
@@ -106,9 +106,9 @@ a:focus {
   margin: 40px 0;
 }
 
-#collapse-container {
-  padding: 30px;
-  text-align: left;
+#collapse-btn-container {
+  position: absolute;
+  margin: 1rem;
 }
 
 /* ---------------------------------------------------
@@ -201,6 +201,10 @@ a.article:hover {
   width: 100%;
   min-height: 100vh;
   transition: all 0.3s;
+}
+
+.view {
+  padding: 30px;
 }
 
 /* ---------------------------------------------------
