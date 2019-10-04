@@ -272,7 +272,7 @@
 
       <div class="mt-4">
         <div class="py-2 text-center" v-if="!saving && !saved">
-          <b-button type="submit">Submit</b-button>
+          <b-button type="submit" class="cta-tokenlandia">Submit</b-button>
         </div>
         <div class="py-2 text-center" v-else-if="saving && !saved">
           Saving...
@@ -404,6 +404,11 @@ export default class TokenLandiaGenerator extends Vue {
   .generator-container {
     width: 70%;
     margin: 0 auto;
+  }
+
+  .cta-tokenlandia {
+    background-color: #DE683C;
+    border-color: #DE683C;
   }
 
   @media only screen and (max-width: 1200px) {

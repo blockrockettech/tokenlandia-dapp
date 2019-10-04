@@ -2,6 +2,6 @@
 
 npm run build;
 
-firebase use tl-token-admin;
+firebase use tokenlandia-admin;
 
 firebase deploy;
