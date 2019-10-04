@@ -88,12 +88,11 @@
           </validate>
         </div>
         <div class="col">
-          <field class="form-group d-inline-block mr-3">
-            <div><label>Image</label></div>
+          <div class="mt-3">
             <b-button variant="dark">
-              <font-awesome-icon icon="file-upload" />&nbsp;Upload Image
+              <font-awesome-icon icon="file-upload" />&nbsp;Attach Image
             </b-button>
-          </field>
+          </div>
         </div>
       </div>
 
@@ -272,13 +271,13 @@
 
       <div class="mt-4">
         <div class="py-2 text-center" v-if="!saving && !saved">
-          <b-button type="submit" class="cta-tokenlandia">Submit</b-button>
+          <b-button type="submit" class="cta-tokenlandia">Mint</b-button>
         </div>
         <div class="py-2 text-center" v-else-if="saving && !saved">
-          Saving...
+          Minting...
         </div>
         <div class="py-2 text-center" v-else-if="!saving && saved">
-          Saved!
+          Minted!
         </div>
       </div>
     </vue-form>
@@ -404,11 +403,6 @@ export default class TokenLandiaGenerator extends Vue {
   .generator-container {
     width: 70%;
     margin: 0 auto;
-  }
-
-  .cta-tokenlandia {
-    background-color: #DE683C;
-    border-color: #DE683C;
   }
 
   @media only screen and (max-width: 1200px) {

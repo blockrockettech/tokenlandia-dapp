@@ -58,6 +58,11 @@ export default class App extends Vue {
   font-family: 'Open Sans', sans-serif;
 }
 
+.cta-tokenlandia {
+  background-color: #DE683C;
+  border-color: #DE683C;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
