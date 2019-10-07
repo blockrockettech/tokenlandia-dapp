@@ -49,6 +49,7 @@ export default class App extends Vue {
 <style lang="scss">
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import '../node_modules/bootstrap-vue/src/index.scss';
+@import '../node_modules/vue-date-pick/src/vueDatePick.scss';
 
 .heading {
   font-family: 'Ubuntu', sans-serif;
