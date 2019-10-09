@@ -367,10 +367,9 @@
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from 'vue-property-decorator';
-  // @ts-ignore
-  import DatePick from 'vue-date-pick';
+  import { Component, Vue } from 'vue-property-decorator';
   import countryCodes from '../../static/country_codes.json';
+  import { mapGetters } from "vuex";
 
   interface Model {
     coo: string,
@@ -399,9 +398,16 @@
   }
 
   @Component({
-    components: {DatePick}
+    computed: {
+        ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
+        ...mapGetters(['contractName']),
+    }
   })
   export default class TokenLandiaGenerator extends Vue {
+    drizzleInstance: any;
+    isDrizzleInitialized!: boolean;
+    contractName!: string;
+
     formState: any = {};
 
     model: Model = {
@@ -438,14 +444,21 @@
 
     onSubmit() {
       if (this.formState.$valid) {
-        const mintTokenArgs = [
-            this.tokenID,
-            this.model.recipient,
-            this.productCode,
-            'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq'
-        ];
+          if (this.isDrizzleInitialized) {
+              const mintTokenArgs = [
+                  this.tokenID,
+                  this.model.recipient,
+                  this.productCode,
+                  'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq'
+              ];
 
-
+              this.drizzleInstance
+                  .contracts[this.contractName]
+                  .methods['mintToken']
+                  .cacheSend(...mintTokenArgs);
+          } else {
+              alert("Drizzle doesn't appear to be ready for transactions");
+          }
       }
     }
 
