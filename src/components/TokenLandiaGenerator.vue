@@ -84,6 +84,7 @@
             <label for="name">Name</label>
             <input type="text"
                    name="name"
+                   maxlength="125"
                    id="name"
                    class="form-control"
                    required v-model="model.name"/>
@@ -107,7 +108,7 @@
         <textarea id="description"
                   name="description"
                   class="form-control"
-                  maxlength="255"
+                  maxlength="300"
                   required
                   v-model.lazy="model.description">
                 </textarea>
@@ -231,7 +232,9 @@
             </field-messages>
           </validate>
         </div>
+      </div>
 
+      <div class="row">
         <div class="col p-2">
           <validate auto-label class="form-group required-field">
             <label for="artist">Artist</label>
@@ -249,6 +252,16 @@
           </validate>
         </div>
 
+        <div class="col p-2">
+          <field class="form-group">
+            <label for="artistAssistant">Assistant</label>
+            <input type="text"
+                   name="artistAssistant"
+                   id="artistAssistant"
+                   class="form-control"
+                   v-model.lazy="model.artistAssistant" />
+          </field>
+        </div>
       </div>
 
       <hr/>
@@ -256,8 +269,8 @@
       <h4 class="heading">Materials Used</h4>
 
       <div class="row">
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material1">Material 1</label>
             <input type="text"
                    name="material1"
@@ -267,8 +280,8 @@
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material2">Material 2</label>
             <input type="text"
                    name="material2"
@@ -278,8 +291,8 @@
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material3">Material 3</label>
             <input type="text"
                    name="material3"
@@ -289,8 +302,8 @@
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material4">Material 4</label>
             <input type="text"
                    name="material4"
@@ -300,7 +313,7 @@
           </validate>
         </div>
 
-        <div class="col">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
           <validate auto-label class="form-group required-field d-inline-block">
             <label for="material5">Material 5</label>
             <input type="text"
@@ -374,6 +387,7 @@
     brand: string,
     model: string,
     artist: string,
+    artistAssistant: string,
     recipient: string,
     materialsUsed: {
       _1: string,
@@ -405,6 +419,7 @@
       brand: '',
       model: '',
       artist: '',
+      artistAssistant: '',
       recipient: '',
       materialsUsed: {
         _1: '',
@@ -423,7 +438,14 @@
 
     onSubmit() {
       if (this.formState.$valid) {
-        console.log(`${this.coo}-${this.initials}-${this.series}-${this.design}-${this.tokenID}`);
+        const mintTokenArgs = [
+            this.tokenID,
+            this.model.recipient,
+            this.productCode,
+            'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq'
+        ];
+
+
       }
     }
 
@@ -473,6 +495,14 @@
 
     get tokenID(): string {
       return this.model.tokenId ? this.model.tokenId : '{TOKEN_ID}';
+    }
+
+    get productCode(): string {
+        return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
+    }
+
+    get uniqueId(): string {
+        return `${this.productCode}-${this.tokenID}`;
     }
   }
 </script>
