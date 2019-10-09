@@ -3,7 +3,7 @@
     <h1 class="heading">TokenLandia NFT Generator</h1>
     <hr/>
     <h4 class="heading">Unique Identifier:
-      <span v-bind:class="{ 'text-success': this.uniqueIdValid }">
+      <span v-bind:class="{ 'text-success': this.productIdValid }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
@@ -126,7 +126,7 @@
                    name="purchLocation"
                    id="purchLocation"
                    class="form-control"
-                   required v-model="model.purchLocation"/>
+                   required v-model="model.purchase_location"/>
 
             <field-messages
               name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
@@ -142,7 +142,7 @@
                    name="purchDate"
                    id="purchDate"
                    class="form-control"
-                   required v-model="model.purchDate"/>
+                   required v-model="model.purchase_date"/>
 
             <!--            <date-pick-->
             <!--              name="purchDate"-->
@@ -168,7 +168,7 @@
                    name="customiseLocation"
                    id="customiseLocation"
                    class="form-control"
-                   required v-model="model.customiseLocation"/>
+                   required v-model="model.customisation_location"/>
 
             <field-messages
               name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
@@ -186,7 +186,7 @@
                    name="customiseDate"
                    id="customiseDate"
                    class="form-control"
-                   required v-model="model.customiseDate"/>
+                   required v-model="model.customisation_date" />
 
             <field-messages
               name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
@@ -276,7 +276,7 @@
                    name="material1"
                    id="material1"
                    class="form-control"
-                   required v-model="model.materialsUsed._1"/>
+                   required v-model="model.material_1"/>
           </validate>
         </div>
 
@@ -287,7 +287,7 @@
                    name="material2"
                    id="material2"
                    class="form-control"
-                   required v-model="model.materialsUsed._2"/>
+                   required v-model="model.material_2"/>
           </validate>
         </div>
 
@@ -298,7 +298,7 @@
                    name="material3"
                    id="material3"
                    class="form-control"
-                   required v-model="model.materialsUsed._3"/>
+                   required v-model="model.material_3"/>
           </validate>
         </div>
 
@@ -309,7 +309,7 @@
                    name="material4"
                    id="material4"
                    class="form-control"
-                   required v-model="model.materialsUsed._4"/>
+                   required v-model="model.material_4"/>
           </validate>
         </div>
 
@@ -320,7 +320,7 @@
                    name="material5"
                    id="material5"
                    class="form-control"
-                   required v-model="model.materialsUsed._5"/>
+                   required v-model="model.material_5"/>
           </validate>
         </div>
       </div>
@@ -379,22 +379,20 @@
     tokenId: string,
     name: string,
     description: string,
-    purchLocation: string,
-    purchDate: string,
-    customiseLocation: string,
-    customiseDate: string,
+    purchase_location: string,
+    purchase_date: string,
+    customisation_location: string,
+    customisation_date: string,
     brand: string,
     model: string,
     artist: string,
     artistAssistant: string,
     recipient: string,
-    materialsUsed: {
-      _1: string,
-      _2: string,
-      _3: string,
-      _4: string,
-      _5: string
-    }
+    material_1: string,
+    material_2: string,
+    material_3: string,
+    material_4: string,
+    material_5: string,
   }
 
   @Component({
@@ -418,22 +416,20 @@
       tokenId: '',
       name: '',
       description: '',
-      purchLocation: '',
-      purchDate: '',
-      customiseLocation: '',
-      customiseDate: '',
+      purchase_location: '',
+      purchase_date: '',
+      customisation_location: '',
+      customisation_date: '',
       brand: '',
       model: '',
       artist: '',
       artistAssistant: '',
       recipient: '',
-      materialsUsed: {
-        _1: '',
-        _2: '',
-        _3: '',
-        _4: '',
-        _5: '',
-      },
+      material_1: '',
+      material_2: '',
+      material_3: '',
+      material_4: '',
+      material_5: '',
     };
 
     countryCodes: any = countryCodes;
@@ -442,24 +438,46 @@
 
     saved: boolean = false;
 
-    onSubmit() {
-      if (this.formState.$valid) {
-          if (this.isDrizzleInitialized) {
-              const mintTokenArgs = [
-                  this.tokenID,
-                  this.model.recipient,
-                  this.productCode,
-                  'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq'
-              ];
+    uploadImageToIpfs(): string {
+        return 'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq';
+    }
 
-              this.drizzleInstance
-                  .contracts[this.contractName]
-                  .methods['mintToken']
-                  .cacheSend(...mintTokenArgs);
-          } else {
-              alert("Drizzle doesn't appear to be ready for transactions");
-          }
-      }
+    pushJsonToIpfs(json: any): string {
+        return '';
+    }
+
+    onSubmit() {
+        if (this.formState.$valid) {
+            if (this.isDrizzleInitialized) {
+                const imageIpfsUrl = this.uploadImageToIpfs();
+                const {name, description, ...basicModel} = this.model;
+                const ipfsPayload = {
+                    name,
+                    description,
+                    image: imageIpfsUrl,
+                    attributes: {
+                      productId: this.productId,
+                      ...basicModel
+                    },
+                };
+
+                const ipfsHashForData = this.pushJsonToIpfs(ipfsPayload);
+
+                const mintTokenArgs = [
+                    this.tokenID,
+                    this.model.recipient,
+                    this.productCode,
+                    ipfsHashForData
+                ];
+
+                this.drizzleInstance
+                    .contracts[this.contractName]
+                    .methods['mintToken']
+                    .cacheSend(...mintTokenArgs);
+            } else {
+                alert("Drizzle doesn't appear to be ready for transactions");
+            }
+        }
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -485,7 +503,7 @@
       return padding + number;
     }
 
-    get uniqueIdValid(): boolean {
+    get productIdValid(): boolean {
       return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
         && this.design !== '{DESIGN}' && this.tokenID !== '{TOKEN_ID}';
     }
@@ -514,7 +532,7 @@
         return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
     }
 
-    get uniqueId(): string {
+    get productId(): string {
         return `${this.productCode}-${this.tokenID}`;
     }
   }
