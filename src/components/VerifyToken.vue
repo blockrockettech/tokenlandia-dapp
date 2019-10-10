@@ -4,8 +4,8 @@
     <hr/>
     <div class="row">
       <div class="searchContainer">
-        <label for="productCode" class="searchLabel">Product Code:&nbsp;</label>
-        <input id="productCode" class="long-input" type="text" v-model="productCode"/>
+        <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
+        <input id="productId" class="long-input" type="text" v-model="productId"/>
 
         <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
         <input id="tokenId" class="long-input" type="text" v-model="tokenId" />
@@ -60,7 +60,7 @@
           </div>
         </div>
         <div class="col">
-          <h4 class="heading">Unique Identifier: {{productId}}</h4>
+          <h4 class="heading">Unique Identifier: {{tokenData.productId}}</h4>
           <div class="img-container">
             <img class="img" :src="ipfsData.image" alt=""/>
           </div>
@@ -68,7 +68,9 @@
       </div>
     </div>
     <div v-else-if="!results && !searching">
-      <p v-bind:class="{ 'text-danger': this.error }">Please fill in the search form above.</p>
+      <p v-bind:class="{ 'text-danger': this.error }">
+        Please fill in one field from the search form above.
+      </p>
     </div>
   </div>
 </template>
@@ -98,18 +100,19 @@ export default class VerifyToken extends Vue {
 
   error: boolean = false;
 
-  productCode: string = '';
+  productId: string = '';
 
   tokenId: string = '';
 
   ipfsURL: string = '';
   ipfsHash: string = '';
-  ipfsData: any;
+  ipfsData: any = {};
   ipfsDataRetrieved: boolean = false;
 
   performSearch() {
-    if (this.productId.trim() !== '-') {
+    if (this.productId.trim() !== '') {
       this.error = false;
+      this.ipfsDataRetrieved = false;
       this.searching = true;
 
       this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
@@ -117,31 +120,63 @@ export default class VerifyToken extends Vue {
           method: 'ipfsUrlForProductId',
           methodArgs: [this.productId]
       });
+    } else if (this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId))) {
+      this.error = false;
+      this.ipfsDataRetrieved = false;
+      this.searching = true;
+
+      this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
+          contractName: this.contractName,
+          method: 'attributes',
+          methodArgs: [Number(this.tokenId)]
+      });
     } else {
       this.error = true;
+      this.searching = false;
+      this.ipfsDataRetrieved = false;
     }
+  }
+
+  processInfuraResponse(response: any) {
+      if (response && response.status === 200) {
+          console.log(response);
+          this.ipfsData = response.data;
+          this.ipfsDataRetrieved = true;
+          this.searching = false;
+      } else {
+          alert(`Unable to retrieve IPFS data for ${this.productId.trim()}`);
+      }
   }
 
   get results(): boolean {
       if (this.searching && this.isDrizzleInitialized) {
-          const ipfsUrl = this.getContractData({
-              contract: this.contractName,
-              method: 'ipfsUrlForProductId'
-          });
+          let ipfsUrl = 'loading';
+          if (this.productId.trim() !== '') {
+              ipfsUrl = this.getContractData({
+                  contract: this.contractName,
+                  method: 'ipfsUrlForProductId',
+                  methodArgs: [this.productId]
+              });
+          } else if (this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId))) {
+              const attributes = this.getContractData({
+                  contract: this.contractName,
+                  method: 'attributes',
+                  methodArgs: [Number(this.tokenId)]
+              });
+
+              if (typeof attributes !== 'string' && attributes['_ipfsUrl']) {
+                  console.log(attributes);
+                  ipfsUrl = attributes._ipfsUrl;
+              }
+          } else {
+              alert("An unknown error has occurred whilst searching - check the search form");
+          }
 
           if (ipfsUrl !== 'loading') {
               this.ipfsURL = ipfsUrl;
               this.ipfsHash = ipfsUrl.replace(this.baseIpfsUrl, '');
 
-              axios.get(ipfsUrl).then(response => {
-                  if (response && response.status === 200) {
-                      this.ipfsData = response.data;
-                      this.ipfsDataRetrieved = true;
-                      this.searching = false;
-                  } else {
-                      alert(`Unable to retrieve IPFS data for ${this.productId.trim()}`);
-                  }
-              });
+              axios.get(ipfsUrl).then(this.processInfuraResponse);
 
               return this.ipfsDataRetrieved;
           }
@@ -155,6 +190,7 @@ export default class VerifyToken extends Vue {
     const data: any = {
       name: name,
       description: description,
+      productId: attributes.productId,
       purchase: {
         date: attributes.purchase_date,
         location: attributes.purchase_location,
@@ -178,10 +214,6 @@ export default class VerifyToken extends Vue {
     });
 
     return data;
-  }
-
-  get productId(): string {
-      return `${this.productCode}-${this.tokenId}`;
   }
 }
 </script>
