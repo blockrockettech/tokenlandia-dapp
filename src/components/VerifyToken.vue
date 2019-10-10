@@ -4,8 +4,8 @@
     <hr/>
     <div class="row">
       <div class="searchContainer">
-        <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
-        <input id="productId" class="long-input" type="text" v-model="productId"/>
+        <label for="productCode" class="searchLabel">Product Code:&nbsp;</label>
+        <input id="productCode" class="long-input" type="text" v-model="productCode"/>
 
         <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
         <input id="tokenId" class="long-input" type="text" v-model="tokenId" />
@@ -14,7 +14,10 @@
       </div>
     </div>
     <hr/>
-    <div id="searchResults" v-if="search">
+    <div v-if="searching">
+      <Spinner />
+    </div>
+    <div id="searchResults" v-if="results">
       <div class="row">
         <div class="col text-left">
           <div>
@@ -54,14 +57,14 @@
           </div>
         </div>
         <div class="col">
-          <h4 class="heading">Unique Identifier: {{tokenData.uniqueItemId}}</h4>
+          <h4 class="heading">Unique Identifier: {{productId}}</h4>
           <div class="img-container">
-            <img src="http://placekitten.com/200/300" alt=""/>
+            <img class="img" :src="ipfsURL" alt=""/>
           </div>
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else-if="!results && !searching">
       <p v-bind:class="{ 'text-danger': this.error }">Please fill in the search form above.</p>
     </div>
   </div>
@@ -69,29 +72,68 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { mapGetters } from "vuex";
 
-@Component({})
+import Spinner from './Spinner.vue';
+
+@Component({
+    components: { Spinner },
+    computed: {
+        ...mapGetters('drizzle', ['isDrizzleInitialized']),
+        ...mapGetters('contracts', ['getContractData']),
+        ...mapGetters(['contractName']),
+    }
+})
 export default class VerifyToken extends Vue {
-  search: boolean = false;
+  getContractData: any;
+  isDrizzleInitialized!: boolean;
+  contractName!: string;
+
+  searching: boolean = false;
 
   error: boolean = false;
 
-  productId: string = '';
+  productCode: string = '';
 
   tokenId: string = '';
 
+  ipfsURL: string = '';
+  ipfsHash: string = '';
+
   performSearch() {
-    if (this.productId.trim() !== '' && this.tokenId.trim() !== '') {
+    if (this.productId.trim() !== '-') {
       this.error = false;
-      this.search = !this.search;
+      this.searching = true;
+
+      this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
+          contractName: this.contractName,
+          method: 'ipfsUrlForProductId',
+          methodArgs: [this.productId]
+      });
     } else {
       this.error = true;
     }
   }
 
+  get results(): boolean {
+      if (this.searching && this.isDrizzleInitialized) {
+          const ipfsUrl = this.getContractData({
+              contract: this.contractName,
+              method: 'ipfsUrlForProductId'
+          });
+
+          if (ipfsUrl !== 'loading') {
+              this.ipfsURL = ipfsUrl;
+              this.ipfsHash = ipfsUrl.replace('https://ipfs.globalupload.io/', '');
+              this.searching = false;
+              return true;
+          }
+      }
+      return false;
+  }
+
   get tokenData() {
     return {
-      uniqueItemId: `${this.productId}-${this.tokenId}`,
       name: 'Shogos Sneakers',
       description: 'Legendary Shogo puts his stamp on a classic',
       purchase: {
@@ -114,12 +156,20 @@ export default class VerifyToken extends Vue {
       ],
     };
   }
+
+  get productId(): string {
+      return `${this.productCode}-${this.tokenId}`;
+  }
 }
 </script>
 
 <style scoped>
   .img-container {
     margin: 2rem 0;
+  }
+
+  .img {
+    height: 345px;
   }
 
   .searchLabel {

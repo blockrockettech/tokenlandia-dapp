@@ -9,6 +9,12 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+// @ts-ignore
+import drizzleVuePlugin from '@drizzle/vue-plugin';
+import drizzleOptions from './drizzle-options';
+
+Vue.use(drizzleVuePlugin, { store, drizzleOptions });
+
 library.add(faFileUpload);
 library.add(faBars);
 

@@ -9,6 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@drizzle/vue-plugin": "^0.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/vue-fontawesome": "^0.1.7",
@@ -16,6 +17,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.2",
     "core-js": "^2.6.5",
+    "ipfs-http-client": "^38.2.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-date-pick": "^1.2.1",

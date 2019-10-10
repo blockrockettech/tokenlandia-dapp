@@ -3,7 +3,7 @@
     <h1 class="heading">TokenLandia NFT Generator</h1>
     <hr/>
     <h4 class="heading">Unique Identifier:
-      <span v-bind:class="{ 'text-success': this.uniqueIdValid }">
+      <span v-bind:class="{ 'text-success': this.productIdValid }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
@@ -84,6 +84,7 @@
             <label for="name">Name</label>
             <input type="text"
                    name="name"
+                   maxlength="125"
                    id="name"
                    class="form-control"
                    required v-model="model.name"/>
@@ -107,7 +108,7 @@
         <textarea id="description"
                   name="description"
                   class="form-control"
-                  maxlength="255"
+                  maxlength="300"
                   required
                   v-model.lazy="model.description">
                 </textarea>
@@ -125,7 +126,7 @@
                    name="purchLocation"
                    id="purchLocation"
                    class="form-control"
-                   required v-model="model.purchLocation"/>
+                   required v-model="model.purchase_location"/>
 
             <field-messages
               name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
@@ -141,7 +142,7 @@
                    name="purchDate"
                    id="purchDate"
                    class="form-control"
-                   required v-model="model.purchDate"/>
+                   required v-model="model.purchase_date"/>
 
             <!--            <date-pick-->
             <!--              name="purchDate"-->
@@ -167,7 +168,7 @@
                    name="customiseLocation"
                    id="customiseLocation"
                    class="form-control"
-                   required v-model="model.customiseLocation"/>
+                   required v-model="model.customisation_location"/>
 
             <field-messages
               name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
@@ -185,7 +186,7 @@
                    name="customiseDate"
                    id="customiseDate"
                    class="form-control"
-                   required v-model="model.customiseDate"/>
+                   required v-model="model.customisation_date" />
 
             <field-messages
               name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
@@ -231,7 +232,9 @@
             </field-messages>
           </validate>
         </div>
+      </div>
 
+      <div class="row">
         <div class="col p-2">
           <validate auto-label class="form-group required-field">
             <label for="artist">Artist</label>
@@ -249,6 +252,16 @@
           </validate>
         </div>
 
+        <div class="col p-2">
+          <field class="form-group">
+            <label for="artistAssistant">Assistant</label>
+            <input type="text"
+                   name="artistAssistant"
+                   id="artistAssistant"
+                   class="form-control"
+                   v-model.lazy="model.artistAssistant" />
+          </field>
+        </div>
       </div>
 
       <hr/>
@@ -256,58 +269,58 @@
       <h4 class="heading">Materials Used</h4>
 
       <div class="row">
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material1">Material 1</label>
             <input type="text"
                    name="material1"
                    id="material1"
                    class="form-control"
-                   required v-model="model.materialsUsed._1"/>
+                   required v-model="model.material_1"/>
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material2">Material 2</label>
             <input type="text"
                    name="material2"
                    id="material2"
                    class="form-control"
-                   required v-model="model.materialsUsed._2"/>
+                   required v-model="model.material_2"/>
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material3">Material 3</label>
             <input type="text"
                    name="material3"
                    id="material3"
                    class="form-control"
-                   required v-model="model.materialsUsed._3"/>
+                   required v-model="model.material_3"/>
           </validate>
         </div>
 
-        <div class="col">
-          <validate auto-label class="form-group required-field d-inline-block mr-3">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
+          <validate auto-label class="form-group required-field d-inline-block">
             <label for="material4">Material 4</label>
             <input type="text"
                    name="material4"
                    id="material4"
                    class="form-control"
-                   required v-model="model.materialsUsed._4"/>
+                   required v-model="model.material_4"/>
           </validate>
         </div>
 
-        <div class="col">
+        <div class="col-4 col-md-4 col-xl-3 p-2">
           <validate auto-label class="form-group required-field d-inline-block">
             <label for="material5">Material 5</label>
             <input type="text"
                    name="material5"
                    id="material5"
                    class="form-control"
-                   required v-model="model.materialsUsed._5"/>
+                   required v-model="model.material_5"/>
           </validate>
         </div>
       </div>
@@ -354,10 +367,9 @@
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from 'vue-property-decorator';
-  // @ts-ignore
-  import DatePick from 'vue-date-pick';
+  import { Component, Vue } from 'vue-property-decorator';
   import countryCodes from '../../static/country_codes.json';
+  import { mapGetters } from "vuex";
 
   interface Model {
     coo: string,
@@ -367,27 +379,33 @@
     tokenId: string,
     name: string,
     description: string,
-    purchLocation: string,
-    purchDate: string,
-    customiseLocation: string,
-    customiseDate: string,
+    purchase_location: string,
+    purchase_date: string,
+    customisation_location: string,
+    customisation_date: string,
     brand: string,
     model: string,
     artist: string,
+    artistAssistant: string,
     recipient: string,
-    materialsUsed: {
-      _1: string,
-      _2: string,
-      _3: string,
-      _4: string,
-      _5: string
-    }
+    material_1: string,
+    material_2: string,
+    material_3: string,
+    material_4: string,
+    material_5: string,
   }
 
   @Component({
-    components: {DatePick}
+    computed: {
+        ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
+        ...mapGetters(['contractName']),
+    }
   })
   export default class TokenLandiaGenerator extends Vue {
+    drizzleInstance: any;
+    isDrizzleInitialized!: boolean;
+    contractName!: string;
+
     formState: any = {};
 
     model: Model = {
@@ -398,21 +416,20 @@
       tokenId: '',
       name: '',
       description: '',
-      purchLocation: '',
-      purchDate: '',
-      customiseLocation: '',
-      customiseDate: '',
+      purchase_location: '',
+      purchase_date: '',
+      customisation_location: '',
+      customisation_date: '',
       brand: '',
       model: '',
       artist: '',
+      artistAssistant: '',
       recipient: '',
-      materialsUsed: {
-        _1: '',
-        _2: '',
-        _3: '',
-        _4: '',
-        _5: '',
-      },
+      material_1: '',
+      material_2: '',
+      material_3: '',
+      material_4: '',
+      material_5: '',
     };
 
     countryCodes: any = countryCodes;
@@ -421,10 +438,46 @@
 
     saved: boolean = false;
 
+    uploadImageToIpfs(): string {
+        return 'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq';
+    }
+
+    pushJsonToIpfs(json: any): string {
+        return '';
+    }
+
     onSubmit() {
-      if (this.formState.$valid) {
-        console.log(`${this.coo}-${this.initials}-${this.series}-${this.design}-${this.tokenID}`);
-      }
+        if (this.formState.$valid) {
+            if (this.isDrizzleInitialized) {
+                const imageIpfsUrl = this.uploadImageToIpfs();
+                const {name, description, ...basicModel} = this.model;
+                const ipfsPayload = {
+                    name,
+                    description,
+                    image: imageIpfsUrl,
+                    attributes: {
+                      productId: this.productId,
+                      ...basicModel
+                    },
+                };
+
+                const ipfsHashForData = this.pushJsonToIpfs(ipfsPayload);
+
+                const mintTokenArgs = [
+                    this.tokenID,
+                    this.model.recipient,
+                    this.productCode,
+                    ipfsHashForData
+                ];
+
+                this.drizzleInstance
+                    .contracts[this.contractName]
+                    .methods['mintToken']
+                    .cacheSend(...mintTokenArgs);
+            } else {
+                alert("Drizzle doesn't appear to be ready for transactions");
+            }
+        }
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -450,7 +503,7 @@
       return padding + number;
     }
 
-    get uniqueIdValid(): boolean {
+    get productIdValid(): boolean {
       return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
         && this.design !== '{DESIGN}' && this.tokenID !== '{TOKEN_ID}';
     }
@@ -473,6 +526,14 @@
 
     get tokenID(): string {
       return this.model.tokenId ? this.model.tokenId : '{TOKEN_ID}';
+    }
+
+    get productCode(): string {
+        return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
+    }
+
+    get productId(): string {
+        return `${this.productCode}-${this.tokenID}`;
     }
   }
 </script>
