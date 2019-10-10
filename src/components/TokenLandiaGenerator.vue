@@ -353,14 +353,22 @@
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg">Mint</b-button>
             </div>
             <div class="py-2 text-center" v-else-if="saving && !saved">
-              Minting...
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
+                <SmallSpinner />
+              </b-button>
             </div>
             <div class="py-2 text-center" v-else-if="!saving && saved">
-              Minted!
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
+                Please authorise the transaction...
+              </b-button>
             </div>
           </div>
         </div>
       </div>
+
+      <hr/>
+
+
 
     </vue-form>
   </div>
@@ -368,8 +376,13 @@
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-  import countryCodes from '../../static/country_codes.json';
   import { mapGetters } from "vuex";
+  import { Buffer } from 'buffer/';
+
+  import SmallSpinner from '@/components/SmallSpinner.vue';
+
+  import countryCodes from '../../static/country_codes.json';
+  import ipfsHttpClient from 'ipfs-http-client';
 
   interface Model {
     coo: string,
@@ -398,13 +411,19 @@
   @Component({
     computed: {
         ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
-        ...mapGetters(['contractName']),
-    }
+        ...mapGetters(['contractName', 'baseIpfsUrl']),
+    },
+    components: {
+        SmallSpinner
+    },
   })
   export default class TokenLandiaGenerator extends Vue {
     drizzleInstance: any;
     isDrizzleInitialized!: boolean;
     contractName!: string;
+    baseIpfsUrl!: string;
+
+    ipfs = ipfsHttpClient('ipfs.infura.io', '5001', { protocol: 'https' });
 
     formState: any = {};
 
@@ -438,42 +457,84 @@
 
     saved: boolean = false;
 
-    uploadImageToIpfs(): string {
-        return 'QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq';
+    // eslint-disable-next-line class-methods-use-this
+    prependPadding(number: string, maxLength: number): string {
+        let padding: string = '';
+        for (let i: number = 0; i < (maxLength - number.length); i += 1) {
+            padding += '0';
+        }
+        return padding + number;
     }
 
-    pushJsonToIpfs(json: any): string {
-        return '';
+    async uploadImageToIpfs(): Promise<String> {
+        //return `${this.baseIpfsUrl}QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
+        return `https://ipfs.globalupload.io/QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
     }
 
-    onSubmit() {
+    async pushJsonToIpfs(ipfsPayload: any): Promise<String> {
+        try {
+            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
+            const results = await this.ipfs.add(buffer, {pin: true});
+
+            if (results && Array.isArray(results) && results.length > 0) {
+                const result = results[0];
+                return result && result.hash? result.hash : 'unsuccessful';
+            }
+        } catch (e) {
+          alert(e);
+        }
+
+        return 'unsuccessful';
+    }
+
+    async onSubmit() {
         if (this.formState.$valid) {
             if (this.isDrizzleInitialized) {
-                const imageIpfsUrl = this.uploadImageToIpfs();
-                const {name, description, ...basicModel} = this.model;
+                this.saving = true;
+
+                const imageIpfsUrl = await this.uploadImageToIpfs();
+
+                const {
+                    name,
+                    description,
+                    recipient,
+                    series,
+                    design,
+                    ...basicModel
+                } = this.model;
+
+                // todo: lodash on props with falsy values
+
                 const ipfsPayload = {
                     name,
                     description,
                     image: imageIpfsUrl,
                     attributes: {
                       productId: this.productId,
-                      ...basicModel
+                      series: this.prependPadding(series, 3),
+                      design: this.prependPadding(design, 4),
+                      ...basicModel,
                     },
                 };
 
-                const ipfsHashForData = this.pushJsonToIpfs(ipfsPayload);
+                console.log(ipfsPayload);
+
+                const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
 
                 const mintTokenArgs = [
                     this.tokenID,
-                    this.model.recipient,
+                    recipient,
                     this.productCode,
-                    ipfsHashForData
+                    ipfsHashForData,
                 ];
 
                 this.drizzleInstance
                     .contracts[this.contractName]
                     .methods['mintToken']
                     .cacheSend(...mintTokenArgs);
+
+                this.saved = true;
+                this.saving = false;
             } else {
                 alert("Drizzle doesn't appear to be ready for transactions");
             }
@@ -492,15 +553,6 @@
         return 'has-danger';
       }
       return '';
-    }
-
-    // eslint-disable-next-line class-methods-use-this
-    prependPadding(number: string, maxLength: number): string {
-      let padding: string = '';
-      for (let i: number = 0; i < (maxLength - number.length); i += 1) {
-        padding += '0';
-      }
-      return padding + number;
     }
 
     get productIdValid(): boolean {

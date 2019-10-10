@@ -59,7 +59,7 @@
         <div class="col">
           <h4 class="heading">Unique Identifier: {{productId}}</h4>
           <div class="img-container">
-            <img class="img" :src="ipfsURL" alt=""/>
+            <img class="img" :src="ipfsData.image" alt=""/>
           </div>
         </div>
       </div>
@@ -73,6 +73,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { mapGetters } from "vuex";
+import axios from 'axios';
 
 import Spinner from './Spinner.vue';
 
@@ -81,13 +82,14 @@ import Spinner from './Spinner.vue';
     computed: {
         ...mapGetters('drizzle', ['isDrizzleInitialized']),
         ...mapGetters('contracts', ['getContractData']),
-        ...mapGetters(['contractName']),
+        ...mapGetters(['contractName', 'baseIpfsUrl']),
     }
 })
 export default class VerifyToken extends Vue {
   getContractData: any;
   isDrizzleInitialized!: boolean;
   contractName!: string;
+  baseIpfsUrl!: string;
 
   searching: boolean = false;
 
@@ -99,6 +101,8 @@ export default class VerifyToken extends Vue {
 
   ipfsURL: string = '';
   ipfsHash: string = '';
+  ipfsData: any;
+  ipfsDataRetrieved: boolean = false;
 
   performSearch() {
     if (this.productId.trim() !== '-') {
@@ -124,35 +128,48 @@ export default class VerifyToken extends Vue {
 
           if (ipfsUrl !== 'loading') {
               this.ipfsURL = ipfsUrl;
-              this.ipfsHash = ipfsUrl.replace('https://ipfs.globalupload.io/', '');
-              this.searching = false;
-              return true;
+              this.ipfsHash = ipfsUrl.replace(this.baseIpfsUrl, '');
+
+              axios.get(ipfsUrl).then(response => {
+                  if (response && response.status === 200) {
+                      this.ipfsData = response.data;
+                      this.ipfsDataRetrieved = true;
+                      this.searching = false;
+                  } else {
+                      alert(`Unable to retrieve IPFS data for ${this.productId.trim()}`);
+                  }
+              });
+
+              return this.ipfsDataRetrieved;
           }
       }
-      return false;
+      return this.ipfsDataRetrieved;
   }
 
   get tokenData() {
+    const {name, description, attributes} = this.ipfsData;
+
     return {
-      name: 'Shogos Sneakers',
-      description: 'Legendary Shogo puts his stamp on a classic',
+      name: name,
+      description: description,
       purchase: {
-        date: '02/09/19',
-        location: 'London',
+        date: attributes.purchase_date,
+        location: attributes.purchase_location,
       },
       customisation: {
-        date: '07/09/19',
-        location: 'Glasgow',
+        date: attributes.customisation_date,
+        location: attributes.customisation_location,
       },
-      brand: 'Nike',
-      model: 'AirMax',
-      artist: 'Shogo',
+      brand: attributes.brand,
+      model: attributes.model,
+      artist: attributes.artist,
+      assistant: attributes.artistAssistant,//todo: add this into view
       materialsUsed: [
-        'Material 1',
-        'Material 2',
-        'Material 3',
-        'Material 4',
-        'Material 5',
+          attributes.material_1,
+          attributes.material_2,
+          attributes.material_3,
+          attributes.material_4,
+          attributes.material_5,
       ],
     };
   }
