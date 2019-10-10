@@ -104,7 +104,12 @@
             ref="myVueDropzone"
             id="dropzone"
             :options="dropzoneOptions"
+            :useCustomSlot="true"
             @vdropzone-file-added="onFileAdded">
+            <div class="dropzone-custom-content">
+              <h4 class="dropzone-custom-title">Drag and drop the image</h4>
+              <div class="subtitle">...or click to select a file from your computer</div>
+            </div>
           </vue-dropzone>
         </div>
       </div>
@@ -459,12 +464,12 @@
         url: 'https://httpbin.org/post',
         thumbnailHeight: 75,
         thumbnailWidth: null,
-        maxFilesize: 1,
+        maxFilesize: 10,
         maxFiles: 1,
     };
 
-    file: any;
-    fileBuffer: any;
+    file: any = null;
+    fileBuffer: any = null;
 
     countryCodes: any = countryCodes;
 
@@ -528,6 +533,11 @@
 
     async onSubmit() {
         if (this.formState.$valid) {
+            if (!this.file && !this.fileBuffer) {
+                alert("An image has not been uploaded");
+                return;
+            }
+
             if (this.isDrizzleInitialized) {
                 this.saving = true;
 
@@ -642,6 +652,7 @@
 
   .dropzone {
     max-height: 125px !important;
+    padding-top: 8px !important;
   }
 
   @media only screen and (max-width: 1200px) {
