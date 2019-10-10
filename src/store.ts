@@ -16,6 +16,9 @@ export default new Vuex.Store({
   getters: {
     contractName: () => {
       return 'Tokenlandia';
-    }
+    },
+    baseIpfsUrl: () => {
+      return 'https://ipfs.infura.io/ipfs/';
+    },
   }
 });
