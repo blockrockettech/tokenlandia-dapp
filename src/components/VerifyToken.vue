@@ -44,6 +44,9 @@
             <p><strong>Brand:</strong> {{tokenData.brand}}</p>
             <p><strong>Model:</strong> {{tokenData.model}}</p>
             <p><strong>Artist:</strong> {{tokenData.artist}}</p>
+            <p v-if="tokenData.assistant">
+              <strong>Assistant:</strong> {{tokenData.assistant}}
+            </p>
           </div>
           <div class="mt-3">
             <span>
@@ -149,7 +152,7 @@ export default class VerifyToken extends Vue {
   get tokenData() {
     const {name, description, attributes} = this.ipfsData;
 
-    return {
+    const data: any = {
       name: name,
       description: description,
       purchase: {
@@ -163,7 +166,6 @@ export default class VerifyToken extends Vue {
       brand: attributes.brand,
       model: attributes.model,
       artist: attributes.artist,
-      assistant: attributes.artistAssistant,//todo: add this into view
       materialsUsed: [
           attributes.material_1,
           attributes.material_2,
@@ -172,6 +174,10 @@ export default class VerifyToken extends Vue {
           attributes.material_5,
       ],
     };
+
+    data['assistant'] = attributes.artistAssistant ? attributes.artistAssistant : null;
+
+    return data;
   }
 
   get productId(): string {

@@ -78,7 +78,7 @@
       <h4 class="heading">Product Information and Provenance</h4>
       <br/>
 
-      <div class="row">
+      <div class="row mb-3">
         <div class="col">
           <validate auto-label class="form-group required-field">
             <label for="name">Name</label>
@@ -95,11 +95,17 @@
           </validate>
         </div>
         <div class="col">
-          <div class="mt-3">
+          <!--<div class="mt-3">
             <b-button variant="dark">
               <font-awesome-icon icon="file-upload"/>&nbsp;Attach Image
             </b-button>
-          </div>
+          </div>-->
+          <vue-dropzone
+            ref="myVueDropzone"
+            id="dropzone"
+            :options="dropzoneOptions"
+            @vdropzone-file-added="onFileAdded">
+          </vue-dropzone>
         </div>
       </div>
 
@@ -143,14 +149,6 @@
                    id="purchDate"
                    class="form-control"
                    required v-model="model.purchase_date"/>
-
-            <!--            <date-pick-->
-            <!--              name="purchDate"-->
-            <!--              id="purchDate"-->
-            <!--              class="form-control"-->
-            <!--              v-model="model.purchDate"-->
-            <!--              :format="'YYYY-MM-DD'"-->
-            <!--            ></date-pick>-->
 
             <field-messages
               name="purchDate" show="$touched || $submitted" class="form-control-feedback">
@@ -378,6 +376,11 @@
   import { Component, Vue } from 'vue-property-decorator';
   import { mapGetters } from "vuex";
   import { Buffer } from 'buffer/';
+  import _ from 'lodash';
+
+  // @ts-ignore
+  import vue2Dropzone from 'vue2-dropzone';
+  import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
   import SmallSpinner from '@/components/SmallSpinner.vue';
 
@@ -414,7 +417,8 @@
         ...mapGetters(['contractName', 'baseIpfsUrl']),
     },
     components: {
-        SmallSpinner
+        SmallSpinner,
+        vueDropzone: vue2Dropzone
     },
   })
   export default class TokenLandiaGenerator extends Vue {
@@ -451,11 +455,35 @@
       material_5: '',
     };
 
+    dropzoneOptions: any = {
+        url: 'https://httpbin.org/post',
+        thumbnailHeight: 75,
+        thumbnailWidth: null,
+        maxFilesize: 1,
+        maxFiles: 1,
+    };
+
+    file: any;
+    fileBuffer: any;
+
     countryCodes: any = countryCodes;
 
     saving: boolean = false;
 
     saved: boolean = false;
+
+    onFileAdded(file: any) {
+        this.file = file;
+
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            // @ts-ignore
+            this.fileBuffer = Buffer.from(reader.result);
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
 
     // eslint-disable-next-line class-methods-use-this
     prependPadding(number: string, maxLength: number): string {
@@ -467,8 +495,19 @@
     }
 
     async uploadImageToIpfs(): Promise<String> {
-        //return `${this.baseIpfsUrl}QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
-        return `https://ipfs.globalupload.io/QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
+        try {
+            const results = await this.ipfs.add(this.fileBuffer, {pin: true});
+
+            if (results && Array.isArray(results) && results.length > 0) {
+                const result = results[0];
+                const hash = result && result.hash? result.hash : 'unsuccessful';
+                return `${this.baseIpfsUrl}${hash}`;
+            }
+        } catch (e) {
+            alert(e);
+        }
+        return 'unsuccessful';
+        //return `https://ipfs.globalupload.io/QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
     }
 
     async pushJsonToIpfs(ipfsPayload: any): Promise<String> {
@@ -493,6 +532,7 @@
                 this.saving = true;
 
                 const imageIpfsUrl = await this.uploadImageToIpfs();
+                // todo: check if unsuccessfull
 
                 const {
                     name,
@@ -503,7 +543,12 @@
                     ...basicModel
                 } = this.model;
 
-                // todo: lodash on props with falsy values
+                const cleanModel = _(basicModel).omitBy(_.isUndefined)
+                                                .omitBy(_.isNull)
+                                                .omitBy((value: any) => {
+                                                  return value.trim() === ''
+                                                })
+                                                .value();
 
                 const ipfsPayload = {
                     name,
@@ -513,13 +558,12 @@
                       productId: this.productId,
                       series: this.prependPadding(series, 3),
                       design: this.prependPadding(design, 4),
-                      ...basicModel,
+                      ...cleanModel,
                     },
                 };
 
-                console.log(ipfsPayload);
-
                 const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
+                // todo: check if unsuccessfull
 
                 const mintTokenArgs = [
                     this.tokenID,
@@ -594,6 +638,10 @@
   .generator-container {
     width: 70%;
     margin: 0 auto;
+  }
+
+  .dropzone {
+    max-height: 125px !important;
   }
 
   @media only screen and (max-width: 1200px) {
