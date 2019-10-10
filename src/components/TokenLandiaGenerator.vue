@@ -371,8 +371,18 @@
 
       <hr/>
 
+      <b-button v-b-toggle.collapse-raw-data variant="dark" class="btn-sm"
+                v-if="formState.$valid && file && fileBuffer">
+        View Raw IPFS Data
+      </b-button>
 
-
+      <b-collapse id="collapse-raw-data" class="mt-2 text-left">
+        <pre>
+          <code>
+            {{this.getIpfsPayload('TBC')}}
+          </code>
+        </pre>
+      </b-collapse>
     </vue-form>
   </div>
 </template>
@@ -499,36 +509,64 @@
         return padding + number;
     }
 
-    async uploadImageToIpfs(): Promise<String> {
+    async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<String> {
         try {
-            const results = await this.ipfs.add(this.fileBuffer, {pin: true});
+            const results = await this.ipfs.add(buffer, { pin: true });
 
             if (results && Array.isArray(results) && results.length > 0) {
                 const result = results[0];
-                const hash = result && result.hash? result.hash : 'unsuccessful';
-                return `${this.baseIpfsUrl}${hash}`;
+                const hash = result && result.hash ? result.hash : 'unsuccessful';
+
+                if (hash === 'unsuccessful') {
+                    alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
+                }
+
+                return hash;
             }
         } catch (e) {
-            alert(e);
+            alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
         }
+
         return 'unsuccessful';
-        //return `https://ipfs.globalupload.io/QmfHKmHcDGu1T3bg82ebs4FqC1mzgVPAjSP9nVEmh4wwgq`;
     }
 
-    async pushJsonToIpfs(ipfsPayload: any): Promise<String> {
-        try {
-            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            const results = await this.ipfs.add(buffer, {pin: true});
+    async uploadImageToIpfs(): Promise<string> {
+        return (await this.pushBufferToIpfs(this.fileBuffer, 'image')).toString();
+    }
 
-            if (results && Array.isArray(results) && results.length > 0) {
-                const result = results[0];
-                return result && result.hash? result.hash : 'unsuccessful';
-            }
-        } catch (e) {
-          alert(e);
-        }
+    async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
+        const buffer = Buffer.from(JSON.stringify(ipfsPayload));
+        return (await this.pushBufferToIpfs(buffer, 'token data')).toString();
+    }
 
-        return 'unsuccessful';
+    getIpfsPayload(imageIpfsUrl: string): any {
+        const {
+            name,
+            description,
+            recipient,
+            series,
+            design,
+            ...basicModel
+        } = this.model;
+
+        const cleanModel = _(basicModel).omitBy(_.isUndefined)
+            .omitBy(_.isNull)
+            .omitBy((value: any) => {
+                return value.trim() === ''
+            })
+            .value();
+
+        return {
+            name,
+            description,
+            image: imageIpfsUrl,
+            attributes: {
+                productId: this.productId,
+                series: this.prependPadding(series, 3),
+                design: this.prependPadding(design, 4),
+                ...cleanModel,
+            },
+        };
     }
 
     async onSubmit() {
@@ -541,43 +579,23 @@
             if (this.isDrizzleInitialized) {
                 this.saving = true;
 
-                const imageIpfsUrl = await this.uploadImageToIpfs();
-                // todo: check if unsuccessfull
+                const imageIpfsHash = await this.uploadImageToIpfs();
+                if(imageIpfsHash === 'unsuccessful') {
+                    this.saving = false;
+                    return;
+                }
 
-                const {
-                    name,
-                    description,
-                    recipient,
-                    series,
-                    design,
-                    ...basicModel
-                } = this.model;
-
-                const cleanModel = _(basicModel).omitBy(_.isUndefined)
-                                                .omitBy(_.isNull)
-                                                .omitBy((value: any) => {
-                                                  return value.trim() === ''
-                                                })
-                                                .value();
-
-                const ipfsPayload = {
-                    name,
-                    description,
-                    image: imageIpfsUrl,
-                    attributes: {
-                      productId: this.productId,
-                      series: this.prependPadding(series, 3),
-                      design: this.prependPadding(design, 4),
-                      ...cleanModel,
-                    },
-                };
-
+                const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
+                const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
                 const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
-                // todo: check if unsuccessfull
+                if(ipfsHashForData === 'unsuccessful') {
+                    this.saving = false;
+                    return;
+                }
 
                 const mintTokenArgs = [
                     this.tokenID,
-                    recipient,
+                    this.model.recipient,
                     this.productCode,
                     ipfsHashForData,
                 ];
@@ -592,6 +610,8 @@
             } else {
                 alert("Drizzle doesn't appear to be ready for transactions");
             }
+        } else {
+            alert("The form is incomplete. Please go back and complete it");
         }
     }
 
@@ -653,6 +673,10 @@
   .dropzone {
     max-height: 125px !important;
     padding-top: 8px !important;
+  }
+
+  #collapse-raw-data {
+    background-color: #ededeb;
   }
 
   @media only screen and (max-width: 1200px) {
