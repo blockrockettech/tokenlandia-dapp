@@ -284,47 +284,47 @@
         </div>
 
         <div class="col-4 col-md-4 col-xl-3 p-2">
-          <validate auto-label class="form-group required-field d-inline-block">
+          <field class="form-group">
             <label for="material2">Material 2</label>
             <input type="text"
                    name="material2"
                    id="material2"
                    class="form-control"
-                   required v-model="model.material_2"/>
-          </validate>
+                   v-model="model.material_2"/>
+          </field>
         </div>
 
         <div class="col-4 col-md-4 col-xl-3 p-2">
-          <validate auto-label class="form-group required-field d-inline-block">
+          <field class="form-group">
             <label for="material3">Material 3</label>
             <input type="text"
                    name="material3"
                    id="material3"
                    class="form-control"
-                   required v-model="model.material_3"/>
-          </validate>
+                   v-model="model.material_3"/>
+          </field>
         </div>
 
         <div class="col-4 col-md-4 col-xl-3 p-2">
-          <validate auto-label class="form-group required-field d-inline-block">
+          <field class="form-group">
             <label for="material4">Material 4</label>
             <input type="text"
                    name="material4"
                    id="material4"
                    class="form-control"
-                   required v-model="model.material_4"/>
-          </validate>
+                   v-model="model.material_4"/>
+          </field>
         </div>
 
         <div class="col-4 col-md-4 col-xl-3 p-2">
-          <validate auto-label class="form-group required-field d-inline-block">
+          <field class="form-group">
             <label for="material5">Material 5</label>
             <input type="text"
                    name="material5"
                    id="material5"
                    class="form-control"
-                   required v-model="model.material_5"/>
-          </validate>
+                   v-model="model.material_5"/>
+          </field>
         </div>
       </div>
 

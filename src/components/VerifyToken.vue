@@ -166,16 +166,16 @@ export default class VerifyToken extends Vue {
       brand: attributes.brand,
       model: attributes.model,
       artist: attributes.artist,
-      materialsUsed: [
-          attributes.material_1,
-          attributes.material_2,
-          attributes.material_3,
-          attributes.material_4,
-          attributes.material_5,
-      ],
+      materialsUsed: [],
     };
 
     data['assistant'] = attributes.artistAssistant ? attributes.artistAssistant : null;
+
+    Object.keys(attributes).forEach(key => {
+       if (key.indexOf('material') !== -1) {
+           data.materialsUsed.push(attributes[key]);
+       }
+    });
 
     return data;
   }
