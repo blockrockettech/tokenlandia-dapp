@@ -549,7 +549,8 @@
             ...basicModel
         } = this.model;
 
-        const cleanModel = _(basicModel).omitBy(_.isUndefined)
+        const cleanModel = _(basicModel)
+            .omitBy(_.isUndefined)
             .omitBy(_.isNull)
             .omitBy((value: any) => {
                 return value.trim() === ''
