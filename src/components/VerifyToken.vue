@@ -5,16 +5,16 @@
     <div class="row">
       <div class="searchContainer">
         <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
-        <input id="productId" class="long-input" type="text" v-model="productId"/>
+        <input id="productId" class="long-input" type="text" v-model="productId" :disabled="searching"/>
 
         <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
-        <input id="tokenId" class="long-input" type="text" v-model="tokenId" />
+        <input id="tokenId" class="long-input" type="text" v-model="tokenId" :disabled="searching"/>
 
         <b-button class="cta-tokenlandia ml-2" @click="performSearch">Search</b-button>
       </div>
     </div>
     <hr/>
-    <div v-if="searching">
+    <div v-if="searching && !noResultFound">
       <Spinner />
     </div>
     <div id="searchResults" v-if="results">
@@ -67,9 +67,14 @@
         </div>
       </div>
     </div>
-    <div v-else-if="!results && !searching">
+    <div v-else-if="!results && !searching && !noResultFound">
       <p v-bind:class="{ 'text-danger': this.error }">
         Please fill in one field from the search form above.
+      </p>
+    </div>
+    <div v-if="noResultFound">
+      <p class="text-info">
+        No results found
       </p>
     </div>
   </div>
@@ -99,6 +104,8 @@ export default class VerifyToken extends Vue {
   searching: boolean = false;
 
   error: boolean = false;
+
+  noResultFound: boolean = false;
 
   productId: string = '';
 
@@ -149,8 +156,10 @@ export default class VerifyToken extends Vue {
   }
 
   get results(): boolean {
+      this.noResultFound = false;
       if (this.searching && this.isDrizzleInitialized) {
           let ipfsUrl = 'loading';
+
           if (this.productId.trim() !== '') {
               ipfsUrl = this.getContractData({
                   contract: this.contractName,
@@ -164,21 +173,22 @@ export default class VerifyToken extends Vue {
                   methodArgs: [Number(this.tokenId)]
               });
 
-              if (typeof attributes !== 'string' && attributes['_ipfsUrl']) {
+              if (attributes && attributes['_ipfsUrl']) {
                   console.log(attributes);
                   ipfsUrl = attributes._ipfsUrl;
               }
-          } else {
-              alert("An unknown error has occurred whilst searching - check the search form");
           }
 
-          if (ipfsUrl !== 'loading') {
+          if (ipfsUrl && ipfsUrl !== 'loading') {
               this.ipfsURL = ipfsUrl;
               this.ipfsHash = ipfsUrl.replace(this.baseIpfsUrl, '');
 
               axios.get(ipfsUrl).then(this.processInfuraResponse);
 
               return this.ipfsDataRetrieved;
+          } else {
+              this.noResultFound = true;
+              this.searching = false;
           }
       }
       return this.ipfsDataRetrieved;

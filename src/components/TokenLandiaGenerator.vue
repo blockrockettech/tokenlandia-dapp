@@ -100,13 +100,13 @@
                 :class="fieldClassName(formState.description)">
         <label for="description" class="col-sm-3 col-form-label">Description</label>
         <div class="col-sm-9">
-          <textarea id="description"
-                    name="description"
-                    class="form-control"
-                    maxlength="300"
-                    required
-                    v-model.lazy="model.description">
-                </textarea>
+            <textarea id="description"
+                      name="description"
+                      class="form-control"
+                      maxlength="300"
+                      required
+                      v-model.lazy="model.description">
+              </textarea>
           <field-messages
             name="description" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">Description is a required field</div>
@@ -212,11 +212,16 @@
       <validate auto-label class="form-group row required-field">
         <label for="purchDate" class="col-sm-3 col-form-label">Purchase Date</label>
         <div class="col-sm-9">
-          <input type="date"
-                 name="purchDate"
-                 id="purchDate"
-                 class="form-control"
-                 required v-model="model.purchase_date"/>
+          <datepicker name="purchDate"
+                      id="purchDate"
+                      placeholder="YYYY-MM-DD"
+                      input-class="form-control"
+                      :typeable="true"
+                      :required="true"
+                      format="yyyy-MM-dd"
+                      :v-model="model.purchase_date">
+          </datepicker>
+
         <field-messages
           name="purchDate" show="$touched || $submitted" class="form-control-feedback">
           <div slot="required" class="text-danger">Purchase Date is a required field</div>
@@ -247,11 +252,15 @@
       <validate auto-label class="form-group row required-field">
         <label for="customiseDate" class="col-sm-3 col-form-label">Customisation Date</label>
         <div class="col-sm-9">
-          <input type="date"
-                 name="customiseDate"
-                 id="customiseDate"
-                 class="form-control"
-                 required v-model="model.customisation_date"/>
+          <datepicker name="customiseDate"
+                      id="customiseDate"
+                      placeholder="YYYY-MM-DD"
+                      input-class="form-control"
+                      :typeable="true"
+                      :required="true"
+                      format="yyyy-MM-dd"
+                      :v-model="model.customisation_date">
+          </datepicker>
 
           <field-messages
             name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
@@ -271,6 +280,7 @@
         <div class="col-sm-9">
           <input type="text"
                  name="material1"
+                 maxlength="40"
                  id="material1"
                  class="form-control"
                  required v-model="model.material_1"/>
@@ -288,6 +298,7 @@
         <div class="col-sm-9">
           <input type="text"
                  name="material2"
+                 maxlength="40"
                  id="material2"
                  class="form-control"
                  v-model="model.material_2"/>
@@ -299,6 +310,7 @@
         <div class="col-sm-9">
           <input type="text"
                  name="material3"
+                 maxlength="40"
                  id="material3"
                  class="form-control"
                  v-model="model.material_3"/>
@@ -310,6 +322,7 @@
         <div class="col-sm-9">
           <input type="text"
                  name="material4"
+                 maxlength="40"
                  id="material4"
                  class="form-control"
                  v-model="model.material_4"/>
@@ -320,6 +333,7 @@
         <label for="material5" class="col-sm-3 col-form-label">Material 5</label>
         <div class="col-sm-9">
           <input type="text"
+                 maxlength="40"
                  name="material5"
                  id="material5"
                  class="form-control"
@@ -400,6 +414,9 @@
   import vue2Dropzone from 'vue2-dropzone';
   import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
+  // @ts-ignore
+  import Datepicker from 'vuejs-datepicker';
+
   import SmallSpinner from '@/components/SmallSpinner.vue';
 
   import countryCodes from '../../static/country_codes.json';
@@ -436,6 +453,7 @@
     },
     components: {
         SmallSpinner,
+        Datepicker,
         vueDropzone: vue2Dropzone
     },
   })
@@ -645,7 +663,7 @@
     }
 
     get initials(): string {
-      return this.model.initials ? this.model.initials : '{INITIALS}';
+      return this.model.initials ? this.model.initials.toUpperCase() : '{INITIALS}';
     }
 
     get series(): string {
