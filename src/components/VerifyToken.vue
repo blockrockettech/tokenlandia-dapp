@@ -8,7 +8,7 @@
         <input id="productId" class="long-input" type="text" v-model="productId" :disabled="searching"/>
 
         <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
-        <input id="tokenId" class="long-input" type="text" v-model="tokenId" :disabled="searching"/>
+        <input id="tokenId" class="long-input" type="number" v-model="tokenId" :disabled="searching"/>
 
         <b-button class="cta-tokenlandia ml-2" @click="performSearch">Search</b-button>
       </div>
