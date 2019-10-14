@@ -3,7 +3,7 @@ import Vue from 'vue';
 import VueForm from 'vue-form';
 import VueMoment from 'vue-moment';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faFileUpload, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faFileUpload, faBars, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import App from './App.vue';
 import router from './router';
@@ -17,6 +17,8 @@ Vue.use(drizzleVuePlugin, { store, drizzleOptions });
 
 library.add(faFileUpload);
 library.add(faBars);
+library.add(faCheckCircle);
+library.add(faTimesCircle);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 

@@ -370,7 +370,7 @@
         <div class="col-12">
           <div class="mt-4">
             <div class="py-2 text-center" v-if="!saving && !saved">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg">Mint</b-button>
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" :disabled="isConnected">Mint</b-button>
             </div>
             <div class="py-2 text-center" v-else-if="saving && !saved">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
@@ -449,7 +449,7 @@
   @Component({
     computed: {
         ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
-        ...mapGetters(['contractName', 'baseIpfsUrl']),
+        ...mapGetters(['contractName', 'baseIpfsUrl', 'isConnected']),
     },
     components: {
         SmallSpinner,

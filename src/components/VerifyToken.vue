@@ -9,8 +9,15 @@
 
         <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
         <input id="tokenId" class=" long-input" type="number" v-model="tokenId"/>
-
-        <b-button class="cta-tokenlandia ml-2" @click="performSearch">Search</b-button>
+        <b-button class="cta-tokenlandia ml-2"
+                  @click="performSearch"
+                  v-if="!searching">
+          Search
+        </b-button>
+        <b-button class="cta-tokenlandia ml-2"
+                  v-if="searching" disabled>
+          <SmallSpinner/>
+        </b-button>
       </div>
     </div>
     <hr/>
@@ -90,21 +97,12 @@
     import axios from 'axios';
 
     import Spinner from './Spinner.vue';
+    import SmallSpinner from "@/components/SmallSpinner.vue";
 
     @Component({
-        components: {Spinner},
-        computed: {
-            ...mapGetters('drizzle', ['isDrizzleInitialized']),
-            ...mapGetters('contracts', ['getContractData']),
-            ...mapGetters(['contractName', 'baseIpfsUrl']),
-        }
+        components: {SmallSpinner, Spinner},
     })
     export default class VerifyToken extends Vue {
-        getContractData: any;
-        isDrizzleInitialized!: boolean;
-        contractName!: string;
-        baseIpfsUrl!: string;
-
         searching: boolean = false;
 
         error: boolean = false;
@@ -127,16 +125,22 @@
             this.ipfsDataRetrieved = false;
             this.error = false;
             this.searching = true;
+            this.attributes = {};
+            this.ownerOf = '';
+            this.noResultFound = false;
 
             const isProductIdSearch = this.productId.trim() !== '';
             const isTokenIdSearch = this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId));
 
             if (isProductIdSearch) {
-                this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
-                    contractName: this.contractName,
-                    method: 'tokenIdForProductId',
-                    methodArgs: [this.productId]
-                });
+                this.$store.dispatch('tokenIdForProductId', this.productId)
+                    .then((tokenId) => {
+                        this.findInformationForTokenId(tokenId);
+                    })
+                    .catch(() => {
+                        this.noResultFound = true;
+                        this.searching = false;
+                    });
             } else if (isTokenIdSearch) {
                 this.findInformationForTokenId(this.tokenId);
             }
@@ -145,17 +149,15 @@
         findInformationForTokenId(tokenId: any) {
             this.foundTokenId = tokenId;
 
-            this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
-                contractName: this.contractName,
-                method: 'attributes',
-                methodArgs: [tokenId]
-            });
-
-            this.$store.dispatch('drizzle/REGISTER_CONTRACT', {
-                contractName: this.contractName,
-                method: 'ownerOf',
-                methodArgs: [tokenId]
-            });
+            this.$store.dispatch('findInformationForTokenId', tokenId)
+                .then(({attributes, ownerOf}) => {
+                    this.attributes = attributes;
+                    this.ownerOf = ownerOf;
+                })
+                .catch(() => {
+                    this.searching = false;
+                    this.noResultFound = true;
+                });
         }
 
         processInfuraResponse(response: any) {
@@ -170,41 +172,9 @@
         }
 
         get results(): boolean {
-            this.noResultFound = false;
-            if (this.searching && this.isDrizzleInitialized) {
-
-                const isProductIdSearch = this.productId.trim() !== '';
-
-                if (isProductIdSearch) {
-                    const foundTokenId = this.getContractData({
-                        contract: this.contractName,
-                        method: 'tokenIdForProductId',
-                        methodArgs: [this.productId]
-                    });
-                    if (foundTokenId && foundTokenId !== 'loading') {
-                        this.findInformationForTokenId(foundTokenId);
-                    }
-                }
-
-                this.attributes = this.getContractData({
-                    contract: this.contractName,
-                    method: 'attributes',
-                    methodArgs: [this.tokenId]
-                });
-
-                this.ownerOf = this.getContractData({
-                    contract: this.contractName,
-                    method: 'ownerOf',
-                    methodArgs: [this.tokenId]
-                });
-
-                if (this.attributes && this.attributes !== 'loading') {
-                    this.ipfsURL = this.attributes._ipfsUrl;
-                    axios.get(this.ipfsURL).then(this.processInfuraResponse);
-                } else {
-                    this.searching = false;
-                    this.noResultFound = true;
-                }
+            if (this.searching && this.attributes) {
+                this.ipfsURL = this.attributes._ipfsUrl;
+                axios.get(this.ipfsURL).then(this.processInfuraResponse);
             }
             return this.ipfsDataRetrieved;
         }
