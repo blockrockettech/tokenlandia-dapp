@@ -1,87 +1,87 @@
 <template>
-    <div class="txt">
-        <h1 class="heading">NFT Verification</h1>
-        <hr/>
-        <div class="row">
-            <div class="searchContainer">
-                <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
-                <input id="productId" class=" long-input" type="text" v-model="productId"/>
+  <div class="txt">
+    <h1 class="heading">NFT Verification</h1>
+    <hr/>
+    <div class="row">
+      <div class="searchContainer">
+        <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
+        <input id="productId" class=" long-input" type="text" v-model="productId"/>
 
-                <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
-                <input id="tokenId" class=" long-input" type="number" v-model="tokenId"/>
+        <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
+        <input id="tokenId" class=" long-input" type="number" v-model="tokenId"/>
 
-                <b-button class="cta-tokenlandia ml-2" @click="performSearch">Search</b-button>
-            </div>
-        </div>
-        <hr/>
-        <div v-if="searching && !noResultFound">
-            <Spinner/>
-        </div>
-        <div id="searchResults" v-if="results">
-            <div class="row">
-                <div class="col text-left">
-                    <div>
-                        <p><strong>Owner:</strong> {{ownerOf}}</p>
-                    </div>
-                    <div>
-                        <p><strong>Name:</strong> {{tokenData.name}}</p>
-                    </div>
-                    <div>
-                        <p><strong>Description:</strong> {{tokenData.description}}</p>
-                    </div>
-                    <div>
-            <span class="d-inline-block dateLabel">
-              <strong>Purchase Date:</strong> {{tokenData.purchase.date}}
-            </span>
-                        <span><strong>Purchase Location:</strong> {{tokenData.purchase.location}}</span>
-                    </div>
-                    <div class="mt-1">
-            <span class="d-inline-block dateLabel">
-              <strong>Customisation Date:</strong> {{tokenData.customisation.date}}
-            </span>
-                        <span>
-              <strong>Customisation Location:</strong> {{tokenData.customisation.location}}
-            </span>
-                    </div>
-                    <div class="mt-3">
-                        <p><strong>Brand:</strong> {{tokenData.brand}}</p>
-                        <p><strong>Model:</strong> {{tokenData.model}}</p>
-                        <p><strong>Artist:</strong> {{tokenData.artist}}</p>
-                        <p v-if="tokenData.assistant">
-                            <strong>Assistant:</strong> {{tokenData.assistant}}
-                        </p>
-                    </div>
-                    <div class="mt-3">
-            <span>
-              <strong>Materials Used:</strong>
-              <ul>
-                <li v-for="(material, idx) in tokenData.materialsUsed" :key="idx">
-                  {{material}}
-                </li>
-              </ul>
-            </span>
-                    </div>
-                </div>
-                <div class="col">
-                    <h4 class="heading">Product ID: {{tokenData.productId}}</h4>
-                    <h4 class="heading">Token ID: {{foundTokenId}}</h4>
-                    <div class="img-container">
-                        <img class="img" :src="ipfsData.image" alt=""/>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div v-else-if="!results && !searching && !noResultFound">
-            <p v-bind:class="{ 'text-danger': this.error }">
-                Please fill in one field from the search form above.
-            </p>
-        </div>
-        <div v-if="noResultFound">
-            <p class="text-info">
-                No results found
-            </p>
-        </div>
+        <b-button class="cta-tokenlandia ml-2" @click="performSearch">Search</b-button>
+      </div>
     </div>
+    <hr/>
+    <div v-if="searching && !noResultFound">
+      <Spinner/>
+    </div>
+    <div id="searchResults" v-if="results">
+      <div class="row">
+        <div class="col text-left">
+          <div>
+            <p><strong>Owner:</strong> {{ownerOf}}</p>
+          </div>
+          <div>
+            <p><strong>Name:</strong> {{tokenData.name}}</p>
+          </div>
+          <div>
+            <p><strong>Description:</strong> {{tokenData.description}}</p>
+          </div>
+          <div>
+        <span class="d-inline-block dateLabel">
+          <strong>Purchase Date:</strong> {{tokenData.purchase.date}}
+        </span>
+            <span><strong>Purchase Location:</strong> {{tokenData.purchase.location}}</span>
+          </div>
+          <div class="mt-1">
+        <span class="d-inline-block dateLabel">
+          <strong>Customisation Date:</strong> {{tokenData.customisation.date}}
+        </span>
+            <span>
+          <strong>Customisation Location:</strong> {{tokenData.customisation.location}}
+        </span>
+          </div>
+          <div class="mt-3">
+            <p><strong>Brand:</strong> {{tokenData.brand}}</p>
+            <p><strong>Model:</strong> {{tokenData.model}}</p>
+            <p><strong>Artist:</strong> {{tokenData.artist}}</p>
+            <p v-if="tokenData.assistant">
+              <strong>Assistant:</strong> {{tokenData.assistant}}
+            </p>
+          </div>
+          <div class="mt-3">
+        <span>
+          <strong>Materials Used:</strong>
+          <ul>
+            <li v-for="(material, idx) in tokenData.materialsUsed" :key="idx">
+              {{material}}
+            </li>
+          </ul>
+        </span>
+          </div>
+        </div>
+        <div class="col">
+          <h4 class="heading">Product ID: {{tokenData.productId}}</h4>
+          <h4 class="heading">Token ID: {{foundTokenId}}</h4>
+          <div class="img-container">
+            <img class="img" :src="ipfsData.image" alt=""/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="!results && !searching && !noResultFound">
+      <p v-bind:class="{ 'text-danger': this.error }">
+        Please fill in one field from the search form above.
+      </p>
+    </div>
+    <div v-if="noResultFound">
+      <p class="text-info">
+        No results found
+      </p>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -244,28 +244,28 @@
 </script>
 
 <style scoped>
-    .img-container {
-        margin: 2rem 0;
-    }
+  .img-container {
+    margin: 2rem 0;
+  }
 
-    .img {
-        height: 345px;
-    }
+  .img {
+    height: 345px;
+  }
 
-    .searchLabel {
-        margin: 0.70rem;
-    }
+  .searchLabel {
+    margin: 0.70rem;
+  }
 
-    .searchContainer {
-        margin-left: auto;
-        margin-right: 2rem;
-    }
+  .searchContainer {
+    margin-left: auto;
+    margin-right: 2rem;
+  }
 
-    .long-input {
-        width: 215px;
-    }
+  .long-input {
+    width: 215px;
+  }
 
-    .dateLabel {
-        width: 265px;
-    }
+  .dateLabel {
+    width: 265px;
+  }
 </style>
