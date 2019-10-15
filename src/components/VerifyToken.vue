@@ -89,7 +89,11 @@
             </span>
           </div>
           <div class="mt-3">
-            <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">Raw IPFS data</a>
+            <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">View IPFS data</a>
+          </div>
+          <div class="mt-3">
+            <a :href="etherscanTokenLink(tokenId)" class="btn-link" target="_blank">View on
+              Etherscan</a>
           </div>
         </div>
         <div class="col">
@@ -116,6 +120,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import {mapGetters} from "vuex";
     import axios from 'axios';
 
     import Spinner from './Spinner.vue';
@@ -123,6 +128,9 @@
 
     @Component({
         components: {SmallSpinner, Spinner},
+        computed: {
+            ...mapGetters(['etherscanTokenLink']),
+        }
     })
     export default class VerifyToken extends Vue {
         searching: boolean = false;

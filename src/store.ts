@@ -42,6 +42,16 @@ export default new Vuex.Store({
       state.web3 = web3;
     },
   },
+  getters: {
+    isConnected() {
+      // @ts-ignore
+      return window.web3 !== undefined;
+    },
+    etherscanTokenLink: (state) => (tokenId: number) => {
+      const networkAddress = TokenlandiaJson.networks[state.networkId].address;
+      return `${state.etherscanBase}/token/${networkAddress}?a=${tokenId}`;
+    }
+  },
   actions: {
 
     bootstrap({dispatch}) {
@@ -229,11 +239,5 @@ export default new Vuex.Store({
       });
     },
 
-  },
-  getters: {
-    isConnected() {
-      // @ts-ignore
-      return window.web3 !== undefined;
-    }
   }
 });
