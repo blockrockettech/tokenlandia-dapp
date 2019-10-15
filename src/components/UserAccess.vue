@@ -12,9 +12,10 @@
           Use the form below to mange address which are allowed to mint tokens for TokenLandia
         </p>
 
+        <!-- Check minter access -->
         <div class="row mt-2">
           <div class="col-2">
-            <label for="ethAddress-can-mint">ETH Address:&nbsp;</label>
+            <label for="ethAddress-can-mint">ETH Address</label>
           </div>
           <div class="col-4">
             <b-form-input id="ethAddress-can-mint" type="text"
@@ -40,21 +41,22 @@
           </div>
         </div>
 
-
+        <!-- Add/remove minter access -->
         <div class="row mt-2">
           <div class="col-2">
-            <label for="ethAddress-add-remove-minter">ETH Address:&nbsp;</label>
+            <label for="ethAddress-add-remove-minter">ETH Address</label>
           </div>
           <div class="col-4">
             <b-form-input id="ethAddress-add-remove-minter" type="text"
                           v-model="addRemoveMinterEthAddress.value"
                           placeholder="0x123..."/>
           </div>
-          <div class="col-2">
+          <div class="col-4">
             <b-button class="btn-success ml-2 mr-2" @click="addMinter" :disabled="!isConnected">Add
             </b-button>
             <b-button class="btn-danger" @click="removeMinter" :disabled="!isConnected">Remove
             </b-button>
+            <txs-link :hash="addRemoveMinterEthAddress.result"></txs-link>
           </div>
         </div>
 
@@ -70,12 +72,13 @@
           Those with admin access can control who is allowed to mint tokens.
         </p>
         <p>
-          Check and add those address which are allowed to add people to the minting role
+          Add an address that can also have root access
         </p>
 
+        <!-- Check admin access -->
         <div class="row">
           <div class="col-2">
-            <label for="ethAddress-is-admin">ETH Address:&nbsp;</label>
+            <label for="ethAddress-is-admin">ETH Address</label>
           </div>
           <div class="col-4">
             <b-form-input id="ethAddress-is-admin" type="text"
@@ -101,20 +104,40 @@
           </div>
         </div>
 
+        <!-- Add admin access -->
         <div class="row mt-2">
           <div class="col-2">
-            <label for="ethAddress-add-remove-admin" class="searchLabel">ETH Address:&nbsp;</label>
+            <label for="ethAddress-add-remove-admin" class="searchLabel">ETH Address</label>
           </div>
           <div class="col-4">
             <b-form-input id="ethAddress-add-remove-admin" type="text"
-                          v-model="addRemoveAdminEthAddress.value"
+                          v-model="addAdminEthAddress.value"
                           placeholder="0x123..."/>
           </div>
-          <div class="col-2">
-            <b-button class="btn-success ml-2 mr-2" @click="addAdmin" :disabled="!isConnected">Add
+          <div class="col-4">
+            <b-button class="btn-success ml-2 mr-2" @click="addAdmin"
+                      :disabled="!isConnected">Add
             </b-button>
-            <b-button class="btn-danger" @click="removeAdmin" :disabled="!isConnected">Remove
+            <txs-link :hash="addAdminEthAddress.result"></txs-link>
+          </div>
+        </div>
+
+        <hr/>
+
+        <!-- Remove minter access -->
+        <p>
+          Once remove you will no longer be able to administer root access
+        </p>
+        <div class="row mt-2">
+          <div class="col-12">
+            <b-button class="btn-danger" @click="renounceWhitelistAdmin"
+                      :disabled="!isConnected">
+              Renounce admin access
             </b-button>
+
+            <txs-link :hash="addAdminEthAddress.result"></txs-link>
+
+            (This is non-reversible, make sure you know what you are doing!)
           </div>
         </div>
 
@@ -128,28 +151,28 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {mapGetters} from "vuex";
-    import axios from 'axios';
 
     import Spinner from './Spinner.vue';
     import SmallSpinner from "@/components/SmallSpinner.vue";
+    import TxsLink from "@/components/TxsLink.vue";
 
     interface InputModel {
         value: string,
         loading: boolean,
-        result: any
+        result?: any
     }
 
     @Component({
-        components: {SmallSpinner, Spinner},
+        components: {TxsLink, SmallSpinner, Spinner},
         computed: {
             ...mapGetters(['isConnected']),
         }
     })
     export default class UserAccess extends Vue {
-        canMintEthAddress: InputModel = {value: '', loading: false, result: null};
-        addRemoveMinterEthAddress: InputModel = {value: '', loading: false, result: null};
-        isAdminEthAddress: InputModel = {value: '', loading: false, result: null};
-        addRemoveAdminEthAddress: InputModel = {value: '', loading: false, result: null};
+        canMintEthAddress: InputModel = {value: '', loading: false};
+        addRemoveMinterEthAddress: InputModel = {value: '', loading: false};
+        isAdminEthAddress: InputModel = {value: '', loading: false};
+        addAdminEthAddress: InputModel = {value: '', loading: false};
 
         checkCanMint() {
             this.canMintEthAddress.loading = true;
@@ -160,11 +183,23 @@
         }
 
         addMinter() {
-
+            this.addRemoveMinterEthAddress.loading = true;
+            this.$store.dispatch('addWhitelisted', this.addRemoveMinterEthAddress.value)
+                .then((data) => {
+                    Vue.set(this.addRemoveMinterEthAddress, 'result', data);
+                })
+                .catch(() => this.addRemoveMinterEthAddress.result = false)
+                .finally(() => this.addRemoveMinterEthAddress.loading = false);
         }
 
         removeMinter() {
-
+            this.addRemoveMinterEthAddress.loading = true;
+            this.$store.dispatch('removeWhitelisted', this.addRemoveMinterEthAddress.value)
+                .then((data) => {
+                    Vue.set(this.addRemoveMinterEthAddress, 'result', data);
+                })
+                .catch(() => this.addRemoveMinterEthAddress.result = false)
+                .finally(() => this.addRemoveMinterEthAddress.loading = false);
         }
 
         checkIsAdmin() {
@@ -176,11 +211,17 @@
         }
 
         addAdmin() {
-
+            this.addAdminEthAddress.loading = true;
+            this.$store.dispatch('addWhitelistAdmin', this.addAdminEthAddress.value)
+                .then((data) => {
+                    Vue.set(this.addAdminEthAddress, 'result', data);
+                })
+                .catch(() => this.addAdminEthAddress.result = false)
+                .finally(() => this.addAdminEthAddress.loading = false);
         }
 
-        removeAdmin() {
-
+        renounceWhitelistAdmin() {
+            // renounceWhitelistAdmin
         }
 
     }

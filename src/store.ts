@@ -1,30 +1,144 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createLogger from 'vuex/dist/logger'
 
-const ethers = require("ethers");
+// @ts-ignore
+import * as Web3 from 'web3';
+
+const {getNetworkName} = require("@blockrocket/utils");
 const TokenlandiaJson = require("./truffleconf/token/Tokenlandia.json");
 
 Vue.use(Vuex);
 
-const ethersStaticProvider = new ethers.providers.InfuraProvider("rinkeby", "27742a31ed334a5cb63ef2560e01b621");
+let tokenLandiaContract: any = {};
+
+// const ethersStaticProvider = new ethers.providers.InfuraProvider("rinkeby", "27742a31ed334a5cb63ef2560e01b621");
 
 export default new Vuex.Store({
+  plugins: [createLogger()],
   state: {
-    tokenLandiaContract: new ethers.Contract(TokenlandiaJson.networks['4'].address, TokenlandiaJson.abi, ethersStaticProvider)
+    // Network
+    networkId: 1,
+    networkName: 'Mainnet',
+    etherscanBase: 'https://etherscan.io',
+
+    // Account
+    account: null,
+
+    // Countracts
+    web3: null,
+    tokenLandiaContract: tokenLandiaContract, /*new ethers.Contract(TokenlandiaJson.networks['4'].address, TokenlandiaJson.abi, ethersStaticProvider)*/
   },
-  mutations: {},
+  mutations: {
+    networkDetails(state, {networkId, networkName, etherscanBase}) {
+      state.networkId = networkId;
+      state.networkName = networkName;
+      state.etherscanBase = etherscanBase;
+      // @ts-ignore
+      state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
+    },
+    account(state, account) {
+      state.account = account;
+    },
+    web3(state, web3) {
+      state.web3 = web3;
+    },
+  },
   actions: {
-    checkCanMint({state, commit, dispatch}, ethAddress) {
-      try {
-        return state.tokenLandiaContract.isWhitelisted(ethAddress);
-      } catch (e) {
-        return Promise.resolve(false);
+
+    bootstrap({dispatch}) {
+      dispatch('loginWeb3');
+    },
+
+    /////////////////////////
+    // Web3 initialisation //
+    /////////////////////////
+
+    async loginWeb3({dispatch, state}, showPopup = false) {
+      if (!state.account) {
+        // @ts-ignore
+        if (window.ethereum) {
+          console.log('Init modern web3');
+          try {
+            // @ts-ignore
+            window.web3 = new Web3(ethereum);
+            console.log('in here 1');
+            // Request account access if needed
+            // @ts-ignore
+            await ethereum.enable();
+            // @ts-ignore
+            dispatch('initWeb3', window.web3);
+          } catch (error) {
+            console.log(error);
+            if (showPopup) {
+              alert('Access denied - we need access to your wallet to fully connect to the site');
+            }
+          }
+        }
+        // Legacy dapp browsers...
+        // @ts-ignore
+        else if (window.web3) {
+          console.log('Init legacy web3');
+          // @ts-ignore
+          window.web3 = new Web3(web3.currentProvider);
+          // @ts-ignore
+          dispatch('initWeb3', window.web3);
+        } else {
+          console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+          if (showPopup) {
+            alert('Unable to find web3 wallet - try installing MetaMask or Coinbase Wallet');
+          }
+        }
       }
     },
 
+    initWeb3({commit, dispatch}, web3) {
+
+      // Set the web3 instance
+      commit('web3', web3);
+
+      dispatch('getNetwork').then(() => {
+        web3.eth.getAccounts((error: any, accounts: any) => {
+          if (!error) {
+            const account = accounts[0];
+            commit('account', account);
+          } else {
+            console.log(`Error getting accounts`, error);
+          }
+        });
+      });
+    },
+
+    async getNetwork({commit, dispatch}) {
+      const networkId = await dispatch('getNetworkId');
+      const networkName = await getNetworkName(networkId);
+      const etherscanBase = await dispatch('getEtherscanAddress', networkId);
+      return commit('networkDetails', {networkId, networkName, etherscanBase});
+    },
+
+    getNetworkId({}) {
+      // @ts-ignore
+      return window.web3.eth.net.getId();
+    },
+
+    getEtherscanAddress({}, networkId) {
+      switch (networkId) {
+        case 1:
+          return 'https://etherscan.io';
+        case 4:
+          return 'https://rinkeby.etherscan.io';
+        default:
+          return '';
+      }
+    },
+
+    ////////////////////
+    // Contract calls //
+    ////////////////////
+
     tokenIdForProductId({state, commit, dispatch}, productId) {
       try {
-        return state.tokenLandiaContract.tokenIdForProductId(productId);
+        return state.tokenLandiaContract.methods.tokenIdForProductId(productId);
       } catch (e) {
         return Promise.reject(null);
       }
@@ -33,8 +147,8 @@ export default new Vuex.Store({
     findInformationForTokenId({state, commit, dispatch}, tokenId) {
       try {
         return Promise.all([
-          state.tokenLandiaContract.attributes(tokenId),
-          state.tokenLandiaContract.ownerOf(tokenId),
+          state.tokenLandiaContract.methods.attributes(tokenId),
+          state.tokenLandiaContract.methods.ownerOf(tokenId),
         ])
           .then(([attributes, ownerOf]) => {
             return {attributes, ownerOf};
@@ -46,22 +160,73 @@ export default new Vuex.Store({
 
     checkIsAdmin({state, commit, dispatch}, ethAddress) {
       try {
-        return state.tokenLandiaContract.isWhitelistAdmin(ethAddress);
+        return state.tokenLandiaContract.methods.isWhitelistAdmin(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
     },
+
+    checkCanMint({state, commit, dispatch}, ethAddress) {
+      try {
+        return state.tokenLandiaContract.methods.isWhitelisted(ethAddress).call();
+      } catch (e) {
+        return Promise.resolve(false);
+      }
+    },
+
+    addWhitelisted({state}, ethAddress) {
+      return new Promise((resolve, reject) => {
+        // @ts-ignore
+        state.tokenLandiaContract.methods.addWhitelisted(ethAddress)
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
+    },
+
+    removeWhitelisted({state}, ethAddress) {
+      return new Promise((resolve, reject) => {
+        // @ts-ignore
+        state.tokenLandiaContract.methods.removeWhitelisted(ethAddress)
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
+    },
+
+    addWhitelistAdmin({state}, ethAddress) {
+      return new Promise((resolve, reject) => {
+        // @ts-ignore
+        state.tokenLandiaContract.methods.addWhitelistAdmin(ethAddress)
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
+    },
+
+    renounceWhitelistAdmin({state}) {
+      return new Promise((resolve, reject) => {
+        // @ts-ignore
+        state.tokenLandiaContract.methods.renounceWhitelistAdmin()
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
+    },
+
   },
   getters: {
-    contractName: () => {
-      return 'Tokenlandia';
-    },
-    baseIpfsUrl: () => {
-      return 'https://ipfs.infura.io/ipfs/';
-    },
     isConnected() {
       // @ts-ignore
-      return window.web3 !== undefined && window.web3.isConnected()
+      return window.web3 !== undefined;
     }
   }
 });

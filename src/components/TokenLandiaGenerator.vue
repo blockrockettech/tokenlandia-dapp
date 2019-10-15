@@ -370,7 +370,7 @@
         <div class="col-12">
           <div class="mt-4">
             <div class="py-2 text-center" v-if="!saving && !saved">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" :disabled="isConnected">Mint</b-button>
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" :disabled="!isConnected">Mint</b-button>
             </div>
             <div class="py-2 text-center" v-else-if="saving && !saved">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
@@ -448,8 +448,8 @@
 
   @Component({
     computed: {
-        ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
-        ...mapGetters(['contractName', 'baseIpfsUrl', 'isConnected']),
+        // ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
+        // ...mapGetters(['contractName', 'baseIpfsUrl', 'isConnected']),
     },
     components: {
         SmallSpinner,
@@ -458,10 +458,10 @@
     },
   })
   export default class TokenLandiaGenerator extends Vue {
-    drizzleInstance: any;
-    isDrizzleInitialized!: boolean;
-    contractName!: string;
-    baseIpfsUrl!: string;
+    // drizzleInstance: any;
+    // isDrizzleInitialized!: boolean;
+    // contractName!: string;
+    // baseIpfsUrl!: string;
 
     ipfs = ipfsHttpClient('ipfs.infura.io', '5001', { protocol: 'https' });
 
@@ -600,40 +600,40 @@
                 return;
             }
 
-            if (this.isDrizzleInitialized) {
-                this.saving = true;
-
-                const imageIpfsHash = await this.uploadImageToIpfs();
-                if(imageIpfsHash === 'unsuccessful') {
-                    this.saving = false;
-                    return;
-                }
-
-                const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
-                const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
-                if(ipfsHashForData === 'unsuccessful') {
-                    this.saving = false;
-                    return;
-                }
-
-                const mintTokenArgs = [
-                    this.tokenID,
-                    this.model.recipient,
-                    this.productCode,
-                    ipfsHashForData,
-                ];
-
-                this.drizzleInstance
-                    .contracts[this.contractName]
-                    .methods['mintToken']
-                    .cacheSend(...mintTokenArgs);
-
-                this.saved = true;
-                this.saving = false;
-            } else {
-                alert("Drizzle doesn't appear to be ready for transactions");
-            }
+            // if (this.isDrizzleInitialized) {
+            //     this.saving = true;
+            //
+            //     const imageIpfsHash = await this.uploadImageToIpfs();
+            //     if(imageIpfsHash === 'unsuccessful') {
+            //         this.saving = false;
+            //         return;
+            //     }
+            //
+            //     const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
+            //     const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
+            //     const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
+            //     if(ipfsHashForData === 'unsuccessful') {
+            //         this.saving = false;
+            //         return;
+            //     }
+            //
+            //     const mintTokenArgs = [
+            //         this.tokenID,
+            //         this.model.recipient,
+            //         this.productCode,
+            //         ipfsHashForData,
+            //     ];
+            //
+            //     // this.drizzleInstance
+            //     //     .contracts[this.contractName]
+            //     //     .methods['mintToken']
+            //     //     .cacheSend(...mintTokenArgs);
+            //
+            //     this.saved = true;
+            //     this.saving = false;
+            // } else {
+            //     alert("Drizzle doesn't appear to be ready for transactions");
+            // }
         } else {
             alert("The form is incomplete. Please go back and complete it");
         }
