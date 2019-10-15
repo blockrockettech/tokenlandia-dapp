@@ -33,13 +33,22 @@
         <router-view class="view"/>
       </div>
     </div>
+
+    <footer class="footer pt-2">
+      <current-network></current-network>
+      Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
+    </footer>
+
   </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import CurrentNetwork from "@/components/CurrentNetwork.vue";
 
-    @Component({})
+    @Component({
+        components: {CurrentNetwork}
+    })
     export default class App extends Vue {
         collapsed: boolean = false;
 
@@ -57,6 +66,7 @@
   @import '../node_modules/bootstrap/scss/bootstrap';
   @import '../node_modules/bootstrap-vue/src/index.scss';
   @import '../node_modules/vue-date-pick/src/vueDatePick.scss';
+  @import './colours.scss';
 
   .heading {
     font-family: 'Ubuntu', sans-serif;
@@ -125,6 +135,11 @@
   #collapse-btn-container {
     position: absolute;
     margin: 1rem;
+  }
+
+  .footer {
+    min-height: 50px;
+    background: #F3B85C;
   }
 
   /* ---------------------------------------------------

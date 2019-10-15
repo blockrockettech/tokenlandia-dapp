@@ -12,9 +12,12 @@
         <span>-</span>
         <span v-bind:class="{ 'text-danger': design === '{DESIGN}' }">{{design}}</span>
         <span>-</span>
-        <span v-bind:class="{ 'text-danger': tokenID === '{TOKEN_ID}' }">{{tokenID}}</span>
+        <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
       </span>
     </h4>
+
+    productIdValid
+
     <br/>
 
     <vue-form :state="formState" @submit.prevent="onSubmit">
@@ -75,6 +78,10 @@
                class="form-control"
                required v-model="model.tokenId"/>
       </validate>
+
+      <div v-if="!productIdValid">
+        <div class="text-danger">Product ID invalid</div>
+      </div>
 
       <hr/>
       <h4 class="heading">Product Information and Provenance</h4>
@@ -149,13 +156,13 @@
       </validate>
 
       <field class="form-group row">
-        <label for="artistAssistant" class="col-sm-3 col-form-label">Assistant</label>
+        <label for="artist_assistant" class="col-sm-3 col-form-label">Assistant</label>
         <div class="col-sm-9">
           <input type="text"
-                 name="artistAssistant"
-                 id="artistAssistant"
+                 name="artist_assistant"
+                 id="artist_assistant"
                  class="form-control"
-                 v-model.lazy="model.artistAssistant"/>
+                 v-model.lazy="model.artist_assistant"/>
         </div>
       </field>
 
@@ -219,13 +226,13 @@
                       :typeable="true"
                       :required="true"
                       format="yyyy-MM-dd"
-                      :v-model="model.purchase_date">
+                      v-model="model.purchase_date">
           </datepicker>
 
-        <field-messages
-          name="purchDate" show="$touched || $submitted" class="form-control-feedback">
-          <div slot="required" class="text-danger">Purchase Date is a required field</div>
-        </field-messages>
+          <field-messages
+            name="purchDate" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">Purchase Date is a required field</div>
+          </field-messages>
         </div>
       </validate>
 
@@ -259,7 +266,7 @@
                       :typeable="true"
                       :required="true"
                       format="yyyy-MM-dd"
-                      :v-model="model.customisation_date">
+                      v-model="model.customisation_date">
           </datepicker>
 
           <field-messages
@@ -353,12 +360,15 @@
                  id="recipient"
                  class="form-control"
                  required
+                 minlength="42"
                  maxlength="42"
-                 required v-model="model.recipient"/>
-          <field-messages
-            name="recipient" show="$touched || $submitted" class="form-control-feedback">
+                 v-model="model.recipient"/>
+          <field-messages name="recipient" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
               ETH account is a required field
+            </div>
+            <div slot="minlength" class="text-danger">
+              ETH address not valid
             </div>
           </field-messages>
         </div>
@@ -369,27 +379,31 @@
       <div class="row">
         <div class="col-12">
           <div class="mt-4">
-            <div class="py-2 text-center" v-if="!saving && !saved">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" :disabled="!isConnected">Mint</b-button>
-            </div>
-            <div class="py-2 text-center" v-else-if="saving && !saved">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
-                <SmallSpinner />
+            <div class="py-2 text-center" v-if="!saving && !mintingHash">
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg"
+                        :disabled="!isConnected || !account">
+                Mint
               </b-button>
             </div>
-            <div class="py-2 text-center" v-else-if="!saving && saved">
+            <div class="py-2 text-center" v-else-if="saving && !mintingHash">
+              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
+                <SmallSpinner/>
+                Uploading data to IPFS...
+              </b-button>
+            </div>
+            <div class="py-2 text-center" v-else-if="mintingHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
                 Please authorise the transaction...
               </b-button>
             </div>
+            <txs-link :hash="mintingHash"></txs-link>
           </div>
         </div>
       </div>
 
       <hr/>
 
-      <b-button v-b-toggle.collapse-raw-data variant="dark" class="btn-sm"
-                v-if="formState.$valid && file && fileBuffer">
+      <b-button v-b-toggle.collapse-raw-data variant="dark" class="btn-sm">
         View Raw IPFS Data
       </b-button>
 
@@ -405,287 +419,284 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
-  import { mapGetters } from "vuex";
-  import { Buffer } from 'buffer/';
-  import _ from 'lodash';
+    import {Component, Vue} from 'vue-property-decorator';
+    import {mapGetters, mapState} from "vuex";
+    import {Buffer} from 'buffer/';
+    import moment from 'moment';
+    import _ from 'lodash';
 
-  // @ts-ignore
-  import vue2Dropzone from 'vue2-dropzone';
-  import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+    // @ts-ignore
+    import vue2Dropzone from 'vue2-dropzone';
+    import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
-  // @ts-ignore
-  import Datepicker from 'vuejs-datepicker';
+    // @ts-ignore
+    import Datepicker from 'vuejs-datepicker';
 
-  import SmallSpinner from '@/components/SmallSpinner.vue';
+    import SmallSpinner from '@/components/SmallSpinner.vue';
+    import TxsLink from "@/components/TxsLink.vue";
 
-  import countryCodes from '../../static/country_codes.json';
-  import ipfsHttpClient from 'ipfs-http-client';
+    import countryCodes from '../../static/country_codes.json';
+    import ipfsHttpClient from 'ipfs-http-client';
 
-  interface Model {
-    coo: string,
-    initials: string,
-    series: string,
-    design: string,
-    tokenId: string,
-    name: string,
-    description: string,
-    purchase_location: string,
-    purchase_date: string,
-    customisation_location: string,
-    customisation_date: string,
-    brand: string,
-    model: string,
-    artist: string,
-    artistAssistant: string,
-    recipient: string,
-    material_1: string,
-    material_2: string,
-    material_3: string,
-    material_4: string,
-    material_5: string,
-  }
+    interface Model {
+        coo: string,
+        initials: string,
+        series: string,
+        design: string,
+        tokenId: string,
+        name: string,
+        description: string,
+        purchase_location: string,
+        purchase_date: string,
+        customisation_location: string,
+        customisation_date: string,
+        brand: string,
+        model: string,
+        artist: string,
+        artist_assistant: string,
+        recipient: string,
+        material_1: string,
+        material_2: string,
+        material_3: string,
+        material_4: string,
+        material_5: string,
+    }
 
-  @Component({
-    computed: {
-        // ...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
-        // ...mapGetters(['contractName', 'baseIpfsUrl', 'isConnected']),
-    },
-    components: {
-        SmallSpinner,
-        Datepicker,
-        vueDropzone: vue2Dropzone
-    },
-  })
-  export default class TokenLandiaGenerator extends Vue {
-    // drizzleInstance: any;
-    // isDrizzleInitialized!: boolean;
-    // contractName!: string;
-    // baseIpfsUrl!: string;
+    @Component({
+        computed: {
+            ...mapGetters(['isConnected']),
+            ...mapState(['account']),
+        },
+        components: {
+            TxsLink,
+            SmallSpinner,
+            Datepicker,
+            vueDropzone: vue2Dropzone,
+        },
+    })
+    export default class TokenLandiaGenerator extends Vue {
+        baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
-    ipfs = ipfsHttpClient('ipfs.infura.io', '5001', { protocol: 'https' });
+        ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
 
-    formState: any = {};
+        formState: any = {};
 
-    model: Model = {
-      coo: '',
-      initials: '',
-      series: '',
-      design: '',
-      tokenId: '',
-      name: '',
-      description: '',
-      purchase_location: '',
-      purchase_date: '',
-      customisation_location: '',
-      customisation_date: '',
-      brand: '',
-      model: '',
-      artist: '',
-      artistAssistant: '',
-      recipient: '',
-      material_1: '',
-      material_2: '',
-      material_3: '',
-      material_4: '',
-      material_5: '',
-    };
-
-    dropzoneOptions: any = {
-        url: 'https://',
-        thumbnailHeight: 75,
-        thumbnailWidth: null,
-        autoProcessQueue: false,
-        maxFilesize: 10,
-        maxFiles: 1,
-        minFiles: 1,
-    };
-
-    file: any = null;
-    fileBuffer: any = null;
-
-    countryCodes: any = countryCodes;
-
-    saving: boolean = false;
-
-    saved: boolean = false;
-
-    onFileAdded(file: any) {
-        this.file = file;
-
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            // @ts-ignore
-            this.fileBuffer = Buffer.from(reader.result);
+        model: Model = {
+            coo: '',
+            initials: '',
+            series: '',
+            design: '',
+            tokenId: '',
+            name: '',
+            description: '',
+            purchase_location: '',
+            purchase_date: '',
+            customisation_location: '',
+            customisation_date: '',
+            brand: '',
+            model: '',
+            artist: '',
+            artist_assistant: '',
+            recipient: '',
+            material_1: '',
+            material_2: '',
+            material_3: '',
+            material_4: '',
+            material_5: '',
         };
 
-        reader.readAsArrayBuffer(file);
-    }
+        dropzoneOptions: any = {
+            url: 'https://',
+            thumbnailHeight: 75,
+            thumbnailWidth: null,
+            autoProcessQueue: false,
+            maxFilesize: 10,
+            maxFiles: 1,
+            minFiles: 1,
+        };
 
-    // eslint-disable-next-line class-methods-use-this
-    prependPadding(number: string, maxLength: number): string {
-        let padding: string = '';
-        for (let i: number = 0; i < (maxLength - number.length); i += 1) {
-            padding += '0';
+        file: any = null;
+        fileBuffer: any = null;
+
+        countryCodes: any = countryCodes;
+
+        mintingHash: string = '';
+        saving: boolean = false;
+
+        onFileAdded(file: any) {
+            this.file = file;
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // @ts-ignore
+                this.fileBuffer = Buffer.from(reader.result);
+            };
+            reader.readAsArrayBuffer(file);
         }
-        return padding + number;
-    }
 
-    async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<String> {
-        try {
-            const results = await this.ipfs.add(buffer, { pin: true });
+        // eslint-disable-next-line class-methods-use-this
+        prependPadding(number: string, maxLength: number): string {
+            let padding: string = '';
+            for (let i: number = 0; i < (maxLength - number.length); i += 1) {
+                padding += '0';
+            }
+            return padding + number;
+        }
 
-            if (results && Array.isArray(results) && results.length > 0) {
-                const result = results[0];
-                const hash = result && result.hash ? result.hash : 'unsuccessful';
+        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<String> {
+            try {
+                const results = await this.ipfs.add(buffer, {pin: true});
 
-                if (hash === 'unsuccessful') {
-                    alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
+                if (results && Array.isArray(results) && results.length > 0) {
+                    const result = results[0];
+                    const hash = result && result.hash ? result.hash : 'unsuccessful';
+
+                    if (hash === 'unsuccessful') {
+                        alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
+                    }
+
+                    return hash;
+                }
+            } catch (e) {
+                alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
+            }
+
+            return 'unsuccessful';
+        }
+
+        async uploadImageToIpfs(): Promise<string> {
+            return (await this.pushBufferToIpfs(this.fileBuffer, 'image')).toString();
+        }
+
+        async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
+            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
+            return (await this.pushBufferToIpfs(buffer, 'token data')).toString();
+        }
+
+        getIpfsPayload(imageIpfsUrl: string): any {
+            const {
+                name,
+                description,
+                recipient,
+                series,
+                design,
+                purchase_date,
+                customisation_date,
+                ...basicModel
+            } = this.model;
+
+            const cleanModel = _(basicModel)
+                .omitBy(_.isUndefined)
+                .omitBy(_.isNull)
+                .omitBy((value: any) => {
+                    return value.trim ? value.trim() === '' : false
+                })
+                .value();
+
+            return {
+                name,
+                description,
+                image: imageIpfsUrl,
+                attributes: {
+                    ...cleanModel,
+                    product_id: this.productId,
+                    series: this.prependPadding(series, 3),
+                    design: this.prependPadding(design, 4),
+                    purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
+                    customisation_date: moment(customisation_date).format('YYYY-MM-DD')
+                },
+            };
+        }
+
+        async onSubmit() {
+            console.log(this.formState.$error);
+            if (this.formState.$valid) {
+                if (!this.file && !this.fileBuffer) {
+                    alert("An image has not been uploaded");
+                    return;
                 }
 
-                return hash;
+                this.mintingHash = '';
+                this.saving = true;
+
+                const imageIpfsHash = await this.uploadImageToIpfs();
+                if (imageIpfsHash === 'unsuccessful') {
+                    this.saving = false;
+                    return;
+                }
+
+                const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
+                const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
+                const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
+                if (ipfsHashForData === 'unsuccessful') {
+                    this.saving = false;
+                    return;
+                }
+
+                this.$store.dispatch('mintToken', {
+                    tokenId: this.tokenId,
+                    recipient: this.model.recipient,
+                    productCode: this.productCode,
+                    ipfsHash: ipfsHashForData
+                })
+                    .then((hash) => {
+                        this.mintingHash = hash;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        this.saving = false;
+                    });
             }
-        } catch (e) {
-            alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
         }
 
-        return 'unsuccessful';
-    }
-
-    async uploadImageToIpfs(): Promise<string> {
-        return (await this.pushBufferToIpfs(this.fileBuffer, 'image')).toString();
-    }
-
-    async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
-        const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-        return (await this.pushBufferToIpfs(buffer, 'token data')).toString();
-    }
-
-    getIpfsPayload(imageIpfsUrl: string): any {
-        const {
-            name,
-            description,
-            recipient,
-            series,
-            design,
-            ...basicModel
-        } = this.model;
-
-        const cleanModel = _(basicModel)
-            .omitBy(_.isUndefined)
-            .omitBy(_.isNull)
-            .omitBy((value: any) => {
-                return value.trim() === ''
-            })
-            .value();
-
-        return {
-            name,
-            description,
-            image: imageIpfsUrl,
-            attributes: {
-                productId: this.productId,
-                series: this.prependPadding(series, 3),
-                design: this.prependPadding(design, 4),
-                ...cleanModel,
-            },
-        };
-    }
-
-    async onSubmit() {
-        if (this.formState.$valid) {
-            if (!this.file && !this.fileBuffer) {
-                alert("An image has not been uploaded");
-                return;
+        // eslint-disable-next-line class-methods-use-this
+        fieldClassName(field: any): string {
+            if (!field) {
+                return '';
             }
+            if ((field.$touched || field.$submitted) && field.$valid) {
+                return 'has-success';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+                return 'has-danger';
+            }
+            return '';
+        }
 
-            // if (this.isDrizzleInitialized) {
-            //     this.saving = true;
-            //
-            //     const imageIpfsHash = await this.uploadImageToIpfs();
-            //     if(imageIpfsHash === 'unsuccessful') {
-            //         this.saving = false;
-            //         return;
-            //     }
-            //
-            //     const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
-            //     const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-            //     const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
-            //     if(ipfsHashForData === 'unsuccessful') {
-            //         this.saving = false;
-            //         return;
-            //     }
-            //
-            //     const mintTokenArgs = [
-            //         this.tokenID,
-            //         this.model.recipient,
-            //         this.productCode,
-            //         ipfsHashForData,
-            //     ];
-            //
-            //     // this.drizzleInstance
-            //     //     .contracts[this.contractName]
-            //     //     .methods['mintToken']
-            //     //     .cacheSend(...mintTokenArgs);
-            //
-            //     this.saved = true;
-            //     this.saving = false;
-            // } else {
-            //     alert("Drizzle doesn't appear to be ready for transactions");
-            // }
-        } else {
-            alert("The form is incomplete. Please go back and complete it");
+        get productIdValid(): boolean {
+            return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
+                && this.design !== '{DESIGN}' && this.tokenId !== '{TOKEN_ID}';
+        }
+
+        get coo(): string {
+            return this.model.coo ? this.model.coo : '{COO}';
+        }
+
+        get initials(): string {
+            return this.model.initials ? this.model.initials.toUpperCase() : '{INITIALS}';
+        }
+
+        get series(): string {
+            return this.model.series ? this.prependPadding(this.model.series, 3) : '{SERIES}';
+        }
+
+        get design(): string {
+            return this.model.design ? this.prependPadding(this.model.design, 4) : '{DESIGN}';
+        }
+
+        get tokenId(): string {
+            return this.model.tokenId ? this.model.tokenId : '{TOKEN_ID}';
+        }
+
+        get productCode(): string {
+            return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
+        }
+
+        get productId(): string {
+            return `${this.productCode}-${this.tokenId}`;
         }
     }
-
-    // eslint-disable-next-line class-methods-use-this
-    fieldClassName(field: any): string {
-      if (!field) {
-        return '';
-      }
-      if ((field.$touched || field.$submitted) && field.$valid) {
-        return 'has-success';
-      }
-      if ((field.$touched || field.$submitted) && field.$invalid) {
-        return 'has-danger';
-      }
-      return '';
-    }
-
-    get productIdValid(): boolean {
-      return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
-        && this.design !== '{DESIGN}' && this.tokenID !== '{TOKEN_ID}';
-    }
-
-    get coo(): string {
-      return this.model.coo ? this.model.coo : '{COO}';
-    }
-
-    get initials(): string {
-      return this.model.initials ? this.model.initials.toUpperCase() : '{INITIALS}';
-    }
-
-    get series(): string {
-      return this.model.series ? this.prependPadding(this.model.series, 3) : '{SERIES}';
-    }
-
-    get design(): string {
-      return this.model.design ? this.prependPadding(this.model.design, 4) : '{DESIGN}';
-    }
-
-    get tokenID(): string {
-      return this.model.tokenId ? this.model.tokenId : '{TOKEN_ID}';
-    }
-
-    get productCode(): string {
-        return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
-    }
-
-    get productId(): string {
-        return `${this.productCode}-${this.tokenID}`;
-    }
-  }
 </script>
 
 <style scoped>

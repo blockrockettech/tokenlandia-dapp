@@ -25,7 +25,8 @@
           <div class="col-2">
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkCanMint"
-                      v-if="!canMintEthAddress.loading">
+                      v-if="!canMintEthAddress.loading"
+                      :disabled="canMintEthAddress.value.length < 42">
               Can mint?
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
@@ -52,9 +53,15 @@
                           placeholder="0x123..."/>
           </div>
           <div class="col-4">
-            <b-button class="btn-success ml-2 mr-2" @click="addMinter" :disabled="!isConnected">Add
+            <b-button class="btn-success ml-2 mr-2"
+                      @click="addMinter"
+                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+              Add
             </b-button>
-            <b-button class="btn-danger" @click="removeMinter" :disabled="!isConnected">Remove
+            <b-button class="btn-danger"
+                      @click="removeMinter"
+                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+              Remove
             </b-button>
             <txs-link :hash="addRemoveMinterEthAddress.result"></txs-link>
           </div>
@@ -88,7 +95,8 @@
           <div class="col-2">
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkIsAdmin"
-                      v-if="!isAdminEthAddress.loading">
+                      v-if="!isAdminEthAddress.loading"
+                      :disabled="isAdminEthAddress.value.length < 42">
               Is admin?
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
@@ -115,8 +123,9 @@
                           placeholder="0x123..."/>
           </div>
           <div class="col-4">
-            <b-button class="btn-success ml-2 mr-2" @click="addAdmin"
-                      :disabled="!isConnected">Add
+            <b-button class="btn-success ml-2 mr-2"
+                      @click="addAdmin"
+                      :disabled="!(isConnected && addAdminEthAddress.value)">Add
             </b-button>
             <txs-link :hash="addAdminEthAddress.result"></txs-link>
           </div>
@@ -131,13 +140,12 @@
         <div class="row mt-2">
           <div class="col-12">
             <b-button class="btn-danger" @click="renounceWhitelistAdmin"
-                      :disabled="!isConnected">
+                      :disabled="!isConnected || !account">
               Renounce admin access
             </b-button>
-
-            <txs-link :hash="addAdminEthAddress.result"></txs-link>
-
-            (This is non-reversible, make sure you know what you are doing!)
+            <span
+              class="ml-2">(This is non-reversible, make sure you know what you are doing!)</span>
+            <txs-link :hash="renounceAdminHash"></txs-link>
           </div>
         </div>
 
@@ -150,7 +158,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {mapGetters} from "vuex";
+    import {mapGetters, mapState} from "vuex";
 
     import Spinner from './Spinner.vue';
     import SmallSpinner from "@/components/SmallSpinner.vue";
@@ -166,6 +174,7 @@
         components: {TxsLink, SmallSpinner, Spinner},
         computed: {
             ...mapGetters(['isConnected']),
+            ...mapState(['account']),
         }
     })
     export default class UserAccess extends Vue {
@@ -173,6 +182,7 @@
         addRemoveMinterEthAddress: InputModel = {value: '', loading: false};
         isAdminEthAddress: InputModel = {value: '', loading: false};
         addAdminEthAddress: InputModel = {value: '', loading: false};
+        renounceAdminHash: string = '';
 
         checkCanMint() {
             this.canMintEthAddress.loading = true;
@@ -221,7 +231,9 @@
         }
 
         renounceWhitelistAdmin() {
-            // renounceWhitelistAdmin
+            this.renounceAdminHash = '';
+            this.$store.dispatch('renounceWhitelistAdmin')
+                .then((data) => this.renounceAdminHash = data);
         }
 
     }

@@ -17,8 +17,7 @@
           </b-input-group>
 
           <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0">
-            <b-input id="inline-form-input-username"
-                     placeholder="1..."
+            <b-input placeholder="1..."
                      v-model="tokenId">
             </b-input>
           </b-input-group>
@@ -26,7 +25,7 @@
           <b-button class="cta-tokenlandia ml-2"
                     @click="performSearch"
                     v-if="!searching"
-          :disabled="!tokenId && !productId">
+                    :disabled="!tokenId && !productId">
             Search
           </b-button>
 
@@ -44,6 +43,7 @@
     <div v-if="searching && !noResultFound">
       <Spinner/>
     </div>
+
     <div id="searchResults" v-if="results">
       <div class="row">
         <div class="col text-left">
@@ -79,14 +79,17 @@
             </p>
           </div>
           <div class="mt-3">
-        <span>
-          <strong>Materials Used:</strong>
-          <ul>
-            <li v-for="(material, idx) in tokenData.materialsUsed" :key="idx">
-              {{material}}
-            </li>
-          </ul>
-        </span>
+            <span>
+              <strong>Materials Used:</strong>
+              <ul>
+                <li v-for="(material, idx) in tokenData.materialsUsed" :key="idx">
+                  {{material}}
+                </li>
+              </ul>
+            </span>
+          </div>
+          <div class="mt-3">
+            <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">Raw IPFS data</a>
           </div>
         </div>
         <div class="col">
@@ -99,7 +102,7 @@
       </div>
     </div>
     <div v-else-if="!results && !searching && !noResultFound">
-      <p v-bind:class="{ 'text-danger': this.error }">
+      <p>
         Please fill in one field from the search form above.
       </p>
     </div>
@@ -113,7 +116,6 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {mapGetters} from "vuex";
     import axios from 'axios';
 
     import Spinner from './Spinner.vue';
@@ -124,26 +126,20 @@
     })
     export default class VerifyToken extends Vue {
         searching: boolean = false;
-
-        error: boolean = false;
-
         noResultFound: boolean = false;
 
         productId: string = '';
-
         tokenId: string = '';
         foundTokenId: string = '';
 
         attributes: any = {};
         ownerOf: string = '';
 
-        ipfsURL: string = '';
         ipfsData: any = {};
         ipfsDataRetrieved: boolean = false;
 
         performSearch() {
             this.ipfsDataRetrieved = false;
-            this.error = false;
             this.searching = true;
             this.attributes = {};
             this.ownerOf = '';
@@ -168,7 +164,6 @@
 
         findInformationForTokenId(tokenId: any) {
             this.foundTokenId = tokenId;
-
             this.$store.dispatch('findInformationForTokenId', tokenId)
                 .then(({attributes, ownerOf}) => {
                     this.attributes = attributes;
@@ -180,21 +175,18 @@
                 });
         }
 
-        processInfuraResponse(response: any) {
-            if (response && response.status === 200) {
-                console.log(response);
-                this.ipfsData = response.data;
-                this.ipfsDataRetrieved = true;
-                this.searching = false;
-            } else {
-                alert(`Unable to retrieve IPFS data for ${this.productId.trim()}`);
-            }
-        }
-
         get results(): boolean {
-            if (this.searching && this.attributes) {
-                this.ipfsURL = this.attributes._ipfsUrl;
-                axios.get(this.ipfsURL).then(this.processInfuraResponse);
+            if (this.searching && this.attributes && this.attributes._ipfsUrl) {
+                axios.get(this.attributes._ipfsUrl)
+                    .then((response: any) => {
+                        if (response && response.status === 200) {
+                            this.ipfsData = response.data;
+                            this.ipfsDataRetrieved = true;
+                            this.searching = false;
+                        } else {
+                            alert(`Unable to retrieve IPFS data for ${this.productId.trim()}`);
+                        }
+                    });
             }
             return this.ipfsDataRetrieved;
         }
@@ -205,7 +197,7 @@
             const data: any = {
                 name: name,
                 description: description,
-                productId: attributes.productId,
+                productId: attributes.product_id,
                 purchase: {
                     date: attributes.purchase_date,
                     location: attributes.purchase_location,
@@ -220,7 +212,7 @@
                 materialsUsed: [],
             };
 
-            data['assistant'] = attributes.artistAssistant ? attributes.artistAssistant : null;
+            data['assistant'] = attributes.artist_assistant ? attributes.artist_assistant : null;
 
             Object.keys(attributes).forEach(key => {
                 if (key.indexOf('material') !== -1) {

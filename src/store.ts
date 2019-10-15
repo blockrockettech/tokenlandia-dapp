@@ -12,8 +12,6 @@ Vue.use(Vuex);
 
 let tokenLandiaContract: any = {};
 
-// const ethersStaticProvider = new ethers.providers.InfuraProvider("rinkeby", "27742a31ed334a5cb63ef2560e01b621");
-
 export default new Vuex.Store({
   plugins: [createLogger()],
   state: {
@@ -27,7 +25,7 @@ export default new Vuex.Store({
 
     // Countracts
     web3: null,
-    tokenLandiaContract: tokenLandiaContract, /*new ethers.Contract(TokenlandiaJson.networks['4'].address, TokenlandiaJson.abi, ethersStaticProvider)*/
+    tokenLandiaContract: tokenLandiaContract,
   },
   mutations: {
     networkDetails(state, {networkId, networkName, etherscanBase}) {
@@ -54,7 +52,7 @@ export default new Vuex.Store({
     // Web3 initialisation //
     /////////////////////////
 
-    async loginWeb3({dispatch, state}, showPopup = false) {
+    async loginWeb3({dispatch, state}) {
       if (!state.account) {
         // @ts-ignore
         if (window.ethereum) {
@@ -70,9 +68,8 @@ export default new Vuex.Store({
             dispatch('initWeb3', window.web3);
           } catch (error) {
             console.log(error);
-            if (showPopup) {
-              alert('Access denied - we need access to your wallet to fully connect to the site');
-            }
+            alert('Access denied - we need access to your wallet to fully connect to the site');
+            dispatch('setupStaticWeb')
           }
         }
         // Legacy dapp browsers...
@@ -85,16 +82,12 @@ export default new Vuex.Store({
           dispatch('initWeb3', window.web3);
         } else {
           console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-          if (showPopup) {
-            alert('Unable to find web3 wallet - try installing MetaMask or Coinbase Wallet');
-          }
+          dispatch('setupStaticWebs')
         }
       }
     },
 
     initWeb3({commit, dispatch}, web3) {
-
-      // Set the web3 instance
       commit('web3', web3);
 
       dispatch('getNetwork').then(() => {
@@ -109,6 +102,13 @@ export default new Vuex.Store({
       });
     },
 
+    setupStaticWebs({dispatch, commit}) {
+      console.log(`No web3 provider found, defaulting to static web3 instance`);
+      const web3 = new Web3(new Web3.providers.HttpProvider(`https://rinkeby.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
+      commit('web3', web3);
+      dispatch('getNetwork');
+    },
+
     async getNetwork({commit, dispatch}) {
       const networkId = await dispatch('getNetworkId');
       const networkName = await getNetworkName(networkId);
@@ -116,9 +116,9 @@ export default new Vuex.Store({
       return commit('networkDetails', {networkId, networkName, etherscanBase});
     },
 
-    getNetworkId({}) {
+    getNetworkId({state}) {
       // @ts-ignore
-      return window.web3.eth.net.getId();
+      return state.web3.eth.net.getId();
     },
 
     getEtherscanAddress({}, networkId) {
@@ -136,19 +136,19 @@ export default new Vuex.Store({
     // Contract calls //
     ////////////////////
 
-    tokenIdForProductId({state, commit, dispatch}, productId) {
+    tokenIdForProductId({state}, productId) {
       try {
-        return state.tokenLandiaContract.methods.tokenIdForProductId(productId);
+        return state.tokenLandiaContract.methods.tokenIdForProductId(productId).call();
       } catch (e) {
         return Promise.reject(null);
       }
     },
 
-    findInformationForTokenId({state, commit, dispatch}, tokenId) {
+    findInformationForTokenId({state}, tokenId) {
       try {
         return Promise.all([
-          state.tokenLandiaContract.methods.attributes(tokenId),
-          state.tokenLandiaContract.methods.ownerOf(tokenId),
+          state.tokenLandiaContract.methods.attributes(tokenId).call(),
+          state.tokenLandiaContract.methods.ownerOf(tokenId).call(),
         ])
           .then(([attributes, ownerOf]) => {
             return {attributes, ownerOf};
@@ -156,6 +156,17 @@ export default new Vuex.Store({
       } catch (e) {
         return Promise.reject(false);
       }
+    },
+
+    mintToken({state}, {tokenId, recipient, productCode, ipfsHash}) {
+      return new Promise((resolve, reject) => {
+        state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
     },
 
     checkIsAdmin({state, commit, dispatch}, ethAddress) {
@@ -176,7 +187,6 @@ export default new Vuex.Store({
 
     addWhitelisted({state}, ethAddress) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
         state.tokenLandiaContract.methods.addWhitelisted(ethAddress)
           .send({
             from: state.account
@@ -188,7 +198,6 @@ export default new Vuex.Store({
 
     removeWhitelisted({state}, ethAddress) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
         state.tokenLandiaContract.methods.removeWhitelisted(ethAddress)
           .send({
             from: state.account
@@ -200,7 +209,6 @@ export default new Vuex.Store({
 
     addWhitelistAdmin({state}, ethAddress) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
         state.tokenLandiaContract.methods.addWhitelistAdmin(ethAddress)
           .send({
             from: state.account
@@ -212,7 +220,6 @@ export default new Vuex.Store({
 
     renounceWhitelistAdmin({state}) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
         state.tokenLandiaContract.methods.renounceWhitelistAdmin()
           .send({
             from: state.account
