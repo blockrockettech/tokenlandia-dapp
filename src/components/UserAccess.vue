@@ -12,34 +12,51 @@
           Use the form below to mange address which are allowed to mint tokens for TokenLandia
         </p>
 
-        <p>
-          <label for="ethAddress-can-mint">ETH Address:&nbsp;</label>
-          <input id="ethAddress-can-mint" type="text"
-                 v-model="canMintEthAddress.value"/>
-          <b-button class="cta-tokenlandia ml-2"
-                    @click="checkCanMint"
-                    v-if="!canMintEthAddress.loading">
-            Can mint?
-          </b-button>
-          <b-button class="cta-tokenlandia ml-2"
-                    v-if="canMintEthAddress.loading" disabled>
-            <SmallSpinner/>
-          </b-button>
-          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
-                             v-if="!canMintEthAddress.loading && canMintEthAddress.result === true">
-          </font-awesome-icon>
-          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
-                             v-if="!canMintEthAddress.loading && canMintEthAddress.result === false">
-          </font-awesome-icon>
-        </p>
+        <div class="row mt-2">
+          <div class="col-2">
+            <label for="ethAddress-can-mint">ETH Address:&nbsp;</label>
+          </div>
+          <div class="col-4">
+            <b-form-input id="ethAddress-can-mint" type="text"
+                          v-model="canMintEthAddress.value"
+                          placeholder="0x123..."/>
+          </div>
+          <div class="col-2">
+            <b-button class="cta-tokenlandia ml-2"
+                      @click="checkCanMint"
+                      v-if="!canMintEthAddress.loading">
+              Can mint?
+            </b-button>
+            <b-button class="cta-tokenlandia ml-2"
+                      v-if="canMintEthAddress.loading" disabled>
+              <SmallSpinner/>
+            </b-button>
+            <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
+                               v-if="!canMintEthAddress.loading && canMintEthAddress.result === true">
+            </font-awesome-icon>
+            <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
+                               v-if="!canMintEthAddress.loading && canMintEthAddress.result === false">
+            </font-awesome-icon>
+          </div>
+        </div>
 
-        <p>
-          <label for="ethAddress-add-remove-minter">ETH Address:&nbsp;</label>
-          <input id="ethAddress-add-remove-minter" type="text"
-                 v-model="addRemoveMinterEthAddress.value"/>
-          <b-button class="btn-success ml-2 mr-2" @click="addMinter" :disabled="!isConnected">Add</b-button>
-          <b-button class="btn-danger" @click="removeMinter" :disabled="!isConnected">Remove</b-button>
-        </p>
+
+        <div class="row mt-2">
+          <div class="col-2">
+            <label for="ethAddress-add-remove-minter">ETH Address:&nbsp;</label>
+          </div>
+          <div class="col-4">
+            <b-form-input id="ethAddress-add-remove-minter" type="text"
+                          v-model="addRemoveMinterEthAddress.value"
+                          placeholder="0x123..."/>
+          </div>
+          <div class="col-2">
+            <b-button class="btn-success ml-2 mr-2" @click="addMinter" :disabled="!isConnected">Add
+            </b-button>
+            <b-button class="btn-danger" @click="removeMinter" :disabled="!isConnected">Remove
+            </b-button>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -56,34 +73,51 @@
           Check and add those address which are allowed to add people to the minting role
         </p>
 
-        <p>
-          <label for="ethAddress-is-admin">ETH Address:&nbsp;</label>
-          <input id="ethAddress-is-admin" class="long-input" type="text"
-                 v-model="isAdminEthAddress.value"/>
-          <b-button class="cta-tokenlandia ml-2"
-                    @click="checkIsAdmin"
-                    v-if="!isAdminEthAddress.loading">
-            Is admin?
-          </b-button>
-          <b-button class="cta-tokenlandia ml-2"
-                    v-if="isAdminEthAddress.loading" disabled>
-            <SmallSpinner/>
-          </b-button>
-          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
-                             v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === true">
-          </font-awesome-icon>
-          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
-                             v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === false">
-          </font-awesome-icon>
-        </p>
+        <div class="row">
+          <div class="col-2">
+            <label for="ethAddress-is-admin">ETH Address:&nbsp;</label>
+          </div>
+          <div class="col-4">
+            <b-form-input id="ethAddress-is-admin" type="text"
+                          v-model="isAdminEthAddress.value"
+                          placeholder="0x123..."/>
+          </div>
+          <div class="col-2">
+            <b-button class="cta-tokenlandia ml-2"
+                      @click="checkIsAdmin"
+                      v-if="!isAdminEthAddress.loading">
+              Is admin?
+            </b-button>
+            <b-button class="cta-tokenlandia ml-2"
+                      v-if="isAdminEthAddress.loading" disabled>
+              <SmallSpinner/>
+            </b-button>
+            <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
+                               v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === true">
+            </font-awesome-icon>
+            <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
+                               v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === false">
+            </font-awesome-icon>
+          </div>
+        </div>
 
-        <p>
-          <label for="ethAddress-add-remove-admin" class="searchLabel">ETH Address:&nbsp;</label>
-          <input id="ethAddress-add-remove-admin" class=" long-input" type="text"
-                 v-model="addRemoveAdminEthAddress.value"/>
-          <b-button class="btn-success ml-2 mr-2" @click="addAdmin" :disabled="!isConnected">Add</b-button>
-          <b-button class="btn-danger" @click="removeAdmin" :disabled="!isConnected">Remove</b-button>
-        </p>
+        <div class="row mt-2">
+          <div class="col-2">
+            <label for="ethAddress-add-remove-admin" class="searchLabel">ETH Address:&nbsp;</label>
+          </div>
+          <div class="col-4">
+            <b-form-input id="ethAddress-add-remove-admin" type="text"
+                          v-model="addRemoveAdminEthAddress.value"
+                          placeholder="0x123..."/>
+          </div>
+          <div class="col-2">
+            <b-button class="btn-success ml-2 mr-2" @click="addAdmin" :disabled="!isConnected">Add
+            </b-button>
+            <b-button class="btn-danger" @click="removeAdmin" :disabled="!isConnected">Remove
+            </b-button>
+          </div>
+        </div>
+
       </div>
     </div>
     <hr/>

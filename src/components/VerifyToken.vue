@@ -3,24 +3,44 @@
     <h1 class="heading">NFT Verification</h1>
     <hr/>
     <div class="row">
-      <div class="searchContainer">
-        <label for="productId" class="searchLabel">Product ID:&nbsp;</label>
-        <input id="productId" class=" long-input" type="text" v-model="productId"/>
+      <div class="col">
 
-        <label for="tokenId" class="searchLabel">Token ID:&nbsp;</label>
-        <input id="tokenId" class=" long-input" type="number" v-model="tokenId"/>
-        <b-button class="cta-tokenlandia ml-2"
-                  @click="performSearch"
-                  v-if="!searching">
-          Search
-        </b-button>
-        <b-button class="cta-tokenlandia ml-2"
-                  v-if="searching" disabled>
-          <SmallSpinner/>
-        </b-button>
+        <b-form inline>
+
+          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0">
+            <b-input
+              id="productId"
+              class="mb-2 mr-sm-2 mb-sm-0"
+              placeholder="ABC-001..."
+              v-model="productId"
+            ></b-input>
+          </b-input-group>
+
+          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0">
+            <b-input id="inline-form-input-username"
+                     placeholder="1..."
+                     v-model="tokenId">
+            </b-input>
+          </b-input-group>
+
+          <b-button class="cta-tokenlandia ml-2"
+                    @click="performSearch"
+                    v-if="!searching"
+          :disabled="!tokenId && !productId">
+            Search
+          </b-button>
+
+          <b-button class="cta-tokenlandia ml-2"
+                    v-if="searching" disabled>
+            <SmallSpinner/>
+          </b-button>
+
+        </b-form>
       </div>
     </div>
+
     <hr/>
+
     <div v-if="searching && !noResultFound">
       <Spinner/>
     </div>
@@ -224,11 +244,6 @@
 
   .searchLabel {
     margin: 0.70rem;
-  }
-
-  .searchContainer {
-    margin-left: auto;
-    margin-right: 2rem;
   }
 
   .long-input {
