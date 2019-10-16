@@ -363,7 +363,8 @@
                  minlength="42"
                  maxlength="42"
                  v-model="model.recipient"/>
-          <field-messages name="recipient" show="$touched || $submitted" class="form-control-feedback">
+          <field-messages name="recipient" show="$touched || $submitted"
+                          class="form-control-feedback">
             <div slot="required" class="text-danger">
               ETH account is a required field
             </div>
@@ -379,41 +380,44 @@
       <div class="row">
         <div class="col-12">
           <div class="mt-4">
-            <div class="py-2 text-center" v-if="!saving && !mintingHash">
+            <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg"
                         :disabled="!isConnected || !account">
                 Mint
               </b-button>
             </div>
-            <div class="py-2 text-center" v-else-if="saving && !mintingHash">
+            <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
                 <SmallSpinner/>
                 Uploading data to IPFS...
               </b-button>
             </div>
-            <div class="py-2 text-center" v-else-if="mintingHash">
+            <div class="py-2 text-center" v-else-if="mintingTransactionHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
                 Please authorise the transaction...
               </b-button>
             </div>
-            <txs-link :hash="mintingHash"></txs-link>
+            <txs-link :hash="mintingTransactionHash"></txs-link>
           </div>
         </div>
       </div>
 
       <hr/>
 
-      <b-button v-b-toggle.collapse-raw-data variant="dark" class="btn-sm">
-        View Raw IPFS Data
-      </b-button>
-
-      <b-collapse id="collapse-raw-data" class="mt-2 text-left">
-        <pre>
-          <code>
-            {{this.getIpfsPayload('TBC')}}
-          </code>
-        </pre>
-      </b-collapse>
+      <div class="row">
+        <div class="col">
+          <a class="btn btn-link text-muted collapse-raw-link" v-b-toggle.collapse-raw-data>Raw IPFS
+            Data</a>
+          <b-collapse id="collapse-raw-data" class="text-left">
+            <pre>{{this.getIpfsPayload('TBC')}}</pre>
+          </b-collapse>
+        </div>
+        <div class="col">
+          <a class="btn btn-link text-muted"
+             v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
+             :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
+        </div>
+      </div>
     </vue-form>
   </div>
 </template>
@@ -520,7 +524,8 @@
 
         countryCodes: any = countryCodes;
 
-        mintingHash: string = '';
+        mintingTransactionHash: string = '';
+        ipfsDataHash: string = '';
         saving: boolean = false;
 
         onFileAdded(file: any) {
@@ -542,7 +547,7 @@
             return padding + number;
         }
 
-        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<String> {
+        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
             try {
                 const results = await this.ipfs.add(buffer, {pin: true});
 
@@ -564,12 +569,12 @@
         }
 
         async uploadImageToIpfs(): Promise<string> {
-            return (await this.pushBufferToIpfs(this.fileBuffer, 'image')).toString();
+            return this.pushBufferToIpfs(this.fileBuffer, 'image');
         }
 
         async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
             const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            return (await this.pushBufferToIpfs(buffer, 'token data')).toString();
+            return this.pushBufferToIpfs(buffer, 'token data');
         }
 
         getIpfsPayload(imageIpfsUrl: string): any {
@@ -615,7 +620,7 @@
                     return;
                 }
 
-                this.mintingHash = '';
+                this.mintingTransactionHash = '';
                 this.saving = true;
 
                 const imageIpfsHash = await this.uploadImageToIpfs();
@@ -626,8 +631,8 @@
 
                 const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
                 const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                const ipfsHashForData = await this.pushJsonToIpfs(ipfsPayload);
-                if (ipfsHashForData === 'unsuccessful') {
+                this.ipfsDataHash = await this.pushJsonToIpfs(ipfsPayload);
+                if (this.ipfsDataHash === 'unsuccessful') {
                     this.saving = false;
                     return;
                 }
@@ -636,10 +641,10 @@
                     tokenId: this.tokenId,
                     recipient: this.model.recipient,
                     productCode: this.productCode,
-                    ipfsHash: ipfsHashForData
+                    ipfsHash: this.ipfsDataHash
                 })
                     .then((hash) => {
-                        this.mintingHash = hash;
+                        this.mintingTransactionHash = hash;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -712,6 +717,11 @@
 
   #collapse-raw-data {
     background-color: #ededeb;
+  }
+
+  #collapse-raw-link {
+    background-color: #ededeb;
+    cursor: pointer;
   }
 
   @media only screen and (max-width: 1200px) {

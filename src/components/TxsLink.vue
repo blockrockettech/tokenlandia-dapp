@@ -1,6 +1,6 @@
 <template>
     <span v-if="hash">
-        <button class="btn btn-link text-muted" @click="visitLink">[View TXS]</button>
+        <button class="btn btn-link text-muted" @click="visitLink">[View Transaction]</button>
     </span>
 </template>
 
