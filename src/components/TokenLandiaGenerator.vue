@@ -16,8 +16,6 @@
       </span>
     </h4>
 
-    productIdValid
-
     <br/>
 
     <vue-form :state="formState" @submit.prevent="onSubmit">
