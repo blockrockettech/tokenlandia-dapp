@@ -19,15 +19,17 @@ export default new Router({
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Verify.vue'),
+      component: () => import(/* webpackChunkName: "verify" */ './views/Verify.vue'),
     },
     {
       path: '/user-access',
       name: 'user-access',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Access.vue'),
+      component: () => import(/* webpackChunkName: "access" */ './views/Access.vue'),
+    },
+    {
+      path: '/activity',
+      name: 'activity',
+      component: () => import(/* webpackChunkName: "activity" */ './views/Activity.vue'),
     },
   ],
 });

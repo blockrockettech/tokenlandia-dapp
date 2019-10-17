@@ -17,6 +17,9 @@
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">Access</router-link>
           </li>
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/activity' }">
+            <router-link to="/activity">Activity</router-link>
+          </li>
         </ul>
       </nav>
 
