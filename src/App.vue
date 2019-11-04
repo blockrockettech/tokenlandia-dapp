@@ -14,6 +14,9 @@
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/verify' }">
             <router-link to="/verify">Verify</router-link>
           </li>
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/account' }">
+            <router-link to="/account">Account</router-link>
+          </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">Access</router-link>
           </li>
