@@ -189,6 +189,16 @@ export default new Vuex.Store({
       });
     },
 
+    transferToken({state}, {recipient, tokenId}) {
+      return new Promise((resolve, reject) => {
+        const from = state.account;
+        state.tokenLandiaContract.methods.transferFrom(from, recipient, tokenId)
+          .send({from})
+          .once('transactionHash', resolve)
+          .on('error', reject);
+      });
+    },
+
     checkIsAdmin({state, commit, dispatch}, ethAddress) {
       try {
         return state.tokenLandiaContract.methods.isWhitelistAdmin(ethAddress).call();
@@ -200,6 +210,14 @@ export default new Vuex.Store({
     checkCanMint({state, commit, dispatch}, ethAddress) {
       try {
         return state.tokenLandiaContract.methods.isWhitelisted(ethAddress).call();
+      } catch (e) {
+        return Promise.resolve(false);
+      }
+    },
+
+    tokensOfOwner({state, commit, dispatch}, ethAddress) {
+      try {
+        return state.tokenLandiaContract.methods.tokensOfOwner(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
