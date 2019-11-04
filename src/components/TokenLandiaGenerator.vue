@@ -236,7 +236,7 @@
 
       <validate auto-label class="form-group row required-field">
         <label for="customiseLocation" class="col-sm-3 col-form-label">
-          Customisation Location
+          Customization Location
         </label>
         <div class="col-sm-9">
           <input type="text"
@@ -248,14 +248,14 @@
           <field-messages
             name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
-              Customisation Location is a required field
+              Customization Location is a required field
             </div>
           </field-messages>
         </div>
       </validate>
 
       <validate auto-label class="form-group row required-field">
-        <label for="customiseDate" class="col-sm-3 col-form-label">Customisation Date</label>
+        <label for="customiseDate" class="col-sm-3 col-form-label">Customization Date</label>
         <div class="col-sm-9">
           <datepicker name="customiseDate"
                       id="customiseDate"
@@ -270,7 +270,7 @@
           <field-messages
             name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
-              Customisation Date is a required field
+              Customization Date is a required field
             </div>
           </field-messages>
         </div>
@@ -605,7 +605,7 @@
                     series: this.prependPadding(series, 3),
                     design: this.prependPadding(design, 4),
                     purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
-                    customisation_date: moment(customisation_date).format('YYYY-MM-DD')
+                    customization_date: moment(customisation_date).format('YYYY-MM-DD'),
                 },
             };
         }

@@ -64,10 +64,10 @@
           </div>
           <div class="mt-1">
         <span class="d-inline-block dateLabel">
-          <strong>Customisation Date:</strong> {{tokenData.customisation.date}}
+          <strong>Customization Date:</strong> {{tokenData.customisation.date}}
         </span>
             <span>
-          <strong>Customisation Location:</strong> {{tokenData.customisation.location}}
+          <strong>Customization Location:</strong> {{tokenData.customisation.location}}
         </span>
           </div>
           <div class="mt-3">
@@ -211,7 +211,7 @@
                     location: attributes.purchase_location,
                 },
                 customisation: {
-                    date: attributes.customisation_date,
+                    date: attributes.customization_date,
                     location: attributes.customisation_location,
                 },
                 brand: attributes.brand,
