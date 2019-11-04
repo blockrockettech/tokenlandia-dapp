@@ -352,7 +352,7 @@
       <h4 class="heading">Recipient</h4>
       <br/>
 
-      <div class="form-group row">
+      <validate auto-label class="form-group row required-field">
         <label for="recipient" class="col-sm-3 col-form-label">ETH Address</label>
         <div class="col-sm-9 text-left">
           <input type="text"
@@ -361,13 +361,19 @@
                  class="form-control mb-2"
                  minlength="42"
                  maxlength="42"
-                 :placeholder="account"
-                :disabled="true" />
-          <small>
-            Please check that this is correct or change it in <strong>Metamask</strong>
-          </small>
+                 v-model="model.recipient"
+                 required/>
+          <b-button variant="primary" class="cta-tokenlandia" @click="useCurrentEthAccount">
+            Use Current
+          </b-button>
+          <field-messages
+            name="recipient" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">
+              ETH Address is required
+            </div>
+          </field-messages>
         </div>
-      </div>
+      </validate>
 
       <hr/>
 
@@ -531,6 +537,10 @@
         mintingTransactionHash: string = '';
         ipfsDataHash: string = '';
         saving: boolean = false;
+
+        useCurrentEthAccount() {
+            this.model.recipient = this.account ? this.account : '';
+        }
 
         onFileAdded(file: any) {
             this.file = file;
