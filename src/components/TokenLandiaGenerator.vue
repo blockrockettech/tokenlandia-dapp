@@ -279,6 +279,7 @@
       <hr/>
 
       <h4 class="heading">Materials Used</h4>
+      <br/>
 
       <validate auto-label class="form-group row required-field">
         <label for="material1" class="col-sm-3 col-form-label">Material 1</label>
@@ -349,29 +350,24 @@
       <hr/>
 
       <h4 class="heading">Recipient</h4>
+      <br/>
 
-      <validate auto-label class="form-group row required-field">
+      <div class="form-group row">
         <label for="recipient" class="col-sm-3 col-form-label">ETH Address</label>
-        <div class="col-sm-9">
+        <div class="col-sm-9 text-left">
           <input type="text"
                  name="recipient"
                  id="recipient"
-                 class="form-control"
-                 required
+                 class="form-control mb-2"
                  minlength="42"
                  maxlength="42"
-                 v-model="model.recipient"/>
-          <field-messages name="recipient" show="$touched || $submitted"
-                          class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              ETH account is a required field
-            </div>
-            <div slot="minlength" class="text-danger">
-              ETH address not valid
-            </div>
-          </field-messages>
+                 :placeholder="account"
+                :disabled="true" />
+          <small>
+            Please check that this is correct or change it in <strong>Metamask</strong>
+          </small>
         </div>
-      </validate>
+      </div>
 
       <hr/>
 
@@ -380,9 +376,13 @@
           <div class="mt-4">
             <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg"
-                        :disabled="!isConnected || !account">
+                        :disabled="isMintingDisabled">
                 Mint
               </b-button>
+              <small v-if="!isWeb3Initialised">Loading up Web 3...</small>
+              <small v-else-if="!canUserMint && accountProperties.canMint === false">
+                It doesn't look like you can mint. Double check you're using the correct account.
+              </small>
             </div>
             <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
               <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
@@ -404,8 +404,9 @@
 
       <div class="row">
         <div class="col">
-          <a class="btn btn-link text-muted collapse-raw-link" v-b-toggle.collapse-raw-data>Raw IPFS
-            Data</a>
+          <a class="btn btn-link text-muted collapse-raw-link" v-b-toggle.collapse-raw-data>
+            Raw IPFS Data
+          </a>
           <b-collapse id="collapse-raw-data" class="text-left">
             <pre>{{this.getIpfsPayload('TBC')}}</pre>
           </b-collapse>
@@ -456,7 +457,6 @@
         model: string,
         artist: string,
         artist_assistant: string,
-        recipient: string,
         material_1: string,
         material_2: string,
         material_3: string,
@@ -466,7 +466,7 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected']),
+            ...mapGetters(['isConnected', 'accountProperties']),
             ...mapState(['account']),
         },
         components: {
@@ -477,6 +477,8 @@
         },
     })
     export default class TokenLandiaGenerator extends Vue {
+        isConnected!: boolean;
+
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
         ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
@@ -499,7 +501,6 @@
             model: '',
             artist: '',
             artist_assistant: '',
-            recipient: '',
             material_1: '',
             material_2: '',
             material_3: '',
@@ -521,6 +522,9 @@
         fileBuffer: any = null;
 
         countryCodes: any = countryCodes;
+
+        account!: string;
+        accountProperties: any;
 
         mintingTransactionHash: string = '';
         ipfsDataHash: string = '';
@@ -579,7 +583,6 @@
             const {
                 name,
                 description,
-                recipient,
                 series,
                 design,
                 purchase_date,
@@ -637,9 +640,9 @@
 
                 this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
-                    recipient: this.model.recipient,
+                    recipient: this.account,
                     productCode: this.productCode,
-                    ipfsHash: this.ipfsDataHash
+                    ipfsHash: this.ipfsDataHash,
                 })
                     .then((hash) => {
                         this.mintingTransactionHash = hash;
@@ -665,6 +668,18 @@
                 return 'has-danger';
             }
             return '';
+        }
+
+        get isMintingDisabled(): boolean {
+            return !this.isWeb3Initialised || !this.canUserMint;
+        }
+
+        get isWeb3Initialised(): boolean {
+            return (this.isConnected && this.account);
+        }
+
+        get canUserMint(): boolean {
+            return this.isWeb3Initialised && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

@@ -20,7 +20,7 @@
         </ul>
       </nav>
 
-      <!-- Page Content  -->
+      <!-- Page Content + Footer  -->
       <div id="content">
         <div id="collapse-btn-container">
           <b-button
@@ -31,13 +31,15 @@
           </b-button>
         </div>
         <router-view class="view"/>
+
+        <hr/>
+
+        <footer class="footer p-2">
+          <current-network></current-network>
+          Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
+        </footer>
       </div>
     </div>
-
-    <footer class="footer pt-2">
-      <current-network></current-network>
-      Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
-    </footer>
 
   </div>
 </template>
@@ -139,7 +141,6 @@
 
   .footer {
     min-height: 50px;
-    background: #F3B85C;
   }
 
   /* ---------------------------------------------------

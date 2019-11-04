@@ -22,6 +22,9 @@ export default new Vuex.Store({
 
     // Account
     account: null,
+    accountProperties: {
+      canMint: null,
+    },
 
     // Countracts
     web3: null,
@@ -41,16 +44,20 @@ export default new Vuex.Store({
     web3(state, web3) {
       state.web3 = web3;
     },
+    updateCanCurrentAccountMint(state, canMint) {
+      state.accountProperties.canMint = canMint;
+    },
   },
   getters: {
     isConnected() {
       // @ts-ignore
       return window.web3 !== undefined;
     },
-    etherscanTokenLink: (state) => (tokenId: number) => {
+    etherscanTokenLink: state => (tokenId: number) => {
       const networkAddress = TokenlandiaJson.networks[state.networkId].address;
       return `${state.etherscanBase}/token/${networkAddress}?a=${tokenId}`;
-    }
+    },
+    accountProperties: state => state.accountProperties,
   },
   actions: {
 
@@ -70,7 +77,6 @@ export default new Vuex.Store({
           try {
             // @ts-ignore
             window.web3 = new Web3(ethereum);
-            console.log('in here 1');
             // Request account access if needed
             // @ts-ignore
             await ethereum.enable();
@@ -79,7 +85,7 @@ export default new Vuex.Store({
           } catch (error) {
             console.log(error);
             alert('Access denied - we need access to your wallet to fully connect to the site');
-            dispatch('setupStaticWeb')
+            dispatch('setupStaticWeb');
           }
         }
         // Legacy dapp browsers...
@@ -92,7 +98,7 @@ export default new Vuex.Store({
           dispatch('initWeb3', window.web3);
         } else {
           console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-          dispatch('setupStaticWebs')
+          dispatch('setupStaticWebs');
         }
       }
     },
@@ -105,6 +111,10 @@ export default new Vuex.Store({
           if (!error) {
             const account = accounts[0];
             commit('account', account);
+
+            dispatch('checkCanMint', account)
+              .then((data) => { commit('updateCanCurrentAccountMint', data); })
+              .catch(() => commit('updateCanCurrentAccountMint', false));
           } else {
             console.log(`Error getting accounts`, error);
           }

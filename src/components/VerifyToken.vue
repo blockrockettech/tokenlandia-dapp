@@ -1,5 +1,5 @@
 <template>
-  <div class="txt">
+  <div class="verify-container txt">
     <h1 class="heading">NFT Verification</h1>
     <hr/>
     <div class="row">
@@ -242,12 +242,8 @@
     height: 345px;
   }
 
-  .searchLabel {
-    margin: 0.70rem;
-  }
-
-  .long-input {
-    width: 215px;
+  .verify-container {
+    height: calc(100vh - 170px);
   }
 
   .dateLabel {
