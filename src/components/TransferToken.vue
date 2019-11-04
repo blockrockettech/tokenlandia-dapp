@@ -23,16 +23,23 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-3 col-form-label">Send To:</label>
+          <label for="sendTo" class="col-sm-3 col-form-label">Send To:</label>
           <div class="col-sm-9">
-            <input class="form-control" type="text" v-model="recipient" />
+            <input id="sendTo" class="form-control" type="text" v-model="recipient" />
           </div>
         </div>
-        <b-button variant="primary" class="cta-tokenlandia" @click="transferToken">
+        <b-button variant="primary"
+                  class="cta-tokenlandia"
+                  @click="transferToken"
+                  :disabled="!recipient">
           Transfer
         </b-button>
         <div v-if="transfering">
-          <small>TX Hash: {{txHash}}</small>
+          <small>
+            <a :href="`https://rinkeby.etherscan.io/tx/${txHash}`" target="_blank">
+              View TX in flight
+            </a>
+          </small>
         </div>
       </div>
     </div>
@@ -59,6 +66,7 @@
                 recipient: this.recipient,
                 tokenId: this.selectedToken,
             });
+            this.transfering = true;
         }
     }
 </script>

@@ -456,6 +456,7 @@
         brand: string,
         model: string,
         artist: string,
+        recipient: string,
         artist_assistant: string,
         material_1: string,
         material_2: string,
@@ -500,6 +501,7 @@
             brand: '',
             model: '',
             artist: '',
+            recipient: '',
             artist_assistant: '',
             material_1: '',
             material_2: '',
@@ -674,7 +676,7 @@
             return !this.isWeb3Initialised || !this.canUserMint;
         }
 
-        get isWeb3Initialised(): boolean {
+        get isWeb3Initialised() {
             return (this.isConnected && this.account);
         }
 

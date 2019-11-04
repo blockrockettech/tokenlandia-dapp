@@ -178,6 +178,10 @@ export default new Vuex.Store({
       }
     },
 
+    attributesForTokenId({state}, tokenId) {
+        return state.tokenLandiaContract.methods.attributes(tokenId).call();
+    },
+
     mintToken({state}, {tokenId, recipient, productCode, ipfsHash}) {
       return new Promise((resolve, reject) => {
         state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)

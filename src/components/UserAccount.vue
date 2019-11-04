@@ -1,12 +1,12 @@
 <template>
   <div class="user-account-container text-left">
-    <h1 class="text-center">Your Web 3 account</h1>
+    <h1 class="text-center">My Account</h1>
     <hr />
-    <TransferToken :tokens="tokenSummaryToIdMap" />
+    <TransferToken :tokens="tokenSummaryToIdMapArray" />
     <br/>
-    <h3 class="text-left">All tokens</h3>
+    <h3 class="text-left">My Tokens</h3>
     <hr />
-    <div v-for="(token, idx) in tokenSummaryToIdMap" :key="idx">{{token.text}}</div>
+    <div v-for="(token, idx) in tokenSummaryToIdMapArray" :key="idx">{{token.text}}</div>
   </div>
 </template>
 
@@ -28,17 +28,19 @@
         initialised: boolean = false;
 
         tokenIds: string[] = [];
-        tokenSummaryToIdMap: any[] = [];
+        tokenSummaryToIdMapArray: any[] = [];
 
         async fetchTokenInfoFromTokenIDs(tokenIds: string[]) {
             this.tokenIds = tokenIds;
-            this.tokenSummaryToIdMap = tokenIds.map((tokenId: string) => (
-                    {
-                        text: `#${tokenId} / JPN-JSH`,
+            this.tokenSummaryToIdMapArray = await Promise.all(
+                tokenIds.map(async (tokenId: string) => {
+                    const attributes = await this.$store.dispatch('attributesForTokenId', tokenId);
+                    return {
+                        text: `#${tokenId} / ${attributes._productId}`,
                         value: tokenId,
                     }
-                )
-            )
+                })
+            );
         }
 
         @Watch('account')
