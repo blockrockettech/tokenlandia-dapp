@@ -42,6 +42,13 @@
             );
         }
 
+        mounted() {
+            if (this.account) {
+                this.$store.dispatch('tokensOfOwner', this.account)
+                    .then(data => this.fetchTokenInfoFromTokenIDs(data));
+            }
+        }
+
         @Watch('account')
         onAccountChange(newVal: any, oldVal: any) {
             if (newVal !== oldVal) {
