@@ -6,23 +6,30 @@
       <div class="col">
         <h4>Minting</h4>
         <p>
-          Those with minting access can create TokenLandia NFT
+          Those with minting access can create TokenLandia NFTs.
         </p>
         <p>
-          Use the form below to mange address which are allowed to mint tokens for TokenLandia
+          Use the form below to mange addresses which are allowed to mint tokens for TokenLandia.
         </p>
 
         <!-- Check minter access -->
+        <h5>Check minter access</h5>
         <div class="row mt-2">
           <div class="col-2">
             <label for="ethAddress-can-mint">ETH Address</label>
           </div>
           <div class="col-4">
-            <b-form-input id="ethAddress-can-mint" type="text"
+            <b-form-input id="ethAddress-can-mint"
+                          type="text"
+                          @input="clearCanMintResult"
                           v-model="canMintEthAddress.value"
                           placeholder="0x123..."/>
           </div>
-          <div class="col-2">
+          <div class="col-6">
+            <b-button class="cta-tokenlandia ml-2"
+                      @click="applyCurrentAddressToCanMint">
+              Use Current
+            </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkCanMint"
                       v-if="!canMintEthAddress.loading"
@@ -33,17 +40,26 @@
                       v-if="canMintEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>
-            <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
-                               v-if="!canMintEthAddress.loading && canMintEthAddress.result === true">
-            </font-awesome-icon>
-            <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
-                               v-if="!canMintEthAddress.loading && canMintEthAddress.result === false">
-            </font-awesome-icon>
           </div>
+        </div>
+        <div class="mt-3" v-if="!canMintEthAddress.loading && canMintEthAddress.result === true">
+          <p class="d-inline-block">
+            The ETH address <strong>{{canMintEthAddress.value}}</strong> can mint Tokenlandia NFTs
+          </p>
+          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+          </font-awesome-icon>
+        </div>
+        <div class="mt-3" v-if="!canMintEthAddress.loading && canMintEthAddress.result === false">
+          <p class="d-inline-block">
+            The ETH address <strong>{{canMintEthAddress.value}}</strong> cannot mint Tokenlandia NFTs
+          </p>
+          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+          </font-awesome-icon>
         </div>
 
         <!-- Add/remove minter access -->
-        <div class="row mt-2">
+        <h5 class="mt-3">Manage minter access</h5>
+        <div class="row">
           <div class="col-2">
             <label for="ethAddress-add-remove-minter">ETH Address</label>
           </div>
@@ -52,7 +68,7 @@
                           v-model="addRemoveMinterEthAddress.value"
                           placeholder="0x123..."/>
           </div>
-          <div class="col-4">
+          <div class="col-6">
             <b-button class="btn-success ml-2 mr-2"
                       @click="addMinter"
                       :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
@@ -182,6 +198,16 @@
         isAdminEthAddress: InputModel = {value: '', loading: false};
         addAdminEthAddress: InputModel = {value: '', loading: false};
         renounceAdminHash: string = '';
+        account: any;
+
+        clearCanMintResult() {
+            this.canMintEthAddress.result = null;
+        }
+
+        applyCurrentAddressToCanMint() {
+            this.canMintEthAddress.value = this.account;
+            this.canMintEthAddress.result = null;
+        }
 
         checkCanMint() {
             this.canMintEthAddress.loading = true;
