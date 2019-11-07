@@ -52,34 +52,37 @@
   </div>
 </template>
 
-<script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+<script>
     import CurrentNetwork from "@/components/CurrentNetwork.vue";
     import web3Connect from '@/web3ConnectService';
 
-    @Component({
-        components: {CurrentNetwork}
-    })
-    export default class App extends Vue {
-        collapsed: boolean = false;
-
+    export default {
+      name: 'App',
+      data() {
+        return {
+          collapsed: false
+        }
+      },
+      components: {
+        CurrentNetwork
+      },
+      methods: {
         toggleCollapse() {
-            this.collapsed = !this.collapsed;
-        }
-
-        created() {
-            web3Connect.on("connect", (provider: any) => {
-                this.$store.dispatch('bootstrap', provider);
-            });
-
-            if (!window.ethereum) {
-                this.$store.dispatch('setupStaticWeb3');
-            }
-        }
-
+          this.collapsed = !this.collapsed;
+        },
         onLogin() {
-            web3Connect.toggleModal();
+          web3Connect.toggleModal();
+        },
+      },
+      created() {
+        web3Connect.on("connect", provider => {
+          this.$store.dispatch('bootstrap', provider);
+        });
+
+        if (!window.ethereum) {
+          this.$store.dispatch('setupStaticWeb3');
         }
+      }
     }
 </script>
 
