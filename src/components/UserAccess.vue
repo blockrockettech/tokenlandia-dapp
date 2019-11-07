@@ -156,6 +156,18 @@
           </div>
         </div>
 
+        <div class="mt-3" v-if="allAdminWhitelistedAddresses && allAdminWhitelistedAddresses.length">
+          <h5>All Admin Whitelisted Addresses</h5>
+          <div v-for="(adminWhitelistedAddress, idx) in allAdminWhitelistedAddresses" :key="idx">
+            {{adminWhitelistedAddress}}
+          </div>
+        </div>
+        <b-button variant="primary"
+                  class="cta-tokenlandia mt-3"
+                  @click="displayAllAdminWhitelistedAddresses">
+          View All Admin Whitelised Addresses
+        </b-button>
+
         <hr/>
 
         <!-- Remove minter access -->
@@ -209,6 +221,7 @@
         renounceAdminHash: string = '';
         account: any;
         allWhitelistedAddresses: string[] = [];
+        allAdminWhitelistedAddresses: string[] = [];
 
         clearCanMintResult() {
             this.canMintEthAddress.result = null;
@@ -220,7 +233,13 @@
         }
 
         async displayAllWhitelistedAddresses() {
-            this.allWhitelistedAddresses = await this.$store.dispatch('fetchAllWhitelistedAddresses');
+            this.allWhitelistedAddresses =
+                await this.$store.dispatch('fetchAllWhitelistedAddresses');
+        }
+
+        async displayAllAdminWhitelistedAddresses() {
+            this.allAdminWhitelistedAddresses =
+                await this.$store.dispatch('fetchAllAdminWhitelistedAddresses');
         }
 
         checkCanMint() {
