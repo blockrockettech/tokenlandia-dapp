@@ -104,18 +104,18 @@ export default new Vuex.Store({
   },
   actions: {
 
-    bootstrap({dispatch}) {
-      dispatch('loginWeb3');
+    bootstrap({dispatch}, provider) {
+      dispatch('loginWeb3', provider);
     },
 
     /////////////////////////
     // Web3 initialisation //
     /////////////////////////
 
-    async loginWeb3({dispatch, state}) {
+    async loginWeb3({dispatch, state}, provider) {
       if (!state.account) {
         // @ts-ignore
-        if (window.ethereum) {
+       /* if (window.ethereum) {
           console.log('Init modern web3');
           try {
             // @ts-ignore
@@ -142,7 +142,11 @@ export default new Vuex.Store({
         } else {
           console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
           dispatch('setupStaticWebs');
-        }
+        }*/
+        // @ts-ignore
+        window.web3 = new Web3(provider);
+        // @ts-ignore
+        dispatch('initWeb3', window.web3);
       }
     },
 
@@ -165,7 +169,7 @@ export default new Vuex.Store({
       });
     },
 
-    setupStaticWebs({dispatch, commit}) {
+    setupStaticWeb3({dispatch, commit}) {
       console.log(`No web3 provider found, defaulting to static web3 instance`);
       const web3 = new Web3(new Web3.providers.HttpProvider(`https://rinkeby.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
       commit('web3', web3);

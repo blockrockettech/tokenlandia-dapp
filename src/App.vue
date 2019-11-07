@@ -20,6 +20,11 @@
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">Access</router-link>
           </li>
+          <li class="mt-2">
+            <b-button class="cta-tokenlandia" @click="onLogin">
+              Login
+            </b-button>
+          </li>
         </ul>
       </nav>
 
@@ -49,7 +54,31 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import Web3Connect from "web3connect";
+    // @ts-ignore
+    import WalletConnectProvider from "@walletconnect/web3-provider";
+    import Portis from "@portis/web3";
+
     import CurrentNetwork from "@/components/CurrentNetwork.vue";
+
+    const web3Connect = new Web3Connect.Core({
+        network: "rinkeby", // optional
+        providerOptions: {
+            // walletconnect: {
+            //     package: WalletConnectProvider, // required
+            //     options: {
+            //         infuraId: "27742a31ed334a5cb63ef2560e01b621" // required
+            //     }
+            // },
+            portis: {
+                package: Portis, // required
+                options: {
+                    id: "b0863293-e454-4941-88ee-4a5eed9577b7" // required
+                }
+            },
+        }
+    });
+
 
     @Component({
         components: {CurrentNetwork}
@@ -62,7 +91,14 @@
         }
 
         created() {
-            this.$store.dispatch('bootstrap');
+            this.$store.dispatch('setupStaticWeb3');
+        }
+
+        onLogin() {
+            web3Connect.on("connect", (provider: any) => {
+                this.$store.dispatch('bootstrap', provider);
+            });
+            web3Connect.toggleModal();
         }
     }
 </script>
