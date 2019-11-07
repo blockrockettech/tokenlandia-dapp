@@ -83,6 +83,15 @@
           </div>
         </div>
 
+        <div class="mt-3" v-if="allWhitelistedAddresses && allWhitelistedAddresses.length">
+          <h5>All Whitelisted Addresses</h5>
+          <div v-for="(whitelistedAddress, idx) in allWhitelistedAddresses" :key="idx">
+            {{whitelistedAddress}}
+          </div>
+        </div>
+        <b-button variant="primary" class="cta-tokenlandia mt-3" @click="displayAllWhitelistedAddresses">
+          View All Whitelised Addresses
+        </b-button>
       </div>
     </div>
 
@@ -199,6 +208,7 @@
         addAdminEthAddress: InputModel = {value: '', loading: false};
         renounceAdminHash: string = '';
         account: any;
+        allWhitelistedAddresses: string[] = [];
 
         clearCanMintResult() {
             this.canMintEthAddress.result = null;
@@ -207,6 +217,10 @@
         applyCurrentAddressToCanMint() {
             this.canMintEthAddress.value = this.account;
             this.canMintEthAddress.result = null;
+        }
+
+        async displayAllWhitelistedAddresses() {
+            this.allWhitelistedAddresses = await this.$store.dispatch('fetchAllWhitelistedAddresses');
         }
 
         checkCanMint() {

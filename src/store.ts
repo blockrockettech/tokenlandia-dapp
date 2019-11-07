@@ -271,5 +271,29 @@ export default new Vuex.Store({
       });
     },
 
+    fetchAllWhitelistedAddresses({state}) {
+      return new Promise((resolve, reject) => {
+        const options = {
+          fromBlock: 0, // FIXME deployed block
+          toBlock: 'latest',
+        };
+        // @ts-ignore
+        const tokenContract = state.tokenLandiaContract;
+        tokenContract.getPastEvents('WhitelistedAdded', options, (error: any, events: any[]) => {
+          if (error) reject(error);
+          if (!events) reject(new Error('Events came back undefined'));
+          if (!events.length) resolve([]);
+
+          const addresses = events.map((event: any) => {
+            return event.returnValues.account;
+          });
+          for (let i = 0; i < addresses.length; i++) {
+            console.log(addresses[i]);
+          }
+          resolve(addresses);
+        });
+      });
+    },
+
   }
 });
