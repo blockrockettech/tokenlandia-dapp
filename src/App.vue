@@ -21,9 +21,18 @@
             <router-link to="/user-access">Access</router-link>
           </li>
           <li class="mt-2">
-            <b-button class="cta-tokenlandia" @click="onLogin">
+            <hr/>
+            <b-button class="cta-tokenlandia" @click="onLogin" v-if="!account">
               Login
             </b-button>
+            <div v-else>
+              <div class="mb-1">Logged in as</div>
+              <strong>
+                <a :href="`${etherscanBase}/address/${account}`" v-if="account" target="_blank">
+                  {{dotDotDotAddress()}}
+                </a>
+              </strong>
+            </div>
           </li>
         </ul>
       </nav>
@@ -53,6 +62,7 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex';
     import CurrentNetwork from '@/components/CurrentNetwork.vue';
     import web3Connect from '@/web3ConnectService';
 
@@ -62,6 +72,12 @@
             return {
                 collapsed: false
             };
+        },
+        computed: {
+            ...mapState([
+                'account',
+                'etherscanBase'
+            ]),
         },
         components: {
             CurrentNetwork
@@ -73,12 +89,14 @@
             onLogin() {
                 web3Connect.toggleModal();
             },
+            dotDotDotAddress: function () {
+                return this.account.substr(0, 6) + '...' + this.account.substr(this.account.length - 6, this.account.length);
+            }
         },
         created() {
             web3Connect.on('connect', provider => {
                 this.$store.dispatch('bootstrap', provider);
             });
-
             this.$store.dispatch('setupStaticWeb3');
         }
     };
