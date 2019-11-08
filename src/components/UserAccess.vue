@@ -28,7 +28,7 @@
           <div class="col-6">
             <b-button class="cta-tokenlandia ml-2"
                       @click="applyCurrentAddressToCanMint"
-                      :disabled="!isConnected">
+                      :disabled="!account">
               Use Current
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
@@ -72,12 +72,12 @@
           <div class="col-6">
             <b-button class="btn-success ml-2 mr-2"
                       @click="addMinter"
-                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+                      :disabled="!(account && addRemoveMinterEthAddress.value.length === 42)">
               Add
             </b-button>
             <b-button class="btn-danger"
                       @click="removeMinter"
-                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+                      :disabled="!(account && addRemoveMinterEthAddress.value.length === 42)">
               Remove
             </b-button>
             <txs-link :hash="addRemoveMinterEthAddress.result"></txs-link>
@@ -123,7 +123,7 @@
           <div class="col-6">
             <b-button class="cta-tokenlandia ml-2"
                       @click="applyCurrentAddressToIsAdmin"
-                      :disabled="!isConnected">
+                      :disabled="!account">
               Use Current
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
@@ -166,7 +166,8 @@
           <div class="col-4">
             <b-button class="btn-success ml-2 mr-2"
                       @click="addAdmin"
-                      :disabled="!(isConnected && addAdminEthAddress.value)">Add
+                      :disabled="!(account && addAdminEthAddress.value)">
+              Add
             </b-button>
             <txs-link :hash="addAdminEthAddress.result"></txs-link>
           </div>

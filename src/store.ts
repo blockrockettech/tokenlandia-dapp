@@ -115,35 +115,6 @@ export default new Vuex.Store({
     async loginWeb3({dispatch, state}, provider) {
       if (!state.account) {
         // @ts-ignore
-        /* if (window.ethereum) {
-           console.log('Init modern web3');
-           try {
-             // @ts-ignore
-             window.web3 = new Web3(ethereum);
-             // Request account access if needed
-             // @ts-ignore
-             await ethereum.enable();
-             // @ts-ignore
-             dispatch('initWeb3', window.web3);
-           } catch (error) {
-             console.log(error);
-             alert('Access denied - we need access to your wallet to fully connect to the site');
-             dispatch('setupStaticWeb');
-           }
-         }
-         // Legacy dapp browsers...
-         // @ts-ignore
-         else if (window.web3) {
-           console.log('Init legacy web3');
-           // @ts-ignore
-           window.web3 = new Web3(web3.currentProvider);
-           // @ts-ignore
-           dispatch('initWeb3', window.web3);
-         } else {
-           console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-           dispatch('setupStaticWebs');
-         }*/
-        // @ts-ignore
         window.web3 = new Web3(provider);
         // @ts-ignore
         dispatch('initWeb3', window.web3);

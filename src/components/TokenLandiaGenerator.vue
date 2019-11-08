@@ -363,7 +363,10 @@
                  maxlength="42"
                  v-model="model.recipient"
                  required/>
-          <b-button variant="primary" class="cta-tokenlandia" @click="useCurrentEthAccount">
+          <b-button variant="primary"
+                    class="cta-tokenlandia"
+                    @click="useCurrentEthAccount"
+                    :disabled="!account">
             Use Current
           </b-button>
           <field-messages
