@@ -53,37 +53,35 @@
 </template>
 
 <script>
-    import CurrentNetwork from "@/components/CurrentNetwork.vue";
+    import CurrentNetwork from '@/components/CurrentNetwork.vue';
     import web3Connect from '@/web3ConnectService';
 
     export default {
-      name: 'App',
-      data() {
-        return {
-          collapsed: false
-        }
-      },
-      components: {
-        CurrentNetwork
-      },
-      methods: {
-        toggleCollapse() {
-          this.collapsed = !this.collapsed;
+        name: 'App',
+        data() {
+            return {
+                collapsed: false
+            };
         },
-        onLogin() {
-          web3Connect.toggleModal();
+        components: {
+            CurrentNetwork
         },
-      },
-      created() {
-        web3Connect.on("connect", provider => {
-          this.$store.dispatch('bootstrap', provider);
-        });
+        methods: {
+            toggleCollapse() {
+                this.collapsed = !this.collapsed;
+            },
+            onLogin() {
+                web3Connect.toggleModal();
+            },
+        },
+        created() {
+            web3Connect.on('connect', provider => {
+                this.$store.dispatch('bootstrap', provider);
+            });
 
-        if (!window.ethereum) {
-          this.$store.dispatch('setupStaticWeb3');
+            this.$store.dispatch('setupStaticWeb3');
         }
-      }
-    }
+    };
 </script>
 
 <style lang="scss">

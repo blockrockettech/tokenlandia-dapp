@@ -33,7 +33,6 @@
                     v-if="searching" disabled>
             <SmallSpinner/>
           </b-button>
-
         </b-form>
       </div>
     </div>

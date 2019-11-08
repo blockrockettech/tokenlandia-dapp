@@ -174,8 +174,9 @@ export default new Vuex.Store({
     setupStaticWeb3({dispatch, commit}) {
       console.log(`No web3 provider found, defaulting to static web3 instance`);
       const web3 = new Web3(new Web3.providers.HttpProvider(`https://rinkeby.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
-      commit('web3', web3);
-      dispatch('getNetwork');
+      // @ts-ignore
+      window.web3 = web3;
+      dispatch('initWeb3', web3);
     },
 
     async getNetwork({commit, dispatch}) {
