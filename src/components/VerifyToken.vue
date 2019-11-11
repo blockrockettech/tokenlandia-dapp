@@ -223,9 +223,8 @@
         .then(({attributes, ownerOf}) => {
           this.attributes = attributes;
           this.ownerOf = ownerOf;
-
-          this.productId = null;
-          this.tokenId = null;
+          this.productId = "";
+          this.tokenId = "";
         })
         .catch(() => {
           this.searching = false;
