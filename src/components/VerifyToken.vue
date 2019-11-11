@@ -5,7 +5,7 @@
     <div class="row">
       <div class="col">
 
-        <b-form inline>
+        <b-form inline class="my-2">
 
           <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0">
             <b-input
@@ -16,6 +16,21 @@
             ></b-input>
           </b-input-group>
 
+          <b-button class="cta-tokenlandia ml-2"
+                    @click="performSearch"
+                    v-if="!searching"
+                    :disabled="!productId">
+            Search
+          </b-button>
+
+          <b-button class="cta-tokenlandia ml-2"
+                    v-if="searching" disabled>
+            <SmallSpinner/>
+          </b-button>
+        </b-form>
+
+        <b-form inline class="my-2">
+
           <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0">
             <b-input placeholder="1..."
                      v-model="tokenId">
@@ -25,7 +40,7 @@
           <b-button class="cta-tokenlandia ml-2"
                     @click="performSearch"
                     v-if="!searching"
-                    :disabled="!tokenId && !productId">
+                    :disabled="!tokenId">
             Search
           </b-button>
 
@@ -37,17 +52,15 @@
       </div>
     </div>
 
-    <hr/>
-
     <div v-if="searching && !noResultFound">
       <Spinner/>
     </div>
 
-    <div id="searchResults" v-if="results">
+    <div id="searchResults" v-if="results" class="mt-4">
       <div class="row">
         <div class="col text-left">
 
-          <h4 class="heading">Product ID: {{tokenData.productId}}</h4>
+          <h4 class="heading text-center">Product ID: {{tokenData.productId}}</h4>
           <div><strong>Token ID:</strong> {{foundTokenId}}</div>
 
           <div><strong>Owner:</strong> {{ownerOf}}</div>
@@ -107,12 +120,12 @@
         </div>
       </div>
     </div>
-    <div v-else-if="!results && !searching && !noResultFound">
+    <div v-else-if="!results && !searching && !noResultFound" class="mt-4">
       <p>
         Please fill in one field from the search form above.
       </p>
     </div>
-    <div v-if="noResultFound">
+    <div v-if="noResultFound" class="mt-4">
       <p class="text-info">
         No results found
       </p>
