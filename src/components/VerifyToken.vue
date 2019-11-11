@@ -56,44 +56,63 @@
       <Spinner/>
     </div>
 
-    <div id="searchResults" v-if="results" class="mt-4">
+    <div id="searchResults" v-if="results" class="my-4">
       <div class="row">
         <div class="col text-left">
 
           <h4 class="heading text-center">Product ID: {{tokenData.productId}}</h4>
-          <div><strong>Token ID:</strong> {{foundTokenId}}</div>
-
-          <div><strong>Owner:</strong> {{ownerOf}}</div>
-
-          <div><strong>Name:</strong> {{tokenData.name}}</div>
-
-          <div><strong>Description:</strong> {{tokenData.description}}</div>
-
-          <div>
-            <span class="d-inline-block dateLabel">
-              <strong>Purchase Date:</strong> {{tokenData.purchase.date}}
-            </span>
-          </div>
-          <div>
-            <span><strong>Purchase Location:</strong> {{tokenData.purchase.location}}</span>
-          </div>
-          <div class="mt-1">
-            <span class="d-inline-block dateLabel">
-              <strong>Customization Date:</strong> {{tokenData.customisation.date}}
-            </span>
-          </div>
-          <div>
-            <span>
-              <strong>Customization Location:</strong> {{tokenData.customisation.location}}
-            </span>
-          </div>
-
-          <div><strong>Brand:</strong> {{tokenData.brand}}</div>
-          <div><strong>Model:</strong> {{tokenData.model}}</div>
-          <div><strong>Artist:</strong> {{tokenData.artist}}</div>
-          <div v-if="tokenData.assistant">
-            <strong>Assistant:</strong> {{tokenData.assistant}}
-          </div>
+          <table class="table table-striped table-borderless">
+            <tbody>
+              <tr>
+                <td>Token ID</td>
+                <td>{{foundTokenId}}</td>
+              </tr>
+              <tr>
+                <td>Owner</td>
+                <td class="small">{{ownerOf}}</td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td>{{tokenData.name}}</td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td>{{tokenData.description}}</td>
+              </tr>
+              <tr>
+                <td>Purchase Date</td>
+                <td>{{tokenData.purchase.date}}</td>
+              </tr>
+              <tr>
+                <td>Purchase Location</td>
+                <td>{{tokenData.purchase.location}}</td>
+              </tr>
+              <tr>
+                <td>Customization Date</td>
+                <td>{{tokenData.customisation.date}}</td>
+              </tr>
+              <tr>
+                <td>Customization Location</td>
+                <td>{{tokenData.customisation.location}}</td>
+              </tr>
+              <tr>
+                <td>Brand</td>
+                <td>{{tokenData.brand}}</td>
+              </tr>
+              <tr>
+                <td>Model</td>
+                <td>{{tokenData.model}}</td>
+              </tr>
+              <tr>
+                <td>Artist</td>
+                <td>{{tokenData.artist}}</td>
+              </tr>
+              <tr v-if="tokenData.assistant">
+                <td>Assistant</td>
+                <td>{{tokenData.assistant}}</td>
+              </tr>
+            </tbody>
+          </table>
 
           <div>
             <span>
@@ -105,13 +124,17 @@
               </ul>
             </span>
           </div>
-          <div class="mt-3">
-            <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">View IPFS data</a>
+
+          <div class="row my-2">
+            <div class="col">
+              <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">View IPFS data</a>
+            </div>
+            <div class="col">
+              <a :href="etherscanTokenLink(tokenId)" class="btn-link" target="_blank">View on
+                Etherscan</a>
+            </div>
           </div>
-          <div class="mt-3">
-            <a :href="etherscanTokenLink(tokenId)" class="btn-link" target="_blank">View on
-              Etherscan</a>
-          </div>
+
         </div>
         <div class="col">
           <div class="img-container">
@@ -126,9 +149,7 @@
       </p>
     </div>
     <div v-if="noResultFound" class="mt-4">
-      <p class="text-info">
         No results found
-      </p>
     </div>
   </div>
 </template>
