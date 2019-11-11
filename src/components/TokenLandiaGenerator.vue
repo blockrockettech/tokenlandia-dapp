@@ -77,8 +77,15 @@
                required v-model="model.tokenId"/>
       </validate>
 
-      <div v-if="formState.$dirty && !productIdValid">
-        <div class="text-danger">Product ID invalid</div>
+      <div v-if="model.tokenId && formState.tokenId.$dirty && !isCheckingTokenId ">
+        <div class="text-danger" v-if="tokenIdAlreadyAssigned">
+          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+          </font-awesome-icon> Token ID already assigned
+        </div>
+        <div class="text-success" v-if="!tokenIdAlreadyAssigned">
+          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+          </font-awesome-icon> Token ID not assigned
+        </div>
       </div>
 
       <hr/>
@@ -431,7 +438,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Watch} from 'vue-property-decorator';
     import {mapGetters, mapState} from "vuex";
     import {Buffer} from 'buffer/';
     import moment from 'moment';
@@ -540,6 +547,8 @@
         mintingTransactionHash: string = '';
         ipfsDataHash: string = '';
         saving: boolean = false;
+        tokenIdAlreadyAssigned: boolean = false;
+        isCheckingTokenId: boolean = false;
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
@@ -626,6 +635,19 @@
                     customization_date: moment(customisation_date).format('YYYY-MM-DD'),
                 },
             };
+        }
+
+        @Watch('model.tokenId')
+        async onAccountChange(newVal: any, oldVal: any) {
+            this.tokenIdAlreadyAssigned = false;
+            this.isCheckingTokenId = true;
+            if (newVal !== oldVal) {
+                if (newVal) {
+                    const checkTokenIdIsValid = await this.$store.dispatch('checkTokenIdIsValid', newVal);
+                    this.tokenIdAlreadyAssigned = checkTokenIdIsValid === true;
+                }
+            }
+            this.isCheckingTokenId = false;
         }
 
         async onSubmit() {

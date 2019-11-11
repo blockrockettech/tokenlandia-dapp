@@ -330,5 +330,14 @@ export default new Vuex.Store({
       });
     },
 
+    async checkTokenIdIsValid({state}, tokenId) {
+      try {
+        await state.tokenLandiaContract.methods.attributes(tokenId).call();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+
   }
 });
