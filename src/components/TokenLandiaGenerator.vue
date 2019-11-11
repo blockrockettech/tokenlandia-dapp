@@ -80,11 +80,13 @@
       <div v-if="model.tokenId && formState.tokenId.$dirty && !isCheckingTokenId ">
         <div class="text-danger" v-if="tokenIdAlreadyAssigned">
           <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
-          </font-awesome-icon> Token ID already assigned
+          </font-awesome-icon>
+          Token ID already assigned
         </div>
         <div class="text-success" v-if="!tokenIdAlreadyAssigned">
           <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
-          </font-awesome-icon> Token ID not assigned
+          </font-awesome-icon>
+          Token ID not assigned
         </div>
       </div>
 
@@ -376,12 +378,24 @@
                     :disabled="!account">
             Use Current
           </b-button>
-          <field-messages
-            name="recipient" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              ETH Address is required
-            </div>
-          </field-messages>
+
+          <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
+            <span class="text-danger" v-if="!validateAddress(model.recipient)">
+              <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+              </font-awesome-icon> Invalid recipient
+            </span>
+            <span class="text-success" v-if="validateAddress(model.recipient)">
+              <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+              </font-awesome-icon> Valid recipient
+            </span>
+          </span>
+
+<!--          <field-messages-->
+<!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
+<!--            <div slot="required" class="text-danger">-->
+<!--              ETH Address is required-->
+<!--            </div>-->
+<!--          </field-messages>-->
         </div>
       </validate>
 
@@ -483,7 +497,7 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected', 'accountProperties']),
+            ...mapGetters(['isConnected', 'accountProperties', 'validateAddress', 'checksumAddress']),
             ...mapState(['account']),
         },
         components: {
@@ -648,6 +662,15 @@
                 }
             }
             this.isCheckingTokenId = false;
+        }
+
+        @Watch('model.recipient')
+        async onRecipientChange(newVal: any, oldVal: any) {
+            if (newVal !== oldVal) {
+                if (_.size(newVal) === 42) {
+                    this.model.recipient = this.checksumAddress(this.model.recipient);
+                }
+            }
         }
 
         async onSubmit() {
