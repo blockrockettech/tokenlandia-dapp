@@ -373,11 +373,10 @@
                  maxlength="42"
                  v-model="model.recipient"
                  required/>
-          <b-button variant="primary"
-                    class="cta-tokenlandia"
+          <b-button variant="link"
                     @click="useCurrentEthAccount"
-                    :disabled="!account">
-            Use Current
+                    v-if="account">
+            use current account
           </b-button>
 
           <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
@@ -779,8 +778,6 @@
 
 <style scoped>
   .generator-container {
-    width: 70%;
-    margin: 0 auto;
   }
 
   .dropzone {
