@@ -21,7 +21,6 @@
             <router-link to="/user-access">Access</router-link>
           </li>
           <li class="mt-2">
-            <hr/>
             <b-button class="cta-tokenlandia" @click="onLogin" v-if="!account">
               Login
             </b-button>
@@ -35,6 +34,14 @@
             </div>
           </li>
         </ul>
+
+        <hr/>
+
+        <footer class="footer mt-5">
+          Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
+          <br/>
+          <current-network class="mt-3"></current-network>
+        </footer>
       </nav>
 
       <!-- Page Content + Footer  -->
@@ -47,14 +54,10 @@
             <font-awesome-icon icon="bars"/>
           </b-button>
         </div>
-        <router-view class="view"/>
 
-        <hr/>
+        <router-view class="view mb-5"/>
 
-        <footer class="footer p-2">
-          <current-network></current-network>
-          Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
-        </footer>
+
       </div>
     </div>
 
@@ -119,6 +122,11 @@
   .cta-tokenlandia {
     background-color: #DE683C;
     border-color: #DE683C;
+  }
+
+  .cta-tokenlandia:hover {
+    background-color: #eb553b;
+    border-color: #eb553b;
   }
 
   #app {

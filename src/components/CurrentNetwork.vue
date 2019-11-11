@@ -1,7 +1,5 @@
 <template>
-    <div>
-      [{{ networkName }}] <span v-if="account">| Account <a :href="`${etherscanBase}/address/${account}`" v-if="account" target="_blank">{{account}}</a></span>
-    </div>
+  <span class="badge badge-light" v-if="networkName">{{ networkName }}</span>
 </template>
 
 <script>
