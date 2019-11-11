@@ -17,14 +17,14 @@
           </b-input-group>
 
           <b-button class="cta-tokenlandia ml-2"
-                    @click="performSearch"
+                    @click="performProductSearch"
                     v-if="!searching"
                     :disabled="!productId">
             Search
           </b-button>
 
           <b-button class="cta-tokenlandia ml-2"
-                    v-if="searching" disabled>
+                    v-if="searching && productId" disabled>
             <SmallSpinner/>
           </b-button>
         </b-form>
@@ -38,14 +38,14 @@
           </b-input-group>
 
           <b-button class="cta-tokenlandia ml-2"
-                    @click="performSearch"
+                    @click="performTokenSearch"
                     v-if="!searching"
                     :disabled="!tokenId">
             Search
           </b-button>
 
           <b-button class="cta-tokenlandia ml-2"
-                    v-if="searching" disabled>
+                    v-if="searching && tokenId" disabled>
             <SmallSpinner/>
           </b-button>
         </b-form>
@@ -182,7 +182,20 @@
     ipfsData: any = {};
     ipfsDataRetrieved: boolean = false;
 
-    performSearch() {
+    performTokenSearch() {
+      this.ipfsDataRetrieved = false;
+      this.searching = true;
+      this.attributes = {};
+      this.ownerOf = '';
+      this.noResultFound = false;
+
+      const isTokenIdSearch = this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId));
+      if (isTokenIdSearch) {
+        this.findInformationForTokenId(this.tokenId);
+      }
+    }
+
+    performProductSearch() {
       this.ipfsDataRetrieved = false;
       this.searching = true;
       this.attributes = {};
@@ -190,7 +203,7 @@
       this.noResultFound = false;
 
       const isProductIdSearch = this.productId.trim() !== '';
-      const isTokenIdSearch = this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId));
+
 
       if (isProductIdSearch) {
         this.$store.dispatch('tokenIdForProductId', this.productId)
@@ -201,8 +214,6 @@
             this.noResultFound = true;
             this.searching = false;
           });
-      } else if (isTokenIdSearch) {
-        this.findInformationForTokenId(this.tokenId);
       }
     }
 
@@ -212,6 +223,9 @@
         .then(({attributes, ownerOf}) => {
           this.attributes = attributes;
           this.ownerOf = ownerOf;
+
+          this.productId = null;
+          this.tokenId = null;
         })
         .catch(() => {
           this.searching = false;
