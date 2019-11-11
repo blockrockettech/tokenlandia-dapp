@@ -136,6 +136,7 @@
             id="dropzone"
             :options="dropzoneOptions"
             :useCustomSlot="true"
+            :duplicateCheck="true"
             @vdropzone-file-added="onFileAdded">
             <div class="dropzone-custom-content">
               <h4 class="dropzone-custom-title">Drag and drop the image</h4>
@@ -542,12 +543,14 @@
 
         dropzoneOptions: any = {
             url: 'https://',
-            thumbnailHeight: 75,
-            thumbnailWidth: null,
+            thumbnailHeight: 120,
+            thumbnailWidth: 120,
             autoProcessQueue: false,
-            maxFilesize: 10,
+            maxFilesize: 20,
             maxFiles: 1,
             minFiles: 1,
+            addRemoveLinks: true,
+            acceptedFiles: 'image/*'
         };
 
         file: any = null;
@@ -668,6 +671,7 @@
         async onRecipientChange(newVal: any, oldVal: any) {
             if (newVal !== oldVal) {
                 if (_.size(newVal) === 42) {
+                    // @ts-ignore
                     this.model.recipient = this.checksumAddress(this.model.recipient);
                 }
             }

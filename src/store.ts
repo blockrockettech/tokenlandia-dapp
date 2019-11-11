@@ -102,10 +102,12 @@ export default new Vuex.Store({
     },
     accountProperties: state => state.accountProperties,
     validateAddress: state => (address: string) => {
+      // @ts-ignore
       return state.web3.utils.isAddress(address);
     },
     checksumAddress: state => (address: string) => {
       try{
+        // @ts-ignore
         return state.web3.utils.toChecksumAddress(address);
       }catch(e){
         return address;
@@ -342,6 +344,7 @@ export default new Vuex.Store({
 
     async checkTokenIdIsValid({state}, tokenId) {
       try {
+        // @ts-ignore
         await state.tokenLandiaContract.methods.attributes(tokenId).call();
         return true;
       } catch (e) {
