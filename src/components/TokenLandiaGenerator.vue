@@ -2,6 +2,12 @@
   <div class="generator-container txt">
     <h1 class="heading">TokenLandia NFT Generator</h1>
     <hr/>
+
+    <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
+    <div class="alert alert-warning" v-else-if="!canUserMint && accountProperties.canMint === false">
+      It doesn't look like you can mint. Double check you're using the correct account.
+    </div>
+
     <h4 class="heading">Unique Identifier:
       <span v-bind:class="{ 'text-success': this.productIdValid }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
@@ -373,11 +379,10 @@
                  maxlength="42"
                  v-model="model.recipient"
                  required/>
-          <b-button variant="primary"
-                    class="cta-tokenlandia"
+          <b-button variant="link"
                     @click="useCurrentEthAccount"
-                    :disabled="!account">
-            Use Current
+                    v-if="account">
+            use current account
           </b-button>
 
           <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
@@ -400,8 +405,6 @@
         </div>
       </validate>
 
-      <hr/>
-
       <div class="row">
         <div class="col-12">
           <div class="mt-4">
@@ -410,10 +413,7 @@
                         :disabled="isMintingDisabled">
                 Mint
               </b-button>
-              <small v-if="!this.account">Login to web3 to mint new tokens</small>
-              <small v-else-if="!canUserMint && accountProperties.canMint === false">
-                It doesn't look like you can mint. Double check you're using the correct account.
-              </small>
+              <!--<b-button type="reset" variant="outline-secondary" class="my-2">Reset</b-button>-->
             </div>
             <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
               <b-button type="button" class="cta-tokenlandia btn-block btn-lg" disabled>
@@ -435,7 +435,7 @@
 
       <div class="row">
         <div class="col">
-          <a class="btn btn-link text-muted collapse-raw-link" v-b-toggle.collapse-raw-data>
+          <a class="collapse-raw-link" v-b-toggle.collapse-raw-data>
             Raw IPFS Data
           </a>
           <b-collapse id="collapse-raw-data" class="text-left">
@@ -785,8 +785,6 @@
 
 <style scoped>
   .generator-container {
-    width: 70%;
-    margin: 0 auto;
   }
 
   .dropzone {
@@ -795,11 +793,9 @@
   }
 
   #collapse-raw-data {
-    background-color: #ededeb;
   }
 
-  #collapse-raw-link {
-    background-color: #ededeb;
+  .collapse-raw-link {
     cursor: pointer;
   }
 
