@@ -13,7 +13,7 @@
            Token ID: #<span class="text-muted">{{token.tokenId}}</span>
           </span>
           <span class="ml-2">
-            Produce Code: <span class="text-muted">{{token._productId}}</span>
+            Product Code: <span class="text-muted">{{token._productId}}</span>
           </span>
         </p>
         <hr/>
@@ -53,6 +53,7 @@
                     const attributes = await this.$store.dispatch('attributesForTokenId', tokenId);
                     return {
                         text: `Token ID: #${tokenId} - Product Code: ${attributes._productId}`,
+                        value: tokenId, // n.b: value is used by b-form-select
                         tokenId,
                         ...attributes
                     }
