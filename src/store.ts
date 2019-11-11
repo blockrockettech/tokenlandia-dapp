@@ -101,6 +101,16 @@ export default new Vuex.Store({
       return `${state.etherscanBase}/token/${networkAddress}?a=${tokenId}`;
     },
     accountProperties: state => state.accountProperties,
+    validateAddress: state => (address: string) => {
+      return state.web3.utils.isAddress(address);
+    },
+    checksumAddress: state => (address: string) => {
+      try{
+        return state.web3.utils.toChecksumAddress(address);
+      }catch(e){
+        return address;
+      }
+    },
   },
   actions: {
 
