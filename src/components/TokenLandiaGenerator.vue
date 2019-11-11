@@ -391,12 +391,12 @@
             </span>
           </span>
 
-<!--          <field-messages-->
-<!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
-<!--            <div slot="required" class="text-danger">-->
-<!--              ETH Address is required-->
-<!--            </div>-->
-<!--          </field-messages>-->
+          <!--          <field-messages-->
+          <!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
+          <!--            <div slot="required" class="text-danger">-->
+          <!--              ETH Address is required-->
+          <!--            </div>-->
+          <!--          </field-messages>-->
         </div>
       </validate>
 
@@ -416,13 +416,13 @@
               </small>
             </div>
             <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
+              <b-button type="button" class="cta-tokenlandia btn-block btn-lg" disabled>
                 <SmallSpinner/>
                 Uploading data to IPFS...
               </b-button>
             </div>
             <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg" disabled>
+              <b-button type="button" class="cta-tokenlandia btn-block btn-lg" disabled>
                 Please authorise the transaction...
               </b-button>
             </div>
@@ -678,12 +678,16 @@
         }
 
         async onSubmit() {
-            console.log(this.formState.$error);
+            if (this.mintingTransactionHash.length > 0) {
+                console.log("Already submitted");
+                return;
+            }
+
+            if (!this.file && !this.fileBuffer) {
+                alert("An image has not been uploaded");
+                return;
+            }
             if (this.formState.$valid) {
-                if (!this.file && !this.fileBuffer) {
-                    alert("An image has not been uploaded");
-                    return;
-                }
 
                 this.mintingTransactionHash = '';
                 this.saving = true;
@@ -717,6 +721,8 @@
                     .finally(() => {
                         this.saving = false;
                     });
+            } else {
+                console.log(this.formState.$error);
             }
         }
 
