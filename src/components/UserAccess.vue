@@ -29,7 +29,7 @@
             <b-button class="cta-tokenlandia ml-2"
                       @click="applyCurrentAddressToCanMint"
                       :disabled="!account">
-              Use Current
+              Use current
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkCanMint"
@@ -124,7 +124,7 @@
             <b-button class="cta-tokenlandia ml-2"
                       @click="applyCurrentAddressToIsAdmin"
                       :disabled="!account">
-              Use Current
+              Use current
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkIsAdmin"
