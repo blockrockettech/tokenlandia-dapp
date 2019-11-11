@@ -27,7 +27,8 @@
           </div>
           <div class="col-6">
             <b-button class="cta-tokenlandia ml-2"
-                      @click="applyCurrentAddressToCanMint">
+                      @click="applyCurrentAddressToCanMint"
+                      :disabled="!account">
               Use Current
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
@@ -71,12 +72,12 @@
           <div class="col-6">
             <b-button class="btn-success ml-2 mr-2"
                       @click="addMinter"
-                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+                      :disabled="!(account && addRemoveMinterEthAddress.value.length === 42)">
               Add
             </b-button>
             <b-button class="btn-danger"
                       @click="removeMinter"
-                      :disabled="!(isConnected && addRemoveMinterEthAddress.value.length === 42)">
+                      :disabled="!(account && addRemoveMinterEthAddress.value.length === 42)">
               Remove
             </b-button>
             <txs-link :hash="addRemoveMinterEthAddress.result"></txs-link>
@@ -113,11 +114,18 @@
             <label for="ethAddress-is-admin">ETH Address</label>
           </div>
           <div class="col-4">
-            <b-form-input id="ethAddress-is-admin" type="text"
+            <b-form-input id="ethAddress-is-admin"
+                          type="text"
                           v-model="isAdminEthAddress.value"
+                          @input="clearIsAdminEthAddressResult"
                           placeholder="0x123..."/>
           </div>
-          <div class="col-2">
+          <div class="col-6">
+            <b-button class="cta-tokenlandia ml-2"
+                      @click="applyCurrentAddressToIsAdmin"
+                      :disabled="!account">
+              Use Current
+            </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkIsAdmin"
                       v-if="!isAdminEthAddress.loading"
@@ -128,13 +136,21 @@
                       v-if="isAdminEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>
-            <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg"
-                               v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === true">
-            </font-awesome-icon>
-            <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg"
-                               v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === false">
-            </font-awesome-icon>
           </div>
+        </div>
+        <div class="mt-3" v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === true">
+          <p class="d-inline-block">
+            The ETH address <strong>{{isAdminEthAddress.value}}</strong> is a Tokenlandia admin
+          </p>
+          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+          </font-awesome-icon>
+        </div>
+        <div class="mt-3" v-if="!isAdminEthAddress.loading && isAdminEthAddress.result === false">
+          <p class="d-inline-block">
+            The ETH address <strong>{{canMintEthAddress.value}}</strong> is not a Tokenlandia admin
+          </p>
+          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+          </font-awesome-icon>
         </div>
 
         <!-- Add admin access -->
@@ -150,7 +166,8 @@
           <div class="col-4">
             <b-button class="btn-success ml-2 mr-2"
                       @click="addAdmin"
-                      :disabled="!(isConnected && addAdminEthAddress.value)">Add
+                      :disabled="!(account && addAdminEthAddress.value)">
+              Add
             </b-button>
             <txs-link :hash="addAdminEthAddress.result"></txs-link>
           </div>
@@ -227,9 +244,18 @@
             this.canMintEthAddress.result = null;
         }
 
+        clearIsAdminEthAddressResult() {
+            this.isAdminEthAddress.result = null;
+        }
+
         applyCurrentAddressToCanMint() {
             this.canMintEthAddress.value = this.account;
             this.canMintEthAddress.result = null;
+        }
+
+        applyCurrentAddressToIsAdmin() {
+            this.isAdminEthAddress.value = this.account;
+            this.isAdminEthAddress.result = null;
         }
 
         async displayAllWhitelistedAddresses() {

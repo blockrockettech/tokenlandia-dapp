@@ -1,12 +1,29 @@
 <template>
   <div class="user-account-container text-left">
     <h1 class="text-center">My Account</h1>
-    <hr />
-    <TransferToken :tokens="tokenSummaryToIdMapArray" />
-    <br/>
-    <h3 class="text-left">My Tokens</h3>
-    <hr />
-    <div v-for="(token, idx) in tokenSummaryToIdMapArray" :key="idx">{{token.text}}</div>
+    <hr/>
+    <div v-if="account">
+      <TransferToken :tokens="tokenSummaryToIdMapArray"/>
+      <br/>
+      <h3 class="text-left">My Tokens</h3>
+      <hr/>
+      <div v-for="(token, idx) in tokenSummaryToIdMapArray" :key="idx">
+        <p>
+          <span class="ml-2">
+           Token ID: #<span class="text-muted">{{token.tokenId}}</span>
+          </span>
+          <span class="ml-2">
+            Produce Code: <span class="text-muted">{{token._productId}}</span>
+          </span>
+        </p>
+        <hr/>
+      </div>
+    </div>
+    <div v-else>
+      <p class="text-center pt-5">
+        Please login to see tokens you currently own
+      </p>
+    </div>
   </div>
 </template>
 
@@ -25,7 +42,6 @@
     })
     export default class UserAccount extends Vue {
         account: any;
-        initialised: boolean = false;
 
         tokenIds: string[] = [];
         tokenSummaryToIdMapArray: any[] = [];
@@ -36,26 +52,31 @@
                 tokenIds.map(async (tokenId: string) => {
                     const attributes = await this.$store.dispatch('attributesForTokenId', tokenId);
                     return {
-                        text: `#${tokenId} / ${attributes._productId}`,
-                        value: tokenId,
+                        text: `Token ID: #${tokenId} - Product Code: ${attributes._productId}`,
+                        tokenId,
+                        ...attributes
                     }
                 })
             );
         }
 
+        mounted() {
+            if (this.account) {
+                this.$store.dispatch('tokensOfOwner', this.account)
+                    .then(data => this.fetchTokenInfoFromTokenIDs(data));
+            }
+        }
+
         @Watch('account')
-        onAccountChange(newVal: any) {
-            if (!this.initialised && newVal) {
+        onAccountChange(newVal: any, oldVal: any) {
+            if (newVal !== oldVal) {
                 this.$store.dispatch('tokensOfOwner', newVal)
                     .then(data => this.fetchTokenInfoFromTokenIDs(data));
-                this.initialised = true;
             }
         }
     }
 </script>
 
 <style scoped>
-  /*.user-account-container {
-    height: calc(100vh - 100px);
-  }*/
+
 </style>

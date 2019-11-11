@@ -1,6 +1,6 @@
 <template>
     <div>
-      [{{ networkName }}] <span v-if="account">| Account <a :href="`${etherscanBase}/address/${account}`" v-if="account">{{account}}</a></span>
+      [{{ networkName }}] <span v-if="account">| Account <a :href="`${etherscanBase}/address/${account}`" v-if="account" target="_blank">{{account}}</a></span>
     </div>
 </template>
 

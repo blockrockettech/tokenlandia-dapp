@@ -12,7 +12,7 @@ Vue.use(Vuex);
 
 let tokenLandiaContract: any = {};
 
-function getWhitelistedAddresses({ addedEventName, removedEventName, tokenContract, options, resolve, reject }: any) {
+function getWhitelistedAddresses({addedEventName, removedEventName, tokenContract, options, resolve, reject}: any) {
   tokenContract.getPastEvents(addedEventName, options, (error: any, events: any[]) => {
     if (error) reject(error);
     if (!events) reject(new Error(`${addedEventName} events came back undefined`));
@@ -104,45 +104,20 @@ export default new Vuex.Store({
   },
   actions: {
 
-    bootstrap({dispatch}) {
-      dispatch('loginWeb3');
+    bootstrap({dispatch}, provider) {
+      dispatch('loginWeb3', provider);
     },
 
     /////////////////////////
     // Web3 initialisation //
     /////////////////////////
 
-    async loginWeb3({dispatch, state}) {
+    async loginWeb3({dispatch, state}, provider) {
       if (!state.account) {
         // @ts-ignore
-        if (window.ethereum) {
-          console.log('Init modern web3');
-          try {
-            // @ts-ignore
-            window.web3 = new Web3(ethereum);
-            // Request account access if needed
-            // @ts-ignore
-            await ethereum.enable();
-            // @ts-ignore
-            dispatch('initWeb3', window.web3);
-          } catch (error) {
-            console.log(error);
-            alert('Access denied - we need access to your wallet to fully connect to the site');
-            dispatch('setupStaticWeb');
-          }
-        }
-        // Legacy dapp browsers...
+        window.web3 = new Web3(provider);
         // @ts-ignore
-        else if (window.web3) {
-          console.log('Init legacy web3');
-          // @ts-ignore
-          window.web3 = new Web3(web3.currentProvider);
-          // @ts-ignore
-          dispatch('initWeb3', window.web3);
-        } else {
-          console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-          dispatch('setupStaticWebs');
-        }
+        dispatch('initWeb3', window.web3);
       }
     },
 
@@ -156,7 +131,9 @@ export default new Vuex.Store({
             commit('account', account);
 
             dispatch('checkCanMint', account)
-              .then((data) => { commit('updateCanCurrentAccountMint', data); })
+              .then((data) => {
+                commit('updateCanCurrentAccountMint', data);
+              })
               .catch(() => commit('updateCanCurrentAccountMint', false));
           } else {
             console.log(`Error getting accounts`, error);
@@ -165,11 +142,12 @@ export default new Vuex.Store({
       });
     },
 
-    setupStaticWebs({dispatch, commit}) {
+    setupStaticWeb3({dispatch, commit}) {
       console.log(`No web3 provider found, defaulting to static web3 instance`);
       const web3 = new Web3(new Web3.providers.HttpProvider(`https://rinkeby.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
-      commit('web3', web3);
-      dispatch('getNetwork');
+      // @ts-ignore
+      window.web3 = web3;
+      dispatch('initWeb3', web3);
     },
 
     async getNetwork({commit, dispatch}) {
@@ -222,7 +200,7 @@ export default new Vuex.Store({
     },
 
     attributesForTokenId({state}, tokenId) {
-        return state.tokenLandiaContract.methods.attributes(tokenId).call();
+      return state.tokenLandiaContract.methods.attributes(tokenId).call();
     },
 
     mintToken({state}, {tokenId, recipient, productCode, ipfsHash}) {

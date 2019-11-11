@@ -77,7 +77,7 @@
                required v-model="model.tokenId"/>
       </validate>
 
-      <div v-if="!productIdValid">
+      <div v-if="formState.$dirty && !productIdValid">
         <div class="text-danger">Product ID invalid</div>
       </div>
 
@@ -363,7 +363,10 @@
                  maxlength="42"
                  v-model="model.recipient"
                  required/>
-          <b-button variant="primary" class="cta-tokenlandia" @click="useCurrentEthAccount">
+          <b-button variant="primary"
+                    class="cta-tokenlandia"
+                    @click="useCurrentEthAccount"
+                    :disabled="!account">
             Use Current
           </b-button>
           <field-messages
@@ -385,7 +388,7 @@
                         :disabled="isMintingDisabled">
                 Mint
               </b-button>
-              <small v-if="!isWeb3Initialised">Loading up Web 3...</small>
+              <small v-if="!this.account">Login to web3 to mint new tokens</small>
               <small v-else-if="!canUserMint && accountProperties.canMint === false">
                 It doesn't look like you can mint. Double check you're using the correct account.
               </small>
@@ -683,15 +686,11 @@
         }
 
         get isMintingDisabled(): boolean {
-            return !this.isWeb3Initialised || !this.canUserMint;
-        }
-
-        get isWeb3Initialised() {
-            return (this.isConnected && this.account);
+            return !this.account || !this.canUserMint;
         }
 
         get canUserMint(): boolean {
-            return this.isWeb3Initialised && this.accountProperties.canMint;
+            return this.account && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

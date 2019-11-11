@@ -20,6 +20,20 @@
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">Access</router-link>
           </li>
+          <li class="mt-2">
+            <hr/>
+            <b-button class="cta-tokenlandia" @click="onLogin" v-if="!account">
+              Login
+            </b-button>
+            <div v-else>
+              <div class="mb-1">Logged in as</div>
+              <strong>
+                <a :href="`${etherscanBase}/address/${account}`" v-if="account" target="_blank">
+                  {{dotDotDotAddress()}}
+                </a>
+              </strong>
+            </div>
+          </li>
         </ul>
       </nav>
 
@@ -47,24 +61,45 @@
   </div>
 </template>
 
-<script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
-    import CurrentNetwork from "@/components/CurrentNetwork.vue";
+<script>
+    import {mapState} from 'vuex';
+    import CurrentNetwork from '@/components/CurrentNetwork.vue';
+    import web3Connect from '@/web3ConnectService';
 
-    @Component({
-        components: {CurrentNetwork}
-    })
-    export default class App extends Vue {
-        collapsed: boolean = false;
-
-        toggleCollapse() {
-            this.collapsed = !this.collapsed;
-        }
-
+    export default {
+        name: 'App',
+        data() {
+            return {
+                collapsed: false
+            };
+        },
+        computed: {
+            ...mapState([
+                'account',
+                'etherscanBase'
+            ]),
+        },
+        components: {
+            CurrentNetwork
+        },
+        methods: {
+            toggleCollapse() {
+                this.collapsed = !this.collapsed;
+            },
+            onLogin() {
+                web3Connect.toggleModal();
+            },
+            dotDotDotAddress: function () {
+                return this.account.substr(0, 6) + '...' + this.account.substr(this.account.length - 6, this.account.length);
+            }
+        },
         created() {
-            this.$store.dispatch('bootstrap');
+            web3Connect.on('connect', provider => {
+                this.$store.dispatch('bootstrap', provider);
+            });
+            this.$store.dispatch('setupStaticWeb3');
         }
-    }
+    };
 </script>
 
 <style lang="scss">
