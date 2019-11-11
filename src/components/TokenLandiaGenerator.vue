@@ -671,6 +671,7 @@
         async onRecipientChange(newVal: any, oldVal: any) {
             if (newVal !== oldVal) {
                 if (_.size(newVal) === 42) {
+                    // @ts-ignore
                     this.model.recipient = this.checksumAddress(this.model.recipient);
                 }
             }
