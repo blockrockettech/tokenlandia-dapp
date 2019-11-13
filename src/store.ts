@@ -62,6 +62,7 @@ export default new Vuex.Store({
     networkId: 1,
     networkName: 'Mainnet',
     etherscanBase: 'https://etherscan.io',
+    openseaBase: 'https://opensea.io',
 
     // Account
     account: null,
@@ -74,10 +75,11 @@ export default new Vuex.Store({
     tokenLandiaContract: tokenLandiaContract,
   },
   mutations: {
-    networkDetails(state, {networkId, networkName, etherscanBase}) {
+    networkDetails(state, {networkId, networkName, etherscanBase, openseaBase}) {
       state.networkId = networkId;
       state.networkName = networkName;
       state.etherscanBase = etherscanBase;
+      state.openseaBase = openseaBase;
       // @ts-ignore
       state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
     },
@@ -96,9 +98,13 @@ export default new Vuex.Store({
       // @ts-ignore
       return window.web3 !== undefined;
     },
-    etherscanTokenLink: state => (tokenId: number) => {
+    etherscanTokenLink: state => (tokenId: string) => {
       const networkAddress = TokenlandiaJson.networks[state.networkId].address;
       return `${state.etherscanBase}/token/${networkAddress}?a=${tokenId}`;
+    },
+    openSeaTokenLink: state => (tokenId: string) => {
+      const networkAddress = TokenlandiaJson.networks[state.networkId].address;
+      return `${state.openseaBase}/assets/${networkAddress}/${tokenId}`;
     },
     accountProperties: state => state.accountProperties,
     validateAddress: state => (address: string) => {
@@ -166,7 +172,8 @@ export default new Vuex.Store({
       const networkId = await dispatch('getNetworkId');
       const networkName = await getNetworkName(networkId);
       const etherscanBase = await dispatch('getEtherscanAddress', networkId);
-      return commit('networkDetails', {networkId, networkName, etherscanBase});
+      const openseaBase = await dispatch('getOpenseaAddress', networkId);
+      return commit('networkDetails', {networkId, networkName, etherscanBase, openseaBase});
     },
 
     getNetworkId({state}) {
@@ -180,6 +187,17 @@ export default new Vuex.Store({
           return 'https://etherscan.io';
         case 4:
           return 'https://rinkeby.etherscan.io';
+        default:
+          return '';
+      }
+    },
+
+    getOpenseaAddress({}, networkId) {
+      switch (networkId) {
+        case 1:
+          return 'https://opensea.io';
+        case 4:
+          return 'https://rinkeby.opensea.io';
         default:
           return '';
       }

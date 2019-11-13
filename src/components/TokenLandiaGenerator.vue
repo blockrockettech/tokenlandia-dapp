@@ -80,10 +80,10 @@
                name="tokenId"
                id="tokenId"
                class="form-control"
-               required v-model="model.tokenId"/>
+               required v-model="model.token_id"/>
       </validate>
 
-      <div v-if="model.tokenId && formState.tokenId.$dirty && !isCheckingTokenId ">
+      <div v-if="model.token_id && formState.tokenId.$dirty && !isCheckingTokenId ">
         <div class="text-danger" v-if="tokenIdAlreadyAssigned">
           <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
           </font-awesome-icon>
@@ -259,7 +259,7 @@
                  name="customiseLocation"
                  id="customiseLocation"
                  class="form-control"
-                 required v-model="model.customisation_location"/>
+                 required v-model="model.customization_location"/>
 
           <field-messages
             name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
@@ -477,12 +477,12 @@
         initials: string,
         series: string,
         design: string,
-        tokenId: string,
+        token_id: string,
         name: string,
         description: string,
         purchase_location: string,
         purchase_date: string,
-        customisation_location: string,
+        customization_location: string,
         customisation_date: string,
         brand: string,
         model: string,
@@ -522,12 +522,12 @@
             initials: '',
             series: '',
             design: '',
-            tokenId: '',
+            token_id: '',
             name: '',
             description: '',
             purchase_location: '',
             purchase_date: '',
-            customisation_location: '',
+            customization_location: '',
             customisation_date: '',
             brand: '',
             model: '',
@@ -628,6 +628,7 @@
                 design,
                 purchase_date,
                 customisation_date,
+                recipient,
                 ...basicModel
             } = this.model;
 
@@ -654,7 +655,7 @@
             };
         }
 
-        @Watch('model.tokenId')
+        @Watch('model.token_id')
         async onAccountChange(newVal: any, oldVal: any) {
             this.tokenIdAlreadyAssigned = false;
             this.isCheckingTokenId = true;
@@ -770,7 +771,7 @@
         }
 
         get tokenId(): string {
-            return this.model.tokenId ? this.model.tokenId : '{TOKEN_ID}';
+            return this.model.token_id ? this.model.token_id : '{TOKEN_ID}';
         }
 
         get productCode(): string {

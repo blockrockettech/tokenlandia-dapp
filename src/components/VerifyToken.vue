@@ -111,34 +111,26 @@
                 <td>Assistant</td>
                 <td>{{tokenData.assistant}}</td>
               </tr>
+              <tr>
+                <td>Materials Used:</td>
+                <td>{{tokenData.materialsUsed}}</td>
+              </tr>
             </tbody>
           </table>
-
-          <div>
-            <span>
-              <strong>Materials Used:</strong>
-              <ul>
-                <li v-for="(material, idx) in tokenData.materialsUsed" :key="idx">
-                  {{material}}
-                </li>
-              </ul>
-            </span>
-          </div>
-
-          <div class="row my-2">
-            <div class="col">
-              <a :href="this.attributes._ipfsUrl" class="btn-link" target="_blank">View IPFS data</a>
-            </div>
-            <div class="col">
-              <a :href="etherscanTokenLink(tokenId)" class="btn-link" target="_blank">View on
-                Etherscan</a>
-            </div>
-          </div>
 
         </div>
         <div class="col">
           <div class="img-container">
             <img class="img" :src="ipfsData.image" alt=""/>
+          </div>
+          <div class="small mt-1">
+            <a :href="openSeaTokenLink(currentTokenId)" target="_blank">→ view token on OpenSea</a>
+          </div>
+          <div class="small mt-1">
+            <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on Etherscan</a>
+          </div>
+          <div class="small mt-1">
+            <a :href="attributes._ipfsUrl" target="_blank">→ view token data on IPFS</a>
           </div>
         </div>
       </div>
@@ -165,7 +157,7 @@
   @Component({
     components: {SmallSpinner, Spinner},
     computed: {
-      ...mapGetters(['etherscanTokenLink']),
+      ...mapGetters(['etherscanTokenLink', 'openSeaTokenLink']),
     }
   })
   export default class VerifyToken extends Vue {
@@ -174,6 +166,7 @@
 
     productId: string = '';
     tokenId: string = '';
+    currentTokenId: string = '';
     foundTokenId: string = '';
 
     attributes: any = {};
@@ -181,6 +174,9 @@
 
     ipfsData: any = {};
     ipfsDataRetrieved: boolean = false;
+
+    etherscanTokenLink!: (tokenId: string) => string;
+    openSeaTokenLink!: (tokenId: string) => string;
 
     performTokenSearch() {
       this.ipfsDataRetrieved = false;
@@ -225,6 +221,7 @@
           this.ownerOf = ownerOf;
           this.productId = "";
           this.tokenId = "";
+          this.currentTokenId = tokenId;
         })
         .catch(() => {
           this.searching = false;
@@ -261,7 +258,7 @@
         },
         customisation: {
           date: attributes.customization_date,
-          location: attributes.customisation_location,
+          location: attributes.customization_location,
         },
         brand: attributes.brand,
         model: attributes.model,
@@ -276,6 +273,8 @@
           data.materialsUsed.push(attributes[key]);
         }
       });
+
+      data.materialsUsed = data.materialsUsed.join(', ');
 
       return data;
     }
