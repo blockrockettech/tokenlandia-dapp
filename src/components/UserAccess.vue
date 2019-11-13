@@ -26,10 +26,11 @@
                           placeholder="0x123..."/>
           </div>
           <div class="col-6">
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
                       @click="applyCurrentAddressToCanMint"
+                      variant="link"
                       :disabled="!account">
-              Use current
+              use current account
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkCanMint"
@@ -121,10 +122,11 @@
                           placeholder="0x123..."/>
           </div>
           <div class="col-6">
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
+                      variant="link"
                       @click="applyCurrentAddressToIsAdmin"
                       :disabled="!account">
-              Use current
+              use current account
             </b-button>
             <b-button class="cta-tokenlandia ml-2"
                       @click="checkIsAdmin"
