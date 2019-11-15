@@ -3,6 +3,9 @@ import Vuex from 'vuex';
 import createLogger from 'vuex/dist/logger'
 
 // @ts-ignore
+import notifier from "./notifier.js"
+
+// @ts-ignore
 import * as Web3 from 'web3';
 
 const {getNetworkName} = require("@blockrocket/utils");
@@ -72,6 +75,7 @@ export default new Vuex.Store({
 
     // Countracts
     web3: null,
+    notifyInstance: null,
     tokenLandiaContract: tokenLandiaContract,
   },
   mutations: {
@@ -80,6 +84,7 @@ export default new Vuex.Store({
       state.networkName = networkName;
       state.etherscanBase = etherscanBase;
       state.openseaBase = openseaBase;
+      state.notifyInstance = notifier(networkId);
       // @ts-ignore
       state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
     },
@@ -112,10 +117,10 @@ export default new Vuex.Store({
       return state.web3.utils.isAddress(address);
     },
     checksumAddress: state => (address: string) => {
-      try{
+      try {
         // @ts-ignore
         return state.web3.utils.toChecksumAddress(address);
-      }catch(e){
+      } catch (e) {
         return address;
       }
     },
@@ -239,7 +244,11 @@ export default new Vuex.Store({
           .send({
             from: state.account
           })
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
@@ -249,12 +258,16 @@ export default new Vuex.Store({
         const from = state.account;
         state.tokenLandiaContract.methods.transferFrom(from, recipient, tokenId)
           .send({from})
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
 
-    checkIsAdmin({state, commit, dispatch}, ethAddress) {
+    c({state, commit, dispatch}, ethAddress) {
       try {
         return state.tokenLandiaContract.methods.isWhitelistAdmin(ethAddress).call();
       } catch (e) {
@@ -284,7 +297,11 @@ export default new Vuex.Store({
           .send({
             from: state.account
           })
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
@@ -295,7 +312,11 @@ export default new Vuex.Store({
           .send({
             from: state.account
           })
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
@@ -306,7 +327,11 @@ export default new Vuex.Store({
           .send({
             from: state.account
           })
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
@@ -317,7 +342,11 @@ export default new Vuex.Store({
           .send({
             from: state.account
           })
-          .once('transactionHash', resolve)
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
           .on('error', reject);
       });
     },
