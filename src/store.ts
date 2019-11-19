@@ -267,7 +267,7 @@ export default new Vuex.Store({
       });
     },
 
-    c({state, commit, dispatch}, ethAddress) {
+    checkIsAdmin({state, commit, dispatch}, ethAddress) {
       try {
         return state.tokenLandiaContract.methods.isWhitelistAdmin(ethAddress).call();
       } catch (e) {
