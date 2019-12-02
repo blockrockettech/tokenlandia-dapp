@@ -7,13 +7,15 @@
           <h3>TokenLandia Admin</h3>
         </div>
 
-        <ul class="list-unstyled components heading">
+        <ul class="list-unstyled components heading menu-text">
           <li>
-            <a href="#" :aria-expanded="mintingExpanded" class="dropdown-toggle" @click="toggleMintingSubmenu">
+            <a href="#" class="dropdown-toggle" @click="toggleMintingSubmenu">
               Minting
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
             </a>
             <ul class="collapse list-unstyled txt" id="homeSubmenu" v-bind:class="{'show': mintingExpanded}">
-              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/' }">
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/assets' }">
                 <router-link to="/">Assets</router-link>
               </li>
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">
@@ -30,7 +32,7 @@
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">Access</router-link>
           </li>
-          <li class="mt-2">
+          <li class="mt-2 centre-li">
             <b-button class="cta-tokenlandia" @click="onLogin" v-if="!account">
               Login
             </b-button>
@@ -207,6 +209,14 @@
       SIDEBAR STYLE
   ----------------------------------------------------- */
 
+  .menu-text {
+    text-align: left;
+  }
+
+  .centre-li {
+    text-align: center;
+  }
+
   .wrapper {
     display: flex;
     width: 100%;
@@ -240,7 +250,7 @@
   }
 
   #sidebar ul li a {
-    padding: 10px;
+    padding: 15px;
     font-size: 1.1em;
     display: block;
   }
@@ -270,8 +280,7 @@
 
   ul ul a {
     font-size: 0.9em !important;
-    padding-top: 5px !important;
-    padding-bottom: 20px !important;
+    padding-left: 30px !important;
   }
 
   a.download {

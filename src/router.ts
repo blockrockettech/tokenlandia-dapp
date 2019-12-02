@@ -10,8 +10,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      redirect: { name: 'mint-assets' }
     },
     {
       path: '/verify',
@@ -38,8 +37,13 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Account.vue'),
     },
     {
+      path: '/mint/assets',
+      name: 'mint-assets',
+      component: Home,
+    },
+    {
       path: '/mint/real-estate',
-      name: '/mint/real-estate',
+      name: 'mint-real-estate',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
