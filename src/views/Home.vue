@@ -1,16 +1,16 @@
 <template>
   <div class="home">
-    <TokenLandiaGenerator />
+    <AssetNFTGenerator />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import TokenLandiaGenerator from '@/components/TokenLandiaGenerator.vue';
+import AssetNFTGenerator from '@/components/minting/Assets.vue';
 
 @Component({
   components: {
-    TokenLandiaGenerator,
+      AssetNFTGenerator,
   },
 })
 export default class Home extends Vue {}

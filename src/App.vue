@@ -3,13 +3,23 @@
     <div class="wrapper">
       <!-- Sidebar  -->
       <nav id="sidebar" v-bind:class="{'s-active': collapsed}">
-        <div class="sidebar-header">
+        <div class="sidebar-header heading">
           <h3>TokenLandia Admin</h3>
         </div>
 
-        <ul class="list-unstyled components">
-          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/' }">
-            <router-link to="/">Mint</router-link>
+        <ul class="list-unstyled components heading">
+          <li>
+            <a href="#" :aria-expanded="mintingExpanded" class="dropdown-toggle" @click="toggleMintingSubmenu">
+              Minting
+            </a>
+            <ul class="collapse list-unstyled txt" id="homeSubmenu" v-bind:class="{'show': mintingExpanded}">
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/' }">
+                <router-link to="/">Assets</router-link>
+              </li>
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">
+                <router-link to="/mint/real-estate">Real Estate</router-link>
+              </li>
+            </ul>
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/verify' }">
             <router-link to="/verify">Verify</router-link>
@@ -50,7 +60,7 @@
           <b-button
             id="sidebarCollapse"
             variant="outline-warning"
-            @click="toggleCollapse">
+            @click="toggleSidebarCollapse">
             <font-awesome-icon icon="bars"/>
           </b-button>
         </div>
@@ -73,7 +83,8 @@
         name: 'App',
         data() {
             return {
-                collapsed: false
+                collapsed: false,
+                mintingExpanded: true
             };
         },
         computed: {
@@ -86,8 +97,11 @@
             CurrentNetwork
         },
         methods: {
-            toggleCollapse() {
+            toggleSidebarCollapse() {
                 this.collapsed = !this.collapsed;
+            },
+            toggleMintingSubmenu() {
+              this.mintingExpanded = !this.mintingExpanded;
             },
             onLogin() {
                 web3Connect.toggleModal();
@@ -256,8 +270,8 @@
 
   ul ul a {
     font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #DE683C;
+    padding-top: 5px !important;
+    padding-bottom: 20px !important;
   }
 
   a.download {

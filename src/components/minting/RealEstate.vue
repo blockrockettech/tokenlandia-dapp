@@ -1,6 +1,6 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">TokenLandia NFT Generator</h1>
+    <h1 class="heading">TokenLandia Real Estate NFT Generator</h1>
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
@@ -8,6 +8,7 @@
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
 
+    <!-- Unique Identifier -->
     <h4 class="heading">Unique Identifier:
       <span v-bind:class="{ 'text-success': this.productIdValid }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
@@ -97,21 +98,23 @@
       </div>
 
       <hr/>
-      <h4 class="heading">Product Information and Provenance</h4>
+      <h4 class="heading">Information and Provenance</h4>
       <br/>
 
-      <validate auto-label class="form-group row required-field">
-        <label for="name" class="col-sm-3 col-form-label">Name</label>
+      <validate auto-label class="form-group row required-field"
+                :class="fieldClassName(formState.property_address)">
+        <label for="property_address" class="col-sm-3 col-form-label">Property Address</label>
         <div class="col-sm-9">
-          <input type="text"
-                 name="name"
-                 maxlength="125"
-                 id="name"
-                 class="form-control"
-                 required v-model="model.name"/>
-
-          <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Name is a required field</div>
+            <textarea id="property_address"
+                      name="property_address"
+                      class="form-control"
+                      maxlength="300"
+                      required
+                      v-model.lazy="model.property_address">
+              </textarea>
+          <field-messages
+            name="property_address" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">Property Address is a required field</div>
           </field-messages>
         </div>
       </validate>
@@ -153,79 +156,52 @@
       </div>
 
       <validate auto-label class="form-group row required-field">
-        <label for="artist" class="col-sm-3 col-form-label">Artist</label>
+        <label for="year_built" class="col-sm-3 col-form-label">Year Built</label>
         <div class="col-sm-9">
           <input type="text"
-                 name="artist"
-                 id="artist"
+                 name="year_built"
+                 id="year_built"
                  class="form-control"
-                 required v-model="model.artist"/>
+                 required v-model="model.year_built"/>
           <field-messages
-            name="artist" show="$touched || $submitted" class="form-control-feedback">
+            name="yearBuilt" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
-              Artist is a required field
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <field class="form-group row">
-        <label for="artist_assistant" class="col-sm-3 col-form-label">Assistant</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="artist_assistant"
-                 id="artist_assistant"
-                 class="form-control"
-                 v-model.lazy="model.artist_assistant"/>
-        </div>
-      </field>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="brand" class="col-sm-3 col-form-label">Brand</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="brand"
-                 id="brand"
-                 class="form-control"
-                 required v-model="model.brand"/>
-          <field-messages
-            name="brand" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Brand is a required field
+              Year Built is a required field
             </div>
           </field-messages>
         </div>
       </validate>
 
       <validate auto-label class="form-group row required-field">
-        <label for="model" class="col-sm-3 col-form-label">Model</label>
+        <label for="community_name" class="col-sm-3 col-form-label">Community Name</label>
         <div class="col-sm-9">
           <input type="text"
-                 name="model"
-                 id="model"
+                 name="community_name"
+                 id="community_name"
                  class="form-control"
-                 required v-model="model.model"/>
+                 required v-model="model.community_name"/>
           <field-messages
-            name="model" show="$touched || $submitted" class="form-control-feedback">
+            name="community_name" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
-              Model is a required field
+              Community Name is a required field
             </div>
           </field-messages>
         </div>
       </validate>
 
       <validate auto-label class="form-group row required-field">
-        <label for="purchLocation" class="col-sm-3 col-form-label">Purchase Location</label>
+        <label for="developer" class="col-sm-3 col-form-label">Developer</label>
         <div class="col-sm-9">
           <input type="text"
-                 name="purchLocation"
-                 id="purchLocation"
+                 name="developer"
+                 id="developer"
                  class="form-control"
-                 required v-model="model.purchase_location"/>
-
+                 required v-model="model.developer"/>
           <field-messages
-            name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Purchase Location is a required field</div>
+            name="developer" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">
+              Developer is a required field
+            </div>
           </field-messages>
         </div>
       </validate>
@@ -251,117 +227,73 @@
       </validate>
 
       <validate auto-label class="form-group row required-field">
-        <label for="customiseLocation" class="col-sm-3 col-form-label">
-          Customization Location
+        <label for="maintenance_costs" class="col-sm-3 col-form-label">Maintenance Costs</label>
+        <div class="col-sm-9">
+          <input type="text"
+                 name="maintenance_costs"
+                 id="maintenance_costs"
+                 class="form-control"
+                 required v-model="model.maintenance_costs"/>
+          <field-messages
+            name="maintenance_costs" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">
+              Maintenance Costs is a required field
+            </div>
+          </field-messages>
+        </div>
+      </validate>
+
+      <validate auto-label class="form-group row required-field">
+        <label for="insurance_costs" class="col-sm-3 col-form-label">Insurance Costs</label>
+        <div class="col-sm-9">
+          <input type="text"
+                 name="insurance_costs"
+                 id="insurance_costs"
+                 class="form-control"
+                 required v-model="model.insurance_costs"/>
+
+          <field-messages
+            name="insurance_costs" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">Insurance Costs is a required field</div>
+          </field-messages>
+        </div>
+      </validate>
+
+      <validate auto-label class="form-group row required-field">
+        <label for="taxes" class="col-sm-3 col-form-label">
+          Taxes
         </label>
         <div class="col-sm-9">
           <input type="text"
-                 name="customiseLocation"
-                 id="customiseLocation"
+                 name="taxes"
+                 id="taxes"
                  class="form-control"
-                 required v-model="model.customization_location"/>
+                 required v-model="model.taxes"/>
 
           <field-messages
-            name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
+            name="taxes" show="$touched || $submitted" class="form-control-feedback">
             <div slot="required" class="text-danger">
-              Customization Location is a required field
+              Taxes is a required field
             </div>
           </field-messages>
         </div>
       </validate>
 
       <validate auto-label class="form-group row required-field">
-        <label for="customiseDate" class="col-sm-3 col-form-label">Customization Date</label>
+        <label for="rental_income" class="col-sm-3 col-form-label">Rental Income</label>
         <div class="col-sm-9">
-          <datepicker name="customiseDate"
-                      id="customiseDate"
-                      placeholder="YYYY-MM-DD"
-                      input-class="form-control"
-                      :typeable="true"
-                      :required="true"
-                      format="yyyy-MM-dd"
-                      v-model="model.customisation_date">
-          </datepicker>
+          <input type="text"
+                 name="rental_income"
+                 id="rental_income"
+                 class="form-control"
+                 required v-model="model.rental_income"/>
 
           <field-messages
-            name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Customization Date is a required field
-            </div>
+            name="rental_income" show="$touched || $submitted" class="form-control-feedback">
+            <div slot="required" class="text-danger">Rental Income is a required field</div>
           </field-messages>
         </div>
       </validate>
-
-      <hr/>
-
-      <h4 class="heading">Materials Used</h4>
-      <br/>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="material1" class="col-sm-3 col-form-label">Material 1</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material1"
-                 maxlength="40"
-                 id="material1"
-                 class="form-control"
-                 required v-model="model.material_1"/>
-          <field-messages
-            name="material1" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              One material is required
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <div class="form-group row">
-        <label for="material2" class="col-sm-3 col-form-label">Material 2</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material2"
-                 maxlength="40"
-                 id="material2"
-                 class="form-control"
-                 v-model="model.material_2"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material3" class="col-sm-3 col-form-label">Material 3</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material3"
-                 maxlength="40"
-                 id="material3"
-                 class="form-control"
-                 v-model="model.material_3"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material4" class="col-sm-3 col-form-label">Material 4</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material4"
-                 maxlength="40"
-                 id="material4"
-                 class="form-control"
-                 v-model="model.material_4"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material5" class="col-sm-3 col-form-label">Material 5</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 maxlength="40"
-                 name="material5"
-                 id="material5"
-                 class="form-control"
-                 v-model="model.material_5"/>
-        </div>
-      </div>
 
       <hr/>
 
@@ -469,7 +401,7 @@
     import SmallSpinner from '@/components/SmallSpinner.vue';
     import TxsLink from "@/components/TxsLink.vue";
 
-    import countryCodes from '../../static/country_codes.json';
+    import countryCodes from '../../../static/country_codes.json';
     import ipfsHttpClient from 'ipfs-http-client';
 
     interface Model {
@@ -478,22 +410,16 @@
         series: string,
         design: string,
         token_id: string,
-        name: string,
         description: string,
-        purchase_location: string,
+        property_address: string,
+        insurance_costs: string,
         purchase_date: string,
-        customization_location: string,
-        customisation_date: string,
-        brand: string,
-        model: string,
-        artist: string,
+        taxes: string,
+        developer: string,
+        maintenance_costs: string,
+        year_built: string,
         recipient: string,
-        artist_assistant: string,
-        material_1: string,
-        material_2: string,
-        material_3: string,
-        material_4: string,
-        material_5: string,
+        community_name: string,
     }
 
     @Component({
@@ -508,7 +434,7 @@
             vueDropzone: vue2Dropzone,
         },
     })
-    export default class TokenLandiaGenerator extends Vue {
+    export default class RealEstateNFTGenerator extends Vue {
         isConnected!: boolean;
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
@@ -523,22 +449,16 @@
             series: '',
             design: '',
             token_id: '',
-            name: '',
             description: '',
-            purchase_location: '',
+            property_address: '',
+            insurance_costs: '',
             purchase_date: '',
-            customization_location: '',
-            customisation_date: '',
-            brand: '',
-            model: '',
-            artist: '',
+            taxes: '',
+            developer: '',
+            maintenance_costs: '',
+            year_built: '',
             recipient: '',
-            artist_assistant: '',
-            material_1: '',
-            material_2: '',
-            material_3: '',
-            material_4: '',
-            material_5: '',
+            community_name: '',
         };
 
         dropzoneOptions: any = {
@@ -622,12 +542,10 @@
 
         getIpfsPayload(imageIpfsUrl: string): any {
             const {
-                name,
                 description,
                 series,
                 design,
                 purchase_date,
-                customisation_date,
                 recipient,
                 ...basicModel
             } = this.model;
@@ -650,7 +568,6 @@
                     series: this.prependPadding(series, 3),
                     design: this.prependPadding(design, 4),
                     purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
-                    customization_date: moment(customisation_date).format('YYYY-MM-DD'),
                 },
             };
         }
