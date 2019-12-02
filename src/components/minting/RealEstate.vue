@@ -547,6 +547,7 @@
                 design,
                 purchase_date,
                 recipient,
+                property_address,
                 ...basicModel
             } = this.model;
 
@@ -559,11 +560,12 @@
                 .value();
 
             return {
-                name,
+                name: property_address,
                 description,
                 image: imageIpfsUrl,
                 attributes: {
                     ...cleanModel,
+                    property_address,
                     product_id: this.productId,
                     series: this.prependPadding(series, 3),
                     design: this.prependPadding(design, 4),
