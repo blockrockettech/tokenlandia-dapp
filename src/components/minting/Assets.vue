@@ -645,6 +645,7 @@
                 description,
                 image: imageIpfsUrl,
                 type: 'PHYSICAL_ASSET',
+                created: Math.floor( Date.now() / 1000 ),
                 attributes: {
                     ...cleanModel,
                     product_id: this.productId,

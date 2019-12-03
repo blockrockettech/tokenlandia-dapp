@@ -564,6 +564,7 @@
                 description,
                 image: imageIpfsUrl,
                 type: 'REAL_ESTATE',
+                created: Math.floor( Date.now() / 1000 ),
                 attributes: {
                     ...cleanModel,
                     property_address,
