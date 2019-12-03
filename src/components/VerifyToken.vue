@@ -63,58 +63,22 @@
           <h4 class="heading text-center">Product ID: {{tokenData.productId}}</h4>
           <table class="table table-striped table-borderless">
             <tbody>
-              <tr>
-                <td>Token ID</td>
-                <td>{{foundTokenId}}</td>
+            <tr>
+              <td>NAME</td>
+              <td>{{tokenData.name}}</td>
+            </tr>
+            <tr>
+              <td>DESCRIPTION</td>
+              <td>{{tokenData.description}}</td>
+            </tr>
+              <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
+                <td>{{attributeKey.toUpperCase().replace('_', ' ')}}</td>
+                <td>{{tokenData.attributes[attributeKey]}}</td>
               </tr>
-              <tr>
-                <td>Owner</td>
-                <td class="small">{{ownerOf}}</td>
-              </tr>
-              <tr>
-                <td>Name</td>
-                <td>{{tokenData.name}}</td>
-              </tr>
-              <tr>
-                <td>Description</td>
-                <td>{{tokenData.description}}</td>
-              </tr>
-              <tr>
-                <td>Purchase Date</td>
-                <td>{{tokenData.purchase.date}}</td>
-              </tr>
-              <tr>
-                <td>Purchase Location</td>
-                <td>{{tokenData.purchase.location}}</td>
-              </tr>
-              <tr>
-                <td>Customization Date</td>
-                <td>{{tokenData.customisation.date}}</td>
-              </tr>
-              <tr>
-                <td>Customization Location</td>
-                <td>{{tokenData.customisation.location}}</td>
-              </tr>
-              <tr>
-                <td>Brand</td>
-                <td>{{tokenData.brand}}</td>
-              </tr>
-              <tr>
-                <td>Model</td>
-                <td>{{tokenData.model}}</td>
-              </tr>
-              <tr>
-                <td>Artist</td>
-                <td>{{tokenData.artist}}</td>
-              </tr>
-              <tr v-if="tokenData.assistant">
-                <td>Assistant</td>
-                <td>{{tokenData.assistant}}</td>
-              </tr>
-              <tr>
-                <td>Materials Used:</td>
-                <td>{{tokenData.materialsUsed}}</td>
-              </tr>
+            <tr v-if="tokenData.materialsUsed">
+              <td>Materials Used:</td>
+              <td>{{tokenData.materialsUsed}}</td>
+            </tr>
             </tbody>
           </table>
 
@@ -246,35 +210,28 @@
     }
 
     get tokenData() {
-      const {name, description, attributes} = this.ipfsData;
+        const data: any = {
+            ...this.ipfsData,
+            materialsUsed: [],
+        };
 
-      const data: any = {
-        name: name,
-        description: description,
-        productId: attributes.product_id,
-        purchase: {
-          date: attributes.purchase_date,
-          location: attributes.purchase_location,
-        },
-        customisation: {
-          date: attributes.customization_date,
-          location: attributes.customization_location,
-        },
-        brand: attributes.brand,
-        model: attributes.model,
-        artist: attributes.artist,
-        materialsUsed: [],
-      };
-
-      data['assistant'] = attributes.artist_assistant ? attributes.artist_assistant : null;
-
-      Object.keys(attributes).forEach(key => {
+      Object.keys(data.attributes).forEach(key => {
         if (key.indexOf('material') !== -1) {
-          data.materialsUsed.push(attributes[key]);
+          data.materialsUsed.push(data.attributes[key]);
         }
       });
 
-      data.materialsUsed = data.materialsUsed.join(', ');
+      if (data.materialsUsed.length) {
+          data.materialsUsed = data.materialsUsed.join(', ');
+
+          const newAttributes: any = {};
+          Object.keys(data.attributes)
+              .filter(key => key.indexOf('material') === -1)
+              .forEach(key => {newAttributes[key] = data.attributes[key]});
+          data.attributes = newAttributes;
+      } else {
+          data.materialsUsed = null;
+      }
 
       return data;
     }
