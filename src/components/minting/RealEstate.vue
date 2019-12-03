@@ -11,24 +11,24 @@
     <!-- Unique Identifier -->
     <h4 class="heading">Unique Identifier:
       <span v-bind:class="{ 'text-success': this.productIdValid }">
-        <span v-bind:class="{ 'text-danger': coo === '{DEVELOPER}' }">{{coo}}</span>
+        <span v-bind:class="{ 'text-danger': developer === '{DEVELOPER}' }">{{developer}}</span>
         <span>-</span>
-        <span v-bind:class="{ 'text-danger': initials === '{CITY}' }">{{initials}}</span>
+        <span v-bind:class="{ 'text-danger': city === '{CITY}' }">{{city}}</span>
         <span>-</span>
-        <span v-bind:class="{ 'text-danger': series === '{ADDRESS}' }">{{series}}</span>
+        <span v-bind:class="{ 'text-danger': address === '{ADDRESS}' }">{{address}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
       </span>
     </h4>
 
     <br/>
-
+    
     <vue-form :state="formState" @submit.prevent="onSubmit">
 
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="coo">Developer</label>
-        <select name="coo"
-                id="coo"
+      <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.developer)">
+        <label for="developer">Developer</label>
+        <select name="developer"
+                id="developer"
                 class="form-control"
                 required
                 v-model="model.developer">
@@ -37,29 +37,35 @@
         </select>
       </validate>
 
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="initials">City</label>
-        <select name="initials"
-                id="initials"
+      <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.city)">
+        <label for="city">City</label>
+        <select name="city"
+                id="city"
                 class="form-control"
                 required
-                v-model="model.initials">
+                v-model="model.city">
           <option value="">Please select one</option>
           <option v-for="code in cityCodes" :value="code['alpha-3']">{{code.name}}</option>
         </select>
       </validate>
 
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="series">Series</label>
+      <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.address)">
+        <label for="address">Address</label>
         <input type="text"
-               name="series"
-               id="series"
+               name="address"
+               id="address"
                class="form-control"
-               required v-model="model.series"/>
+               required
+               pattern="^[A-Za-z0-9]+$"
+               maxlength="10"
+               v-model="model.address"/>
+
+          <!--<field-messages name="address" show="$touched || $submitted" class="form-control-feedback">-->
+            <!--<div slot="pattern">Address is invalid</div>-->
+          <!--</field-messages>-->
       </validate>
 
-
-      <validate auto-label class="form-group required-field d-inline-block">
+      <validate auto-label class="form-group required-field d-inline-block" :class="fieldClassName(formState.tokenId)">
         <label for="tokenId">Token ID</label>
         <input type="number"
                min="1"
@@ -174,7 +180,7 @@
           </field-messages>
         </div>
       </validate>
-      
+
       <validate auto-label class="form-group row required-field">
         <label for="purchDate" class="col-sm-3 col-form-label">Purchase Date</label>
         <div class="col-sm-9">
@@ -376,8 +382,8 @@
 
     interface Model {
         developer: string,
-        initials: string,
-        series: string,
+        city: string,
+        address: string,
         design: string,
         token_id: string,
         description: string,
@@ -414,8 +420,8 @@
 
         model: Model = {
             developer: '',
-            initials: '',
-            series: '',
+            city: '',
+            address: '',
             design: '',
             token_id: '',
             description: '',
@@ -512,10 +518,7 @@
         getIpfsPayload(imageIpfsUrl: string): any {
             const {
                 description,
-                series,
-                design,
                 purchase_date,
-                recipient,
                 property_address,
                 ...basicModel
             } = this.model;
@@ -538,8 +541,6 @@
                     ...cleanModel,
                     property_address,
                     product_id: this.productId,
-                    series: this.prependPadding(series, 3),
-                    design: this.prependPadding(design, 4),
                     purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
                 },
             };
@@ -623,10 +624,10 @@
                 return '';
             }
             if ((field.$touched || field.$submitted) && field.$valid) {
-                return 'has-success';
+                return 'text-success';
             }
             if ((field.$touched || field.$submitted) && field.$invalid) {
-                return 'has-danger';
+                return 'text-danger';
             }
             return '';
         }
@@ -640,19 +641,19 @@
         }
 
         get productIdValid(): boolean {
-            return this.developer !== '{DEVELOPER}' && this.initials !== '{CITY}' && this.series !== '{ADDRESS}' && this.tokenId !== '{TOKEN_ID}';
+            return this.developer !== '{DEVELOPER}' && this.city !== '{CITY}' && this.address !== '{ADDRESS}' && this.tokenId !== '{TOKEN_ID}';
         }
 
         get developer(): string {
             return this.model.developer ? this.model.developer : '{DEVELOPER}';
         }
 
-        get initials(): string {
-            return this.model.initials ? this.model.initials.toUpperCase() : '{CITY}';
+        get city(): string {
+            return this.model.city ? this.model.city.toUpperCase() : '{CITY}';
         }
 
-        get series(): string {
-            return this.model.series ? this.prependPadding(this.model.series, 3) : '{ADDRESS}';
+        get address(): string {
+            return this.model.address ? this.prependPadding(this.model.address, 3) : '{ADDRESS}';
         }
 
         get tokenId(): string {
@@ -660,7 +661,7 @@
         }
 
         get productCode(): string {
-            return `${this.developer}-${this.initials}-${this.series}`;
+            return `${this.developer}-${this.city}-${this.address}`;
         }
 
         get productId(): string {
