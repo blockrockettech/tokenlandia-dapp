@@ -644,6 +644,7 @@
                 name,
                 description,
                 image: imageIpfsUrl,
+                type: 'PHYSICAL_ASSET',
                 attributes: {
                     ...cleanModel,
                     product_id: this.productId,

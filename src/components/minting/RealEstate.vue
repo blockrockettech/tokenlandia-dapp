@@ -563,6 +563,7 @@
                 name: property_address,
                 description,
                 image: imageIpfsUrl,
+                type: 'REAL_ESTATE',
                 attributes: {
                     ...cleanModel,
                     property_address,
