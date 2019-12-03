@@ -60,19 +60,19 @@
       <div class="row">
         <div class="col text-left">
 
-          <h4 class="heading text-center">Product ID: {{tokenData.productId}}</h4>
+          <h4 class="heading text-center">Product ID: {{tokenData.attributes.product_id}}</h4>
           <table class="table table-striped table-borderless">
             <tbody>
             <tr>
-              <td>NAME</td>
+              <td>Name:</td>
               <td>{{tokenData.name}}</td>
             </tr>
             <tr>
-              <td>DESCRIPTION</td>
+              <td>Description:</td>
               <td>{{tokenData.description}}</td>
             </tr>
               <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
-                <td>{{attributeKey.toUpperCase().replace('_', ' ')}}</td>
+                <td>{{convertStringToPascalCase(attributeKey.replace('_', ' '))}}:</td>
                 <td>{{tokenData.attributes[attributeKey]}}</td>
               </tr>
             <tr v-if="tokenData.materialsUsed">
@@ -193,6 +193,12 @@
         });
     }
 
+    convertStringToPascalCase(original: string) {
+        return original.replace(/(\w)(\w*)/g, (g0, g1, g2) => {
+            return g1.toUpperCase() + g2.toLowerCase();
+        });
+    }
+
     get results(): boolean {
       if (this.searching && this.attributes && this.attributes._ipfsUrl) {
         axios.get(this.attributes._ipfsUrl)
@@ -233,7 +239,7 @@
           data.materialsUsed = null;
       }
 
-      return data;
+        return data;
     }
   }
 </script>
