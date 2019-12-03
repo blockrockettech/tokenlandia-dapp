@@ -11,13 +11,11 @@
     <!-- Unique Identifier -->
     <h4 class="heading">Unique Identifier:
       <span v-bind:class="{ 'text-success': this.productIdValid }">
-        <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
+        <span v-bind:class="{ 'text-danger': coo === '{DEVELOPER}' }">{{coo}}</span>
         <span>-</span>
-        <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
+        <span v-bind:class="{ 'text-danger': initials === '{CITY}' }">{{initials}}</span>
         <span>-</span>
-        <span v-bind:class="{ 'text-danger': series === '{SERIES}' }">{{series}}</span>
-        <span>-</span>
-        <span v-bind:class="{ 'text-danger': design === '{DESIGN}' }">{{design}}</span>
+        <span v-bind:class="{ 'text-danger': series === '{ADDRESS}' }">{{series}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
       </span>
@@ -28,50 +26,38 @@
     <vue-form :state="formState" @submit.prevent="onSubmit">
 
       <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="coo">Country of Origin</label>
+        <label for="coo">Developer</label>
         <select name="coo"
                 id="coo"
                 class="form-control"
                 required
-                v-model="model.coo">
+                v-model="model.developer">
           <option value="">Please select one</option>
-          <option v-for="code in countryCodes" :value="code['alpha-3']">{{code.name}}</option>
+          <option v-for="code in developerCodes" :value="code['alpha-3']">{{code.name}}</option>
         </select>
       </validate>
 
       <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="initials">Artist Initials</label>
-        <input type="text"
-               name="initials"
-               id="initials"
-               class="form-control text-uppercase"
-               maxlength="4"
-               required v-model="model.initials"/>
+        <label for="initials">City</label>
+        <select name="initials"
+                id="initials"
+                class="form-control"
+                required
+                v-model="model.initials">
+          <option value="">Please select one</option>
+          <option v-for="code in cityCodes" :value="code['alpha-3']">{{code.name}}</option>
+        </select>
       </validate>
 
       <validate auto-label class="form-group required-field d-inline-block mr-3">
         <label for="series">Series</label>
-        <input type="number"
+        <input type="text"
                name="series"
                id="series"
-               min="1"
-               max="999"
-               step="1"
                class="form-control"
                required v-model="model.series"/>
       </validate>
 
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="design">Design</label>
-        <input type="number"
-               name="design"
-               id="design"
-               min="1"
-               max="9999"
-               step="1"
-               class="form-control"
-               required v-model="model.design"/>
-      </validate>
 
       <validate auto-label class="form-group required-field d-inline-block">
         <label for="tokenId">Token ID</label>
@@ -188,24 +174,7 @@
           </field-messages>
         </div>
       </validate>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="developer" class="col-sm-3 col-form-label">Developer</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="developer"
-                 id="developer"
-                 class="form-control"
-                 required v-model="model.developer"/>
-          <field-messages
-            name="developer" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Developer is a required field
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
+      
       <validate auto-label class="form-group row required-field">
         <label for="purchDate" class="col-sm-3 col-form-label">Purchase Date</label>
         <div class="col-sm-9">
@@ -401,11 +370,12 @@
     import SmallSpinner from '@/components/SmallSpinner.vue';
     import TxsLink from "@/components/TxsLink.vue";
 
-    import countryCodes from '../../../static/country_codes.json';
+    import developerCodes from '../../../static/developer_codes.json';
+    import cityCodes from '../../../static/city_codes.json';
     import ipfsHttpClient from 'ipfs-http-client';
 
     interface Model {
-        coo: string,
+        developer: string,
         initials: string,
         series: string,
         design: string,
@@ -415,7 +385,6 @@
         insurance_costs: string,
         purchase_date: string,
         taxes: string,
-        developer: string,
         maintenance_costs: string,
         year_built: string,
         recipient: string,
@@ -444,7 +413,7 @@
         formState: any = {};
 
         model: Model = {
-            coo: '',
+            developer: '',
             initials: '',
             series: '',
             design: '',
@@ -454,7 +423,6 @@
             insurance_costs: '',
             purchase_date: '',
             taxes: '',
-            developer: '',
             maintenance_costs: '',
             year_built: '',
             recipient: '',
@@ -476,7 +444,8 @@
         file: any = null;
         fileBuffer: any = null;
 
-        countryCodes: any = countryCodes;
+        developerCodes: any = developerCodes;
+        cityCodes: any = cityCodes;
 
         account!: string;
         accountProperties: any;
@@ -671,24 +640,19 @@
         }
 
         get productIdValid(): boolean {
-            return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
-                && this.design !== '{DESIGN}' && this.tokenId !== '{TOKEN_ID}';
+            return this.developer !== '{DEVELOPER}' && this.initials !== '{CITY}' && this.series !== '{ADDRESS}' && this.tokenId !== '{TOKEN_ID}';
         }
 
-        get coo(): string {
-            return this.model.coo ? this.model.coo : '{COO}';
+        get developer(): string {
+            return this.model.developer ? this.model.developer : '{DEVELOPER}';
         }
 
         get initials(): string {
-            return this.model.initials ? this.model.initials.toUpperCase() : '{INITIALS}';
+            return this.model.initials ? this.model.initials.toUpperCase() : '{CITY}';
         }
 
         get series(): string {
-            return this.model.series ? this.prependPadding(this.model.series, 3) : '{SERIES}';
-        }
-
-        get design(): string {
-            return this.model.design ? this.prependPadding(this.model.design, 4) : '{DESIGN}';
+            return this.model.series ? this.prependPadding(this.model.series, 3) : '{ADDRESS}';
         }
 
         get tokenId(): string {
@@ -696,7 +660,7 @@
         }
 
         get productCode(): string {
-            return `${this.coo}-${this.initials}-${this.series}-${this.design}`;
+            return `${this.developer}-${this.initials}-${this.series}`;
         }
 
         get productId(): string {
