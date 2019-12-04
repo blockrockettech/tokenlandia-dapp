@@ -16,14 +16,14 @@
             ></b-input>
           </b-input-group>
 
-          <b-button class="cta-tokenlandia ml-2"
+          <b-button class="ml-2"
                     @click="performProductSearch"
                     v-if="!searching"
                     :disabled="!productId">
             Search
           </b-button>
 
-          <b-button class="cta-tokenlandia ml-2"
+          <b-button class="ml-2"
                     v-if="searching && productId" disabled>
             <SmallSpinner/>
           </b-button>
@@ -37,14 +37,14 @@
             </b-input>
           </b-input-group>
 
-          <b-button class="cta-tokenlandia ml-2"
+          <b-button class="ml-2"
                     @click="performTokenSearch"
                     v-if="!searching"
                     :disabled="!tokenId">
             Search
           </b-button>
 
-          <b-button class="cta-tokenlandia ml-2"
+          <b-button class="ml-2"
                     v-if="searching && tokenId" disabled>
             <SmallSpinner/>
           </b-button>

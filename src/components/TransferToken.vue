@@ -31,7 +31,7 @@
         </div>
       </div>
       <b-button variant="primary"
-                class="cta-tokenlandia"
+                class=""
                 @click="transferToken"
                 :disabled="!recipient">
         Transfer

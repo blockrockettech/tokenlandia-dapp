@@ -32,13 +32,13 @@
                       :disabled="!account">
               use current account
             </b-button>
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
                       @click="checkCanMint"
                       v-if="!canMintEthAddress.loading"
                       :disabled="canMintEthAddress.value.length < 42">
               Can mint?
             </b-button>
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
                       v-if="canMintEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>
@@ -91,7 +91,7 @@
             {{whitelistedAddress}}
           </div>
         </div>
-        <b-button variant="primary" class="cta-tokenlandia mt-3" @click="displayAllWhitelistedAddresses">
+        <b-button variant="primary" class="mt-3" @click="displayAllWhitelistedAddresses">
           View All Whitelised Addresses
         </b-button>
       </div>
@@ -128,13 +128,13 @@
                       :disabled="!account">
               use current account
             </b-button>
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
                       @click="checkIsAdmin"
                       v-if="!isAdminEthAddress.loading"
                       :disabled="isAdminEthAddress.value.length < 42">
               Is admin?
             </b-button>
-            <b-button class="cta-tokenlandia ml-2"
+            <b-button class="ml-2"
                       v-if="isAdminEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>
@@ -182,7 +182,7 @@
           </div>
         </div>
         <b-button variant="primary"
-                  class="cta-tokenlandia mt-3"
+                  class="mt-3"
                   @click="displayAllAdminWhitelistedAddresses">
           View All Admin Whitelised Addresses
         </b-button>

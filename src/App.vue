@@ -33,7 +33,7 @@
             <router-link to="/user-access">Access</router-link>
           </li>
           <li class="mt-2 centre-li">
-            <b-button class="cta-tokenlandia" @click="onLogin" v-if="!account">
+            <b-button @click="onLogin" v-if="!account">
               Login
             </b-button>
             <div v-else>
@@ -92,7 +92,8 @@
         computed: {
             ...mapState([
                 'account',
-                'etherscanBase'
+                'etherscanBase',
+                'networkId',
             ]),
         },
         components: {
@@ -133,16 +134,6 @@
 
   .txt {
     font-family: 'Open Sans', sans-serif;
-  }
-
-  .cta-tokenlandia {
-    background-color: #DE683C;
-    border-color: #DE683C;
-  }
-
-  .cta-tokenlandia:hover {
-    background-color: #eb553b;
-    border-color: #eb553b;
   }
 
   #app {

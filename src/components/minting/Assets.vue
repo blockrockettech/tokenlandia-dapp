@@ -409,20 +409,20 @@
         <div class="col-12">
           <div class="mt-4">
             <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-              <b-button type="submit" class="cta-tokenlandia btn-block btn-lg"
+              <b-button type="submit" class="btn-block btn-lg"
                         :disabled="isMintingDisabled">
                 Mint
               </b-button>
               <!--<b-button type="reset" variant="outline-secondary" class="my-2">Reset</b-button>-->
             </div>
             <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-              <b-button type="button" class="cta-tokenlandia btn-block btn-lg" disabled>
+              <b-button type="button" class="btn-block btn-lg" disabled>
                 <SmallSpinner/>
                 Uploading data to IPFS...
               </b-button>
             </div>
             <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-              <b-button type="button" class="cta-tokenlandia btn-block btn-lg" disabled>
+              <b-button type="button" class="btn-block btn-lg" disabled>
                 Please authorise the transaction...
               </b-button>
             </div>
