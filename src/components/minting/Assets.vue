@@ -1,15 +1,16 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">TokenLandia Asset NFT Generator</h1>
+    <h1 class="heading">Physical Asset NFT Generator</h1>
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning" v-else-if="!canUserMint && accountProperties.canMint === false">
+    <div class="alert alert-warning"
+         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
-
-    <h4 class="heading">Unique Identifier:
-      <span v-bind:class="{ 'text-success': this.productIdValid }">
+    <div v-else>
+      <h4 class="heading mb-4">Unique Identifier:
+        <span v-bind:class="{ 'text-success': this.productIdValid }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
@@ -20,372 +21,404 @@
         <span>-</span>
         <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
       </span>
-    </h4>
+      </h4>
 
-    <br/>
+      <vue-form :state="formState" @submit.prevent="onSubmit">
 
-    <vue-form :state="formState" @submit.prevent="onSubmit">
+        <validate auto-label class="form-group required-field d-inline-block mr-3">
+          <label for="coo">Country of Origin</label>
+          <select name="coo"
+                  id="coo"
+                  class="form-control"
+                  required
+                  v-model="model.coo">
+            <option value="">Please select one</option>
+            <option v-for="code in countryCodes" :value="code['alpha-3']">{{code.name}}</option>
+          </select>
+        </validate>
 
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="coo">Country of Origin</label>
-        <select name="coo"
-                id="coo"
-                class="form-control"
-                required
-                v-model="model.coo">
-          <option value="">Please select one</option>
-          <option v-for="code in countryCodes" :value="code['alpha-3']">{{code.name}}</option>
-        </select>
-      </validate>
-
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="initials">Artist Initials</label>
-        <input type="text"
-               name="initials"
-               id="initials"
-               class="form-control text-uppercase"
-               maxlength="4"
-               required v-model="model.initials"/>
-      </validate>
-
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="series">Series</label>
-        <input type="number"
-               name="series"
-               id="series"
-               min="1"
-               max="999"
-               step="1"
-               class="form-control"
-               required v-model="model.series"/>
-      </validate>
-
-      <validate auto-label class="form-group required-field d-inline-block mr-3">
-        <label for="design">Design</label>
-        <input type="number"
-               name="design"
-               id="design"
-               min="1"
-               max="9999"
-               step="1"
-               class="form-control"
-               required v-model="model.design"/>
-      </validate>
-
-      <validate auto-label class="form-group required-field d-inline-block">
-        <label for="tokenId">Token ID</label>
-        <input type="number"
-               min="1"
-               step="1"
-               name="tokenId"
-               id="tokenId"
-               class="form-control"
-               required v-model="model.token_id"/>
-      </validate>
-
-      <div v-if="model.token_id && formState.tokenId.$dirty && !isCheckingTokenId ">
-        <div class="text-danger" v-if="tokenIdAlreadyAssigned">
-          <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
-          </font-awesome-icon>
-          Token ID already assigned
-        </div>
-        <div class="text-success" v-if="!tokenIdAlreadyAssigned">
-          <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
-          </font-awesome-icon>
-          Token ID not assigned
-        </div>
-      </div>
-
-      <hr/>
-      <h4 class="heading">Product Information and Provenance</h4>
-      <br/>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="name" class="col-sm-3 col-form-label">Name</label>
-        <div class="col-sm-9">
+        <validate auto-label class="form-group required-field d-inline-block mr-3">
+          <label for="initials">Artist Initials</label>
           <input type="text"
-                 name="name"
-                 maxlength="125"
-                 id="name"
+                 name="initials"
+                 id="initials"
+                 class="form-control text-uppercase"
+                 maxlength="4"
+                 required v-model="model.initials"/>
+        </validate>
+
+        <validate auto-label class="form-group required-field d-inline-block mr-3">
+          <label for="series">Series</label>
+          <input type="number"
+                 name="series"
+                 id="series"
+                 min="1"
+                 max="999"
+                 step="1"
                  class="form-control"
-                 required v-model="model.name"/>
+                 required v-model="model.series"/>
+        </validate>
 
-          <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Name is a required field</div>
-          </field-messages>
+        <validate auto-label class="form-group required-field d-inline-block mr-3">
+          <label for="design">Design</label>
+          <input type="number"
+                 name="design"
+                 id="design"
+                 min="1"
+                 max="9999"
+                 step="1"
+                 class="form-control"
+                 required v-model="model.design"/>
+        </validate>
+
+        <validate auto-label class="form-group required-field d-inline-block">
+          <label for="tokenId">Token ID</label>
+          <input type="number"
+                 min="1"
+                 step="1"
+                 name="tokenId"
+                 id="tokenId"
+                 class="form-control"
+                 required v-model="model.token_id"/>
+        </validate>
+
+        <div v-if="model.token_id && formState.tokenId.$dirty && !isCheckingTokenId ">
+          <div class="text-danger" v-if="tokenIdAlreadyAssigned">
+            <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+            </font-awesome-icon>
+            Token ID already assigned
+          </div>
+          <div class="text-success" v-if="!tokenIdAlreadyAssigned">
+            <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+            </font-awesome-icon>
+            Token ID not assigned
+          </div>
         </div>
-      </validate>
 
-      <validate auto-label class="form-group row required-field"
-                :class="fieldClassName(formState.description)">
-        <label for="description" class="col-sm-3 col-form-label">Description</label>
-        <div class="col-sm-9">
+
+        <h4 class="my-3 text-left">Product Information and Provenance</h4>
+
+        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.name)">
+          <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="name"
+                   maxlength="125"
+                   id="name"
+                   class="form-control"
+                   :class="inputClassName(formState.name)"
+                   required v-model="model.name"/>
+
+            <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">Name is a required field</div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.description)">
+          <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
+          <div class="col-sm-9">
             <textarea id="description"
                       name="description"
                       class="form-control"
+                      :class="inputClassName(formState.description)"
                       maxlength="300"
                       required
                       v-model.lazy="model.description">
               </textarea>
-          <field-messages
-            name="description" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Description is a required field</div>
-          </field-messages>
+            <field-messages
+              name="description" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">Description is a required field</div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <div class="form-group row required-field">
+          <label for="dropzone"
+                 class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': file && fileBuffer }">
+            Image
+          </label>
+          <div class="col-sm-9">
+            <vue-dropzone
+              ref="myVueDropzone"
+              id="dropzone"
+              :options="dropzoneOptions"
+              :useCustomSlot="true"
+              :duplicateCheck="true"
+              @vdropzone-file-added="onFileAdded">
+              <div class="dropzone-custom-content">
+                <h4 class="dropzone-custom-title">Drag and drop the image</h4>
+                <div class="subtitle">...or click to select a file from your computer</div>
+              </div>
+            </vue-dropzone>
+          </div>
         </div>
-      </validate>
 
-      <div class="form-group row required-field">
-        <label for="dropzone" class="col-sm-3 col-form-label">Image</label>
-        <div class="col-sm-9">
-          <vue-dropzone
-            ref="myVueDropzone"
-            id="dropzone"
-            :options="dropzoneOptions"
-            :useCustomSlot="true"
-            :duplicateCheck="true"
-            @vdropzone-file-added="onFileAdded">
-            <div class="dropzone-custom-content">
-              <h4 class="dropzone-custom-title">Drag and drop the image</h4>
-              <div class="subtitle">...or click to select a file from your computer</div>
-            </div>
-          </vue-dropzone>
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.artist)">
+          <label for="artist" class="col-sm-3 col-form-label text-right">Artist</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="artist"
+                   id="artist"
+                   class="form-control"
+                   :class="inputClassName(formState.artist)"
+                   required v-model="model.artist"/>
+            <field-messages
+              name="artist" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Artist is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <field class="form-group row">
+          <label for="artist_assistant" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.artist_assistant }">
+            Assistant
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="artist_assistant"
+                   id="artist_assistant"
+                   class="form-control"
+                   :class="inputClassName(formState.artist_assistant)"
+                   v-model.lazy="model.artist_assistant"/>
+          </div>
+        </field>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.brand)">
+          <label for="brand" class="col-sm-3 col-form-label text-right">Brand</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="brand"
+                   id="brand"
+                   class="form-control"
+                   :class="inputClassName(formState.brand)"
+                   required v-model="model.brand"/>
+            <field-messages
+              name="brand" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Brand is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.model)">
+          <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="model"
+                   id="model"
+                   class="form-control"
+                   :class="inputClassName(formState.model)"
+                   required v-model="model.model"/>
+            <field-messages
+              name="model" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Model is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.purchLocation)">
+          <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="purchLocation"
+                   id="purchLocation"
+                   class="form-control"
+                   :class="inputClassName(formState.purchLocation)"
+                   required v-model="model.purchase_location"/>
+
+            <field-messages
+              name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">Purchase Location is a required field</div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field">
+          <label for="purchDate" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.purchase_date }">
+            Purchase Date
+          </label>
+          <div class="col-sm-9">
+            <datepicker name="purchDate"
+                        id="purchDate"
+                        placeholder="YYYY-MM-DD"
+                        input-class="form-control"
+                        :typeable="true"
+                        :required="true"
+                        format="yyyy-MM-dd"
+                        v-model="model.purchase_date">
+            </datepicker>
+
+            <field-messages
+              name="purchDate" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">Purchase Date is a required field</div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.customiseLocation)">
+          <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
+            Customization Location
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="customiseLocation"
+                   id="customiseLocation"
+                   class="form-control"
+                   :class="inputClassName(formState.customiseLocation)"
+                   required v-model="model.customization_location"/>
+
+            <field-messages
+              name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Customization Location is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <validate auto-label class="form-group row required-field">
+          <label for="customiseDate" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.customisation_date }">
+            Customization Date
+          </label>
+          <div class="col-sm-9">
+            <datepicker name="customiseDate"
+                        id="customiseDate"
+                        placeholder="YYYY-MM-DD"
+                        input-class="form-control"
+                        :typeable="true"
+                        :required="true"
+                        format="yyyy-MM-dd"
+                        v-model="model.customisation_date">
+            </datepicker>
+
+            <field-messages
+              name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Customization Date is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <h4 class="heading text-left my-3">Materials Used</h4>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.material1)">
+          <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="material1"
+                   maxlength="40"
+                   id="material1"
+                   class="form-control"
+                   :class="inputClassName(formState.material1)"
+                   required v-model="model.material_1"/>
+            <field-messages
+              name="material1" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                One material is required
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
+        <div class="form-group row">
+          <label for="material2" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_2 }">
+            Material 2
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="material2"
+                   maxlength="40"
+                   id="material2"
+                   class="form-control"
+                   v-model="model.material_2"/>
+          </div>
         </div>
-      </div>
 
-      <validate auto-label class="form-group row required-field">
-        <label for="artist" class="col-sm-3 col-form-label">Artist</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="artist"
-                 id="artist"
-                 class="form-control"
-                 required v-model="model.artist"/>
-          <field-messages
-            name="artist" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Artist is a required field
-            </div>
-          </field-messages>
+        <div class="form-group row">
+          <label for="material3" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_3 }">
+            Material 3
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="material3"
+                   maxlength="40"
+                   id="material3"
+                   class="form-control"
+                   v-model="model.material_3"/>
+          </div>
         </div>
-      </validate>
 
-      <field class="form-group row">
-        <label for="artist_assistant" class="col-sm-3 col-form-label">Assistant</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="artist_assistant"
-                 id="artist_assistant"
-                 class="form-control"
-                 v-model.lazy="model.artist_assistant"/>
+        <div class="form-group row">
+          <label for="material4" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_4 }">
+            Material 4
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="material4"
+                   maxlength="40"
+                   id="material4"
+                   class="form-control"
+                   v-model="model.material_4"/>
+          </div>
         </div>
-      </field>
 
-      <validate auto-label class="form-group row required-field">
-        <label for="brand" class="col-sm-3 col-form-label">Brand</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="brand"
-                 id="brand"
-                 class="form-control"
-                 required v-model="model.brand"/>
-          <field-messages
-            name="brand" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Brand is a required field
-            </div>
-          </field-messages>
+        <div class="form-group row">
+          <label for="material5" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_5 }">
+            Material 5
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   maxlength="40"
+                   name="material5"
+                   id="material5"
+                   class="form-control"
+                   v-model="model.material_5"/>
+          </div>
         </div>
-      </validate>
 
-      <validate auto-label class="form-group row required-field">
-        <label for="model" class="col-sm-3 col-form-label">Model</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="model"
-                 id="model"
-                 class="form-control"
-                 required v-model="model.model"/>
-          <field-messages
-            name="model" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Model is a required field
-            </div>
-          </field-messages>
-        </div>
-      </validate>
+        <h4 class="heading text-left my-3">Recipient</h4>
 
-      <validate auto-label class="form-group row required-field">
-        <label for="purchLocation" class="col-sm-3 col-form-label">Purchase Location</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="purchLocation"
-                 id="purchLocation"
-                 class="form-control"
-                 required v-model="model.purchase_location"/>
+        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.recipient)">
+          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
+          <div class="col-sm-9 text-left">
+            <input type="text"
+                   name="recipient"
+                   id="recipient"
+                   class="form-control mb-2"
+                   :class="inputClassName(formState.recipient)"
+                   minlength="42"
+                   maxlength="42"
+                   v-model="model.recipient"
+                   required/>
+            <b-button variant="link"
+                      @click="useCurrentEthAccount"
+                      v-if="account">
+              use current account
+            </b-button>
 
-          <field-messages
-            name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Purchase Location is a required field</div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="purchDate" class="col-sm-3 col-form-label">Purchase Date</label>
-        <div class="col-sm-9">
-          <datepicker name="purchDate"
-                      id="purchDate"
-                      placeholder="YYYY-MM-DD"
-                      input-class="form-control"
-                      :typeable="true"
-                      :required="true"
-                      format="yyyy-MM-dd"
-                      v-model="model.purchase_date">
-          </datepicker>
-
-          <field-messages
-            name="purchDate" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">Purchase Date is a required field</div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="customiseLocation" class="col-sm-3 col-form-label">
-          Customization Location
-        </label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="customiseLocation"
-                 id="customiseLocation"
-                 class="form-control"
-                 required v-model="model.customization_location"/>
-
-          <field-messages
-            name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Customization Location is a required field
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="customiseDate" class="col-sm-3 col-form-label">Customization Date</label>
-        <div class="col-sm-9">
-          <datepicker name="customiseDate"
-                      id="customiseDate"
-                      placeholder="YYYY-MM-DD"
-                      input-class="form-control"
-                      :typeable="true"
-                      :required="true"
-                      format="yyyy-MM-dd"
-                      v-model="model.customisation_date">
-          </datepicker>
-
-          <field-messages
-            name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              Customization Date is a required field
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <hr/>
-
-      <h4 class="heading">Materials Used</h4>
-      <br/>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="material1" class="col-sm-3 col-form-label">Material 1</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material1"
-                 maxlength="40"
-                 id="material1"
-                 class="form-control"
-                 required v-model="model.material_1"/>
-          <field-messages
-            name="material1" show="$touched || $submitted" class="form-control-feedback">
-            <div slot="required" class="text-danger">
-              One material is required
-            </div>
-          </field-messages>
-        </div>
-      </validate>
-
-      <div class="form-group row">
-        <label for="material2" class="col-sm-3 col-form-label">Material 2</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material2"
-                 maxlength="40"
-                 id="material2"
-                 class="form-control"
-                 v-model="model.material_2"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material3" class="col-sm-3 col-form-label">Material 3</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material3"
-                 maxlength="40"
-                 id="material3"
-                 class="form-control"
-                 v-model="model.material_3"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material4" class="col-sm-3 col-form-label">Material 4</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 name="material4"
-                 maxlength="40"
-                 id="material4"
-                 class="form-control"
-                 v-model="model.material_4"/>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="material5" class="col-sm-3 col-form-label">Material 5</label>
-        <div class="col-sm-9">
-          <input type="text"
-                 maxlength="40"
-                 name="material5"
-                 id="material5"
-                 class="form-control"
-                 v-model="model.material_5"/>
-        </div>
-      </div>
-
-      <hr/>
-
-      <h4 class="heading">Recipient</h4>
-      <br/>
-
-      <validate auto-label class="form-group row required-field">
-        <label for="recipient" class="col-sm-3 col-form-label">ETH Address</label>
-        <div class="col-sm-9 text-left">
-          <input type="text"
-                 name="recipient"
-                 id="recipient"
-                 class="form-control mb-2"
-                 minlength="42"
-                 maxlength="42"
-                 v-model="model.recipient"
-                 required/>
-          <b-button variant="link"
-                    @click="useCurrentEthAccount"
-                    v-if="account">
-            use current account
-          </b-button>
-
-          <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
+            <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
             <span class="text-danger" v-if="!validateAddress(model.recipient)">
               <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
               </font-awesome-icon> Invalid recipient
@@ -396,59 +429,64 @@
             </span>
           </span>
 
-          <!--          <field-messages-->
-          <!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
-          <!--            <div slot="required" class="text-danger">-->
-          <!--              ETH Address is required-->
-          <!--            </div>-->
-          <!--          </field-messages>-->
-        </div>
-      </validate>
+            <!--          <field-messages-->
+            <!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
+            <!--            <div slot="required" class="text-danger">-->
+            <!--              ETH Address is required-->
+            <!--            </div>-->
+            <!--          </field-messages>-->
+          </div>
+        </validate>
 
-      <div class="row">
-        <div class="col-12">
-          <div class="mt-4">
-            <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-              <b-button type="submit" class="btn-block btn-lg"
-                        :disabled="isMintingDisabled">
-                Mint
-              </b-button>
-              <!--<b-button type="reset" variant="outline-secondary" class="my-2">Reset</b-button>-->
+        <div class="row">
+          <div class="col-12">
+            <div class="mt-4">
+              <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
+                <b-button type="submit" class="btn-block btn-lg" variant="primary"
+                          :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
+                  Mint
+                </b-button>
+                <p class="mt-2 text-danger" v-if="formState.$invalid && formState.$dirty">
+                  Please complete the form and image upload above before you can mint.
+                </p>
+              </div>
+              <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
+                  <SmallSpinner/>
+                  Uploading data to IPFS...
+                </b-button>
+              </div>
+              <div class="py-2 text-center" v-else-if="mintingTransactionHash">
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
+                  Please authorise the transaction...
+                </b-button>
+              </div>
+              <txs-link :hash="mintingTransactionHash"></txs-link>
             </div>
-            <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-              <b-button type="button" class="btn-block btn-lg" disabled>
-                <SmallSpinner/>
-                Uploading data to IPFS...
-              </b-button>
-            </div>
-            <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-              <b-button type="button" class="btn-block btn-lg" disabled>
-                Please authorise the transaction...
-              </b-button>
-            </div>
-            <txs-link :hash="mintingTransactionHash"></txs-link>
           </div>
         </div>
-      </div>
 
-      <hr/>
+        <b-card header-tag="header" class="mt-3" no-body>
+          <template v-slot:header>
+            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
+              <span class="mr-2">View IPFS MetaData</span>
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
+            </b-button>
+          </template>
 
-      <div class="row">
-        <div class="col">
-          <a class="collapse-raw-link" v-b-toggle.collapse-raw-data>
-            Raw IPFS Data
-          </a>
-          <b-collapse id="collapse-raw-data" class="text-left">
+          <b-alert class="text-left" variant="light" :show="showIPFSData">
+            <div class="small text-muted mb-2">IPFS MetaData</div>
             <pre>{{this.getIpfsPayload('TBC')}}</pre>
-          </b-collapse>
-        </div>
-        <div class="col">
-          <a class="btn btn-link text-muted"
-             v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-             :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-        </div>
-      </div>
-    </vue-form>
+            <div>
+              <a class="btn btn-link"
+                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
+                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
+            </div>
+          </b-alert>
+        </b-card>
+      </vue-form>
+    </div>
   </div>
 </template>
 
@@ -566,6 +604,11 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
+        showIPFSData: boolean = false;
+
+        toggleShowIPFSData() {
+            this.showIPFSData = !this.showIPFSData;
+        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
@@ -735,10 +778,23 @@
                 return '';
             }
             if ((field.$touched || field.$submitted) && field.$valid) {
-                return 'has-success';
+                return 'text-success';
             }
             if ((field.$touched || field.$submitted) && field.$invalid) {
-                return 'has-danger';
+                return 'text-danger';
+            }
+            return '';
+        }
+
+        inputClassName(field: any): string {
+            if (!field) {
+                return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$valid) {
+                return 'border-success';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+                return 'border-danger';
             }
             return '';
         }

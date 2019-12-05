@@ -1,11 +1,12 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">TokenLandia Real Estate NFT Generator</h1>
+    <h1 class="heading">Real Estate NFT Generator</h1>
 
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning" v-else-if="!canUserMint && accountProperties.canMint === false">
+    <div class="alert alert-warning"
+         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
     <div v-else>
@@ -128,7 +129,11 @@
         </validate>
 
         <div class="form-group row required-field">
-          <label for="dropzone" class="col-sm-3 col-form-label text-right">Image</label>
+          <label for="dropzone"
+                 class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': file && fileBuffer }">
+            Image
+          </label>
           <div class="col-sm-9">
             <vue-dropzone
               ref="myVueDropzone"
@@ -148,7 +153,7 @@
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.year_built)">
           <label for="year_built" class="col-sm-3 col-form-label text-right">Year Built</label>
           <div class="col-sm-9">
-            <input type="text"
+            <input type="number"
                    name="year_built"
                    id="year_built"
                    class="form-control"
@@ -183,8 +188,12 @@
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.purchase_date)">
-          <label for="purchDate" class="col-sm-3 col-form-label text-right">Purchase Date</label>
+        <validate auto-label class="form-group row required-field">
+          <label for="purchDate"
+                 class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.purchase_date }">
+            Purchase Date
+          </label>
           <div class="col-sm-9">
             <datepicker name="purchDate"
                         id="purchDate"
@@ -320,19 +329,24 @@
           <div class="col-12">
             <div class="mt-4">
               <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit" class="btn-block btn-lg" :disabled="isMintingDisabled || formState.$invalid">
+                <b-button type="submit"
+                          class="btn-block btn-lg"
+                          variant="primary"
+                          :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
                   Mint
                 </b-button>
-                <!--<b-button type="reset" variant="outline-secondary" class="my-2">Reset</b-button>-->
+                <p class="mt-2 text-danger" v-if="formState.$invalid && formState.$dirty">
+                  Please complete the form and image upload above before you can mint.
+                </p>
               </div>
               <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   <SmallSpinner/>
                   Uploading data to IPFS...
                 </b-button>
               </div>
               <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   Please authorise the transaction...
                 </b-button>
               </div>
@@ -341,15 +355,25 @@
           </div>
         </div>
 
-        <b-alert show dismissible class="mt-5 text-left" variant="light">
-          <div class="small text-muted mb-2">MetaData</div>
-          <pre>{{this.getIpfsPayload('TBC')}}</pre>
-          <div>
-          <a class="btn btn-link"
-             v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-             :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-          </div>
-        </b-alert>
+        <b-card header-tag="header" class="mt-3" no-body>
+          <template v-slot:header>
+            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
+              <span class="mr-2">View IPFS MetaData</span>
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
+            </b-button>
+          </template>
+
+          <b-alert class="text-left" variant="light" :show="showIPFSData">
+            <div class="small text-muted mb-2">IPFS MetaData</div>
+            <pre>{{this.getIpfsPayload('TBC')}}</pre>
+            <div>
+              <a class="btn btn-link"
+                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
+                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
+            </div>
+          </b-alert>
+        </b-card>
       </vue-form>
     </div>
   </div>
@@ -457,6 +481,11 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
+        showIPFSData: boolean = false;
+
+        toggleShowIPFSData() {
+            this.showIPFSData = !this.showIPFSData;
+        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';

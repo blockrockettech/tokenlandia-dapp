@@ -1,5 +1,5 @@
 <template>
-  <div class="verify-container txt">
+  <div class="txt">
     <h1 class="heading">NFT Verification</h1>
     <hr/>
     <div class="row">
@@ -7,10 +7,10 @@
 
         <b-form inline class="my-2">
 
-          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0">
+          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
             <b-input
               id="productId"
-              class="mb-2 mr-sm-2 mb-sm-0"
+              class="mb-2 mb-sm-0"
               placeholder="ABC-001..."
               v-model="productId"
             ></b-input>
@@ -19,11 +19,13 @@
           <b-button class="ml-2"
                     @click="performProductSearch"
                     v-if="!searching"
+                    variant="primary"
                     :disabled="!productId">
             Search
           </b-button>
 
           <b-button class="ml-2"
+                    variant="primary"
                     v-if="searching && productId" disabled>
             <SmallSpinner/>
           </b-button>
@@ -31,7 +33,7 @@
 
         <b-form inline class="my-2">
 
-          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0">
+          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
             <b-input placeholder="1..."
                      v-model="tokenId">
             </b-input>
@@ -39,12 +41,14 @@
 
           <b-button class="ml-2"
                     @click="performTokenSearch"
+                    variant="primary"
                     v-if="!searching"
                     :disabled="!tokenId">
             Search
           </b-button>
 
           <b-button class="ml-2"
+                    variant="primary"
                     v-if="searching && tokenId" disabled>
             <SmallSpinner/>
           </b-button>
@@ -247,16 +251,20 @@
 <style lang="scss" scoped>
   @import "../colours.scss";
 
+  .input-group > .input-group-prepend > .input-group-text {
+    width: 105px;
+  }
+
+  .fixed-width-input {
+    width: 325px;
+  }
+
   .img-container {
     margin: 2rem 0;
   }
 
   .img {
     height: 345px;
-  }
-
-  .verify-container {
-    height: calc(100vh - 170px);
   }
 
   .dateLabel {

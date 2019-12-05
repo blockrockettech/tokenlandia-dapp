@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <div v-if="account && !accountProperties.staticWeb3 && networkName !== 'rinkeby'">
+      <b-alert show dismissible variant="danger" class="m-0">
+        Please switch to rinkeby as {{networkName}} is not currently supported.
+      </b-alert>
+    </div>
     <div class="wrapper">
       <!-- Sidebar  -->
       <nav id="sidebar" v-bind:class="{'s-active': collapsed}">
@@ -33,7 +38,7 @@
             <router-link to="/user-access">Access</router-link>
           </li>
           <li class="mt-2 centre-li">
-            <b-button @click="onLogin" v-if="!account">
+            <b-button @click="onLogin" v-if="!account" variant="primary">
               Login
             </b-button>
             <div v-else>
@@ -77,7 +82,7 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
+    import {mapState, mapGetters} from 'vuex';
     import CurrentNetwork from '@/components/CurrentNetwork.vue';
     import web3Connect from '@/web3ConnectService';
 
@@ -94,7 +99,11 @@
                 'account',
                 'etherscanBase',
                 'networkId',
+                'networkName'
             ]),
+            ...mapGetters([
+                'accountProperties'
+            ])
         },
         components: {
             CurrentNetwork
@@ -123,10 +132,10 @@
 </script>
 
 <style lang="scss">
+  @import "colours";
   @import '../node_modules/bootstrap/scss/bootstrap';
   @import '../node_modules/bootstrap-vue/src/index.scss';
   @import '../node_modules/vue-date-pick/src/vueDatePick.scss';
-  @import './colours.scss';
 
   .heading {
     font-family: 'Ubuntu', sans-serif;
