@@ -33,12 +33,14 @@
               use current account
             </b-button>
             <b-button class="ml-2"
+                      variant="primary"
                       @click="checkCanMint"
                       v-if="!canMintEthAddress.loading"
                       :disabled="canMintEthAddress.value.length < 42">
               Can mint?
             </b-button>
             <b-button class="ml-2"
+                      variant="primary"
                       v-if="canMintEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>
@@ -129,12 +131,14 @@
               use current account
             </b-button>
             <b-button class="ml-2"
+                      variant="primary"
                       @click="checkIsAdmin"
                       v-if="!isAdminEthAddress.loading"
                       :disabled="isAdminEthAddress.value.length < 42">
               Is admin?
             </b-button>
             <b-button class="ml-2"
+                      variant="primary"
                       v-if="isAdminEthAddress.loading" disabled>
               <SmallSpinner/>
             </b-button>

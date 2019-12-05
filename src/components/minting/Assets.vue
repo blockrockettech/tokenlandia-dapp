@@ -106,6 +106,7 @@
                    maxlength="125"
                    id="name"
                    class="form-control"
+                   :class="inputClassName(formState.name)"
                    required v-model="model.name"/>
 
             <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
@@ -121,6 +122,7 @@
             <textarea id="description"
                       name="description"
                       class="form-control"
+                      :class="inputClassName(formState.description)"
                       maxlength="300"
                       required
                       v-model.lazy="model.description">
@@ -162,6 +164,7 @@
                    name="artist"
                    id="artist"
                    class="form-control"
+                   :class="inputClassName(formState.artist)"
                    required v-model="model.artist"/>
             <field-messages
               name="artist" show="$touched || $submitted" class="form-control-feedback">
@@ -182,6 +185,7 @@
                    name="artist_assistant"
                    id="artist_assistant"
                    class="form-control"
+                   :class="inputClassName(formState.artist_assistant)"
                    v-model.lazy="model.artist_assistant"/>
           </div>
         </field>
@@ -194,6 +198,7 @@
                    name="brand"
                    id="brand"
                    class="form-control"
+                   :class="inputClassName(formState.brand)"
                    required v-model="model.brand"/>
             <field-messages
               name="brand" show="$touched || $submitted" class="form-control-feedback">
@@ -212,6 +217,7 @@
                    name="model"
                    id="model"
                    class="form-control"
+                   :class="inputClassName(formState.model)"
                    required v-model="model.model"/>
             <field-messages
               name="model" show="$touched || $submitted" class="form-control-feedback">
@@ -230,6 +236,7 @@
                    name="purchLocation"
                    id="purchLocation"
                    class="form-control"
+                   :class="inputClassName(formState.purchLocation)"
                    required v-model="model.purchase_location"/>
 
             <field-messages
@@ -272,6 +279,7 @@
                    name="customiseLocation"
                    id="customiseLocation"
                    class="form-control"
+                   :class="inputClassName(formState.customiseLocation)"
                    required v-model="model.customization_location"/>
 
             <field-messages
@@ -319,6 +327,7 @@
                    maxlength="40"
                    id="material1"
                    class="form-control"
+                   :class="inputClassName(formState.material1)"
                    required v-model="model.material_1"/>
             <field-messages
               name="material1" show="$touched || $submitted" class="form-control-feedback">
@@ -391,13 +400,14 @@
 
         <h4 class="heading text-left my-3">Recipient</h4>
 
-        <validate auto-label class="form-group row required-field">
+        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.recipient)">
           <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
           <div class="col-sm-9 text-left">
             <input type="text"
                    name="recipient"
                    id="recipient"
                    class="form-control mb-2"
+                   :class="inputClassName(formState.recipient)"
                    minlength="42"
                    maxlength="42"
                    v-model="model.recipient"
@@ -772,6 +782,19 @@
             }
             if ((field.$touched || field.$submitted) && field.$invalid) {
                 return 'text-danger';
+            }
+            return '';
+        }
+
+        inputClassName(field: any): string {
+            if (!field) {
+                return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$valid) {
+                return 'border-success';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+                return 'border-danger';
             }
             return '';
         }
