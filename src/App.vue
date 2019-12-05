@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <div v-if="account && !accountProperties.staticWeb3 && networkName !== 'rinkeby'">
+      <b-alert show dismissible variant="danger" class="m-0">
+        Please switch to rinkeby as {{networkName}} is not currently supported.
+      </b-alert>
+    </div>
     <div class="wrapper">
       <!-- Sidebar  -->
       <nav id="sidebar" v-bind:class="{'s-active': collapsed}">
@@ -77,7 +82,7 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
+    import {mapState, mapGetters} from 'vuex';
     import CurrentNetwork from '@/components/CurrentNetwork.vue';
     import web3Connect from '@/web3ConnectService';
 
@@ -94,7 +99,11 @@
                 'account',
                 'etherscanBase',
                 'networkId',
+                'networkName'
             ]),
+            ...mapGetters([
+                'accountProperties'
+            ])
         },
         components: {
             CurrentNetwork

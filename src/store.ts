@@ -44,8 +44,11 @@ export default new Vuex.Store({
       state.etherscanBase = etherscanBase;
       state.openseaBase = openseaBase;
       state.notifyInstance = notifier(networkId);
-      // @ts-ignore
-      state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
+
+      if (TokenlandiaJson.networks[state.networkId]) {
+        // @ts-ignore
+        state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
+      }
     },
     account(state, account) {
       state.account = account;
