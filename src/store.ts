@@ -8,55 +8,13 @@ import notifier from "./notifier.js"
 // @ts-ignore
 import * as Web3 from 'web3';
 
+const {getWhitelistedAddresses} = require("./utils");
 const {getNetworkName} = require("@blockrocket/utils");
 const TokenlandiaJson = require("./truffleconf/token/Tokenlandia.json");
 
 Vue.use(Vuex);
 
 let tokenLandiaContract: any = {};
-
-function getWhitelistedAddresses({addedEventName, removedEventName, tokenContract, options, resolve, reject}: any) {
-  tokenContract.getPastEvents(addedEventName, options, (error: any, events: any[]) => {
-    if (error) reject(error);
-    if (!events) reject(new Error(`${addedEventName} events came back undefined`));
-    if (!events.length) resolve([]);
-
-    const whitelistedAddedCount: any = {};
-    const addedAddresses = events.map((event: any) => {
-      const address = event.returnValues.account;
-      whitelistedAddedCount[address] =
-        whitelistedAddedCount[address] ? whitelistedAddedCount[address] + 1 : 1;
-      return address;
-    });
-
-    // eslint-disable-next-line no-shadow
-    tokenContract.getPastEvents(removedEventName, options, (error: any, events: any[]) => {
-      if (error) reject(error);
-      if (!events) reject(new Error(`${removedEventName} events came back undefined`));
-      if (!events.length) resolve(addedAddresses);
-
-      const whitelistedRemoveCount: any = {};
-      events.forEach((event: any) => {
-        const address = event.returnValues.account;
-        whitelistedRemoveCount[address] =
-          whitelistedRemoveCount[address] ? whitelistedRemoveCount[address] + 1 : 1;
-      });
-
-      const currentlyWhitelistedAddresses: string[] = [];
-      Object.keys(whitelistedAddedCount).forEach((address: string) => {
-        const addedCount = whitelistedAddedCount[address];
-        const removedCount = whitelistedRemoveCount[address] ?
-          whitelistedRemoveCount[address] : 0;
-
-        if (addedCount > removedCount) {
-          currentlyWhitelistedAddresses.push(address);
-        }
-      });
-
-      resolve(currentlyWhitelistedAddresses);
-    });
-  });
-}
 
 export default new Vuex.Store({
   plugins: [createLogger()],
@@ -71,6 +29,7 @@ export default new Vuex.Store({
     account: null,
     accountProperties: {
       canMint: null,
+      staticWeb3: false,
     },
 
     // Countracts
@@ -94,8 +53,9 @@ export default new Vuex.Store({
     web3(state, web3) {
       state.web3 = web3;
     },
-    updateCanCurrentAccountMint(state, canMint) {
+    updateAccountProperties(state, {canMint}) {
       state.accountProperties.canMint = canMint;
+      state.accountProperties.staticWeb3 = !state.account;
     },
   },
   getters: {
@@ -154,10 +114,8 @@ export default new Vuex.Store({
             commit('account', account);
 
             dispatch('checkCanMint', account)
-              .then((data) => {
-                commit('updateCanCurrentAccountMint', data);
-              })
-              .catch(() => commit('updateCanCurrentAccountMint', false));
+              .then(canMint => commit('updateAccountProperties', {canMint}))
+              .catch(() => commit('updateAccountProperties', {canMint: false}));
           } else {
             console.log(`Error getting accounts`, error);
           }

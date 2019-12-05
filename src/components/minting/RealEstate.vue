@@ -1,11 +1,12 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">TokenLandia Real Estate NFT Generator</h1>
+    <h1 class="heading">Real Estate NFT Generator</h1>
 
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning" v-else-if="!canUserMint && accountProperties.canMint === false">
+    <div class="alert alert-warning"
+         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
     <div v-else>
@@ -128,7 +129,11 @@
         </validate>
 
         <div class="form-group row required-field">
-          <label for="dropzone" class="col-sm-3 col-form-label text-right">Image</label>
+          <label for="dropzone"
+                 class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': file && fileBuffer }">
+            Image
+          </label>
           <div class="col-sm-9">
             <vue-dropzone
               ref="myVueDropzone"
@@ -183,8 +188,12 @@
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.purchase_date)">
-          <label for="purchDate" class="col-sm-3 col-form-label text-right">Purchase Date</label>
+        <validate auto-label class="form-group row required-field">
+          <label for="purchDate"
+                 class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.purchase_date }">
+            Purchase Date
+          </label>
           <div class="col-sm-9">
             <datepicker name="purchDate"
                         id="purchDate"
@@ -320,10 +329,14 @@
           <div class="col-12">
             <div class="mt-4">
               <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit" class="btn-block btn-lg" :disabled="isMintingDisabled || formState.$invalid">
+                <b-button type="submit"
+                          class="btn-block btn-lg"
+                          :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
                   Mint
                 </b-button>
-                <!--<b-button type="reset" variant="outline-secondary" class="my-2">Reset</b-button>-->
+                <p class="mt-2 text-danger" v-if="formState.$invalid && formState.$dirty">
+                  Please complete the form and image upload above before you can mint.
+                </p>
               </div>
               <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
                 <b-button type="button" class="btn-block btn-lg" disabled>

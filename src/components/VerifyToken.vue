@@ -1,5 +1,5 @@
 <template>
-  <div class="verify-container txt">
+  <div class="txt">
     <h1 class="heading">NFT Verification</h1>
     <hr/>
     <div class="row">
@@ -7,7 +7,7 @@
 
         <b-form inline class="my-2">
 
-          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0">
+          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
             <b-input
               id="productId"
               class="mb-2 mr-sm-2 mb-sm-0"
@@ -31,7 +31,7 @@
 
         <b-form inline class="my-2">
 
-          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0">
+          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
             <b-input placeholder="1..."
                      v-model="tokenId">
             </b-input>
@@ -247,16 +247,16 @@
 <style lang="scss" scoped>
   @import "../colours.scss";
 
+  .fixed-width-input {
+    width: 325px;
+  }
+
   .img-container {
     margin: 2rem 0;
   }
 
   .img {
     height: 345px;
-  }
-
-  .verify-container {
-    height: calc(100vh - 170px);
   }
 
   .dateLabel {
