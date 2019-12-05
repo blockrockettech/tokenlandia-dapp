@@ -153,7 +153,7 @@
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.year_built)">
           <label for="year_built" class="col-sm-3 col-form-label text-right">Year Built</label>
           <div class="col-sm-9">
-            <input type="text"
+            <input type="number"
                    name="year_built"
                    id="year_built"
                    class="form-control"
@@ -331,6 +331,7 @@
               <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
                 <b-button type="submit"
                           class="btn-block btn-lg"
+                          variant="primary"
                           :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
                   Mint
                 </b-button>
@@ -339,13 +340,13 @@
                 </p>
               </div>
               <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   <SmallSpinner/>
                   Uploading data to IPFS...
                 </b-button>
               </div>
               <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   Please authorise the transaction...
                 </b-button>
               </div>
@@ -354,15 +355,25 @@
           </div>
         </div>
 
-        <b-alert show dismissible class="mt-5 text-left" variant="light">
-          <div class="small text-muted mb-2">MetaData</div>
-          <pre>{{this.getIpfsPayload('TBC')}}</pre>
-          <div>
-          <a class="btn btn-link"
-             v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-             :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-          </div>
-        </b-alert>
+        <b-card header-tag="header" class="mt-3" no-body>
+          <template v-slot:header>
+            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
+              <span class="mr-2">View IPFS MetaData</span>
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
+            </b-button>
+          </template>
+
+          <b-alert class="text-left" variant="light" :show="showIPFSData">
+            <div class="small text-muted mb-2">IPFS MetaData</div>
+            <pre>{{this.getIpfsPayload('TBC')}}</pre>
+            <div>
+              <a class="btn btn-link"
+                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
+                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
+            </div>
+          </b-alert>
+        </b-card>
       </vue-form>
     </div>
   </div>
@@ -470,6 +481,11 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
+        showIPFSData: boolean = false;
+
+        toggleShowIPFSData() {
+            this.showIPFSData = !this.showIPFSData;
+        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';

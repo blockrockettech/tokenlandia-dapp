@@ -33,7 +33,7 @@
             <router-link to="/user-access">Access</router-link>
           </li>
           <li class="mt-2 centre-li">
-            <b-button @click="onLogin" v-if="!account">
+            <b-button @click="onLogin" v-if="!account" variant="primary">
               Login
             </b-button>
             <div v-else>
@@ -123,10 +123,10 @@
 </script>
 
 <style lang="scss">
+  @import "colours";
   @import '../node_modules/bootstrap/scss/bootstrap';
   @import '../node_modules/bootstrap-vue/src/index.scss';
   @import '../node_modules/vue-date-pick/src/vueDatePick.scss';
-  @import './colours.scss';
 
   .heading {
     font-family: 'Ubuntu', sans-serif;

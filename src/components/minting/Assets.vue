@@ -99,7 +99,7 @@
         <h4 class="my-3 text-left">Product Information and Provenance</h4>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.name)">
-          <label for="name" class="col-sm-3 col-form-label">Name</label>
+          <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
           <div class="col-sm-9">
             <input type="text"
                    name="name"
@@ -116,7 +116,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.description)">
-          <label for="description" class="col-sm-3 col-form-label">Description</label>
+          <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
           <div class="col-sm-9">
             <textarea id="description"
                       name="description"
@@ -134,7 +134,7 @@
 
         <div class="form-group row required-field">
           <label for="dropzone"
-                 class="col-sm-3 col-form-label"
+                 class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': file && fileBuffer }">
             Image
           </label>
@@ -156,7 +156,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.artist)">
-          <label for="artist" class="col-sm-3 col-form-label">Artist</label>
+          <label for="artist" class="col-sm-3 col-form-label text-right">Artist</label>
           <div class="col-sm-9">
             <input type="text"
                    name="artist"
@@ -173,7 +173,7 @@
         </validate>
 
         <field class="form-group row">
-          <label for="artist_assistant" class="col-sm-3 col-form-label"
+          <label for="artist_assistant" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.artist_assistant }">
             Assistant
           </label>
@@ -188,7 +188,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.brand)">
-          <label for="brand" class="col-sm-3 col-form-label">Brand</label>
+          <label for="brand" class="col-sm-3 col-form-label text-right">Brand</label>
           <div class="col-sm-9">
             <input type="text"
                    name="brand"
@@ -206,7 +206,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.model)">
-          <label for="model" class="col-sm-3 col-form-label">Model</label>
+          <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
           <div class="col-sm-9">
             <input type="text"
                    name="model"
@@ -224,7 +224,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.purchLocation)">
-          <label for="purchLocation" class="col-sm-3 col-form-label">Purchase Location</label>
+          <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
           <div class="col-sm-9">
             <input type="text"
                    name="purchLocation"
@@ -240,7 +240,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field">
-          <label for="purchDate" class="col-sm-3 col-form-label"
+          <label for="purchDate" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.purchase_date }">
             Purchase Date
           </label>
@@ -264,7 +264,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.customiseLocation)">
-          <label for="customiseLocation" class="col-sm-3 col-form-label">
+          <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
             Customization Location
           </label>
           <div class="col-sm-9">
@@ -284,7 +284,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field">
-          <label for="customiseDate" class="col-sm-3 col-form-label"
+          <label for="customiseDate" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.customisation_date }">
             Customization Date
           </label>
@@ -312,7 +312,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.material1)">
-          <label for="material1" class="col-sm-3 col-form-label">Material 1</label>
+          <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
           <div class="col-sm-9">
             <input type="text"
                    name="material1"
@@ -330,7 +330,7 @@
         </validate>
 
         <div class="form-group row">
-          <label for="material2" class="col-sm-3 col-form-label"
+          <label for="material2" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_2 }">
             Material 2
           </label>
@@ -345,7 +345,7 @@
         </div>
 
         <div class="form-group row">
-          <label for="material3" class="col-sm-3 col-form-label"
+          <label for="material3" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_3 }">
             Material 3
           </label>
@@ -360,7 +360,7 @@
         </div>
 
         <div class="form-group row">
-          <label for="material4" class="col-sm-3 col-form-label"
+          <label for="material4" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_4 }">
             Material 4
           </label>
@@ -375,7 +375,7 @@
         </div>
 
         <div class="form-group row">
-          <label for="material5" class="col-sm-3 col-form-label"
+          <label for="material5" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_5 }">
             Material 5
           </label>
@@ -392,7 +392,7 @@
         <h4 class="heading text-left my-3">Recipient</h4>
 
         <validate auto-label class="form-group row required-field">
-          <label for="recipient" class="col-sm-3 col-form-label">ETH Address</label>
+          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
           <div class="col-sm-9 text-left">
             <input type="text"
                    name="recipient"
@@ -432,7 +432,7 @@
           <div class="col-12">
             <div class="mt-4">
               <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit" class="btn-block btn-lg"
+                <b-button type="submit" class="btn-block btn-lg" variant="primary"
                           :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
                   Mint
                 </b-button>
@@ -441,13 +441,13 @@
                 </p>
               </div>
               <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   <SmallSpinner/>
                   Uploading data to IPFS...
                 </b-button>
               </div>
               <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" disabled>
+                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   Please authorise the transaction...
                 </b-button>
               </div>
@@ -456,23 +456,25 @@
           </div>
         </div>
 
-        <hr/>
+        <b-card header-tag="header" class="mt-3" no-body>
+          <template v-slot:header>
+            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
+              <span class="mr-2">View IPFS MetaData</span>
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
+            </b-button>
+          </template>
 
-        <div class="row">
-          <div class="col">
-            <a class="collapse-raw-link" v-b-toggle.collapse-raw-data>
-              Raw IPFS Data
-            </a>
-            <b-collapse id="collapse-raw-data" class="text-left">
-              <pre>{{this.getIpfsPayload('TBC')}}</pre>
-            </b-collapse>
-          </div>
-          <div class="col">
-            <a class="btn btn-link text-muted"
-               v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-               :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-          </div>
-        </div>
+          <b-alert class="text-left" variant="light" :show="showIPFSData">
+            <div class="small text-muted mb-2">IPFS MetaData</div>
+            <pre>{{this.getIpfsPayload('TBC')}}</pre>
+            <div>
+              <a class="btn btn-link"
+                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
+                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
+            </div>
+          </b-alert>
+        </b-card>
       </vue-form>
     </div>
   </div>
@@ -592,6 +594,11 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
+        showIPFSData: boolean = false;
+
+        toggleShowIPFSData() {
+            this.showIPFSData = !this.showIPFSData;
+        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
