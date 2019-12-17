@@ -479,18 +479,24 @@
                   Please complete the form and image upload above before you can mint.
                 </p>
               </div>
-              <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
+              <div class="py-2 text-center" v-else-if="saving && !ipfsDataHash">
                 <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   <SmallSpinner/>
                   Uploading data to IPFS...
                 </b-button>
               </div>
-              <div class="py-2 text-center" v-else-if="mintingTransactionHash">
+              <div class="py-2 text-center" v-else-if="ipfsDataHash && saving">
                 <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                   Please authorize this transaction...
                 </b-button>
               </div>
-              <txs-link :hash="mintingTransactionHash"></txs-link>
+              <div v-else-if="mintingTransactionHash">
+                <txs-link :hash="mintingTransactionHash" containerClass="alert alert-success">
+                  <template>
+                    Minting in progress...
+                  </template>
+                </txs-link>
+              </div>
             </div>
           </div>
         </div>

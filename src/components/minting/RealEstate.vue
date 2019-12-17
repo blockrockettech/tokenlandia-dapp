@@ -378,7 +378,13 @@
                   Please authorize this transaction...
                 </b-button>
               </div>
-              <txs-link :hash="mintingTransactionHash"></txs-link>
+              <div v-else-if="mintingTransactionHash">
+                <txs-link :hash="mintingTransactionHash" containerClass="alert alert-success">
+                  <template>
+                    Minting in progress...
+                  </template>
+                </txs-link>
+              </div>
             </div>
           </div>
         </div>
