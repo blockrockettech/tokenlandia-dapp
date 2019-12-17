@@ -13,7 +13,7 @@
 
       <h4 class="my-3">
         Unique Identifier:
-        <span v-bind:class="{ 'text-success': this.productIdValid }">
+        <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
           <span v-bind:class="{ 'text-danger': developer === '{DEVELOPER}' }">{{developer}}</span>
           <span>-</span>
           <span v-bind:class="{ 'text-danger': city === '{CITY}' }">{{city}}</span>
@@ -88,6 +88,33 @@
           </div>
         </div>
 
+        <h4 class="my-3 text-left">Token Information</h4>
+        <field class="form-group row">
+          <label for="token_name" class="col-sm-3 col-form-label text-right">
+            Token Name
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="token_name"
+                   id="token_name"
+                   class="form-control"
+                   value="TokenLandia NFT" disabled/>
+          </div>
+        </field>
+
+        <field class="form-group row">
+          <label for="token_symbol" class="col-sm-3 col-form-label text-right">
+            Token Symbol
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="token_symbol"
+                   id="token_symbol"
+                   class="form-control"
+                   value="TLN" disabled/>
+          </div>
+        </field>
+
         <h4 class="my-3 text-left">Information and Provenance</h4>
 
         <validate auto-label class="form-group row required-field"
@@ -97,7 +124,7 @@
               <textarea id="property_address"
                         name="property_address"
                         class="form-control"
-                        maxlength="300"
+                        maxlength="45"
                         required
                         :class="inputClassName(formState.property_address)"
                         v-model.lazy="model.property_address">
@@ -116,7 +143,7 @@
               <textarea id="description"
                         name="description"
                         class="form-control"
-                        maxlength="300"
+                        maxlength="60"
                         required
                         :class="inputClassName(formState.description)"
                         v-model.lazy="model.description">
@@ -198,9 +225,10 @@
             <datepicker name="purchDate"
                         id="purchDate"
                         placeholder="YYYY-MM-DD"
-                        input-class="form-control"
-                        :typeable="true"
+                        input-class="form-control bg-white"
+                        :typeable="false"
                         :required="true"
+                        :disabled-dates="disabledDates()"
                         format="yyyy-MM-dd"
                         :class="inputClassName(formState.purchase_date)"
                         v-model="model.purchase_date">
@@ -332,10 +360,10 @@
                 <b-button type="submit"
                           class="btn-block btn-lg"
                           variant="primary"
-                          :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
+                          :disabled="isMintingDisabled">
                   Mint
                 </b-button>
-                <p class="mt-2 text-danger" v-if="formState.$invalid && formState.$dirty">
+                <p class="mt-2 text-danger" v-if="(formState.$invalid || tokenIdAlreadyAssigned) && formState.$dirty">
                   Please complete the form and image upload above before you can mint.
                 </p>
               </div>
@@ -347,7 +375,7 @@
               </div>
               <div class="py-2 text-center" v-else-if="mintingTransactionHash">
                 <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  Please authorise the transaction...
+                  Please authorize this transaction...
                 </b-button>
               </div>
               <txs-link :hash="mintingTransactionHash"></txs-link>
@@ -670,8 +698,19 @@
           return '';
         }
 
+        disabledDates(): any {
+            const today = new Date();
+            return {
+                from: today
+            }
+        }
+
         get isMintingDisabled(): boolean {
-            return !this.account || !this.canUserMint;
+            return this.formState.$invalid ||
+                !this.file && !this.fileBuffer ||
+                !this.account ||
+                !this.canUserMint ||
+                this.tokenIdAlreadyAssigned;
         }
 
         get canUserMint(): boolean {
@@ -679,7 +718,7 @@
         }
 
         get productIdValid(): boolean {
-            return this.developer !== '{DEVELOPER}' && this.city !== '{CITY}' && this.address !== '{ADDRESS}' && this.tokenId !== '{TOKEN_ID}';
+            return this.developer !== '{DEVELOPER}' && this.city !== '{CITY}' && this.address !== '{ADDRESS}' && this.tokenId !== '{TOKEN_ID}' && !this.tokenIdAlreadyAssigned;
         }
 
         get developer(): string {

@@ -1,6 +1,6 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">Physical Asset NFT Generator</h1>
+    <h1 class="heading">General Asset NFT Generator</h1>
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
@@ -10,7 +10,7 @@
     </div>
     <div v-else>
       <h4 class="heading mb-4">Unique Identifier:
-        <span v-bind:class="{ 'text-success': this.productIdValid }">
+        <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
         <span>-</span>
         <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
@@ -94,6 +94,33 @@
             Token ID not assigned
           </div>
         </div>
+
+        <h4 class="my-3 text-left">Token Information</h4>
+        <field class="form-group row">
+          <label for="token_name" class="col-sm-3 col-form-label text-right">
+            Token Name
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="token_name"
+                   id="token_name"
+                   class="form-control"
+                   value="TokenLandia NFT" disabled/>
+          </div>
+        </field>
+
+        <field class="form-group row">
+          <label for="token_symbol" class="col-sm-3 col-form-label text-right">
+            Token Symbol
+          </label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="token_symbol"
+                   id="token_symbol"
+                   class="form-control"
+                   value="TLN" disabled/>
+          </div>
+        </field>
 
 
         <h4 class="my-3 text-left">Product Information and Provenance</h4>
@@ -255,10 +282,11 @@
             <datepicker name="purchDate"
                         id="purchDate"
                         placeholder="YYYY-MM-DD"
-                        input-class="form-control"
-                        :typeable="true"
+                        input-class="form-control bg-white"
+                        :typeable="false"
                         :required="true"
                         format="yyyy-MM-dd"
+                        :disabled-dates="disabledDates()"
                         v-model="model.purchase_date">
             </datepicker>
 
@@ -300,9 +328,10 @@
             <datepicker name="customiseDate"
                         id="customiseDate"
                         placeholder="YYYY-MM-DD"
-                        input-class="form-control"
-                        :typeable="true"
+                        input-class="form-control bg-white"
+                        :typeable="false"
                         :required="true"
+                        :disabled-dates="disabledDates()"
                         format="yyyy-MM-dd"
                         v-model="model.customisation_date">
             </datepicker>
@@ -443,10 +472,10 @@
             <div class="mt-4">
               <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
                 <b-button type="submit" class="btn-block btn-lg" variant="primary"
-                          :disabled="formState.$invalid || !file && !fileBuffer || isMintingDisabled">
+                          :disabled="isMintingDisabled">
                   Mint
                 </b-button>
-                <p class="mt-2 text-danger" v-if="formState.$invalid && formState.$dirty">
+                <p class="mt-2 text-danger" v-if="(formState.$invalid || tokenIdAlreadyAssigned) && formState.$dirty">
                   Please complete the form and image upload above before you can mint.
                 </p>
               </div>
@@ -458,7 +487,7 @@
               </div>
               <div class="py-2 text-center" v-else-if="mintingTransactionHash">
                 <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  Please authorise the transaction...
+                  Please authorize this transaction...
                 </b-button>
               </div>
               <txs-link :hash="mintingTransactionHash"></txs-link>
@@ -799,8 +828,19 @@
             return '';
         }
 
+        disabledDates(): any {
+            const today = new Date();
+            return {
+                from: today
+            }
+        }
+
         get isMintingDisabled(): boolean {
-            return !this.account || !this.canUserMint;
+            return this.formState.$invalid ||
+                !this.file && !this.fileBuffer ||
+                !this.account ||
+                !this.canUserMint ||
+                this.tokenIdAlreadyAssigned;
         }
 
         get canUserMint(): boolean {
@@ -809,7 +849,7 @@
 
         get productIdValid(): boolean {
             return this.coo !== '{COO}' && this.initials !== '{INITIALS}' && this.series !== '{SERIES}'
-                && this.design !== '{DESIGN}' && this.tokenId !== '{TOKEN_ID}';
+                && this.design !== '{DESIGN}' && this.tokenId !== '{TOKEN_ID}' && !this.tokenIdAlreadyAssigned;
         }
 
         get coo(): string {
