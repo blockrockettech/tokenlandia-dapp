@@ -215,6 +215,26 @@
           </div>
         </validate>
 
+        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.developer_full_name)">
+          <label for="developer_full_name" class="col-sm-3 col-form-label text-right">Developer</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="developer_full_name"
+                   id="developer_full_name"
+                   class="form-control"
+                   maxlength="125"
+                   required
+                   :class="inputClassName(formState.developer_full_name)"
+                   v-model="model.developer_full_name"/>
+            <field-messages
+              name="developer_full_name" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Developer is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
+
         <validate auto-label class="form-group row required-field">
           <label for="purchDate"
                  class="col-sm-3 col-form-label text-right"
@@ -436,6 +456,7 @@
 
     interface Model {
         developer: string,
+        developer_full_name: string,
         city: string,
         address: string,
         design: string,
@@ -474,6 +495,7 @@
 
         model: Model = {
             developer: '',
+            developer_full_name: '',
             city: '',
             address: '',
             design: '',
@@ -579,6 +601,9 @@
                 description,
                 purchase_date,
                 property_address,
+                developer,
+                developer_full_name,
+                recipient,
                 ...basicModel
             } = this.model;
 
@@ -601,6 +626,7 @@
                     property_address,
                     product_id: this.productId,
                     purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
+                    developer: developer_full_name
                 },
             };
         }
