@@ -1,6 +1,9 @@
 <template>
     <span v-if="hash">
+      <div :class="containerClass">
+        <slot></slot>
         <button class="btn btn-link text-muted" @click="visitLink">[View Transaction]</button>
+      </div>
     </span>
 </template>
 
@@ -10,7 +13,8 @@
     export default {
         name: 'txs-link',
         props: [
-            'hash'
+            'hash',
+            'containerClass'
         ],
         computed: {
             ...mapState(['etherscanBase'])
