@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <div v-if="account && !accountProperties.staticWeb3 && networkName !== 'rinkeby'">
+    <div v-if="account && !accountProperties.staticWeb3 && networkName !== 'mainnet'">
       <b-alert show dismissible variant="danger" class="m-0">
-        Please switch to rinkeby as {{networkName}} is not currently supported.
+        Please switch to mainnet as {{networkName}} is not currently supported.
       </b-alert>
     </div>
     <div class="wrapper">
