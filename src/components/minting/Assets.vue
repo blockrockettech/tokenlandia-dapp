@@ -1,6 +1,6 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">General Asset NFT Generator</h1>
+    <h1 class="heading">General Products</h1>
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>

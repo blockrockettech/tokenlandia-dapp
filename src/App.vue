@@ -21,7 +21,7 @@
             </a>
             <ul class="collapse list-unstyled txt" id="homeSubmenu" v-bind:class="{'show': mintingExpanded}">
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/assets' }">
-                <router-link to="/">Assets</router-link>
+                <router-link to="/">General Products</router-link>
               </li>
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">
                 <router-link to="/mint/real-estate">Real Estate</router-link>

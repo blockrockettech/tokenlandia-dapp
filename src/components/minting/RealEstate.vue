@@ -1,6 +1,6 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">Real Estate NFT Generator</h1>
+    <h1 class="heading">Real Estate</h1>
 
     <hr/>
 
