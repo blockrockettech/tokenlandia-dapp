@@ -1,6 +1,6 @@
 <template>
   <div class="generator-container txt">
-    <h1 class="heading">General Asset NFT Generator</h1>
+    <h1 class="heading">General Products</h1>
     <hr/>
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
@@ -429,25 +429,32 @@
 
         <h4 class="heading text-left my-3">Recipient</h4>
 
-        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.recipient)">
+        <validate auto-label class="form-group row required-field" :class="fieldClassNameRecipient(formState.recipient)">
           <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
           <div class="col-sm-9 text-left">
+
+            <b-button-group size="md">
+              <b-button
+                v-for="(btn, idx) in recipientButtons"
+                :key="idx"
+                :pressed.sync="btn.state"
+                @click="recipientChanged(idx)"
+                variant="primary">
+                {{ btn.caption }}
+              </b-button>
+            </b-button-group>
             <input type="text"
                    name="recipient"
                    id="recipient"
-                   class="form-control mb-2"
+                   class="form-control d-inline-block mt-2"
                    :class="inputClassName(formState.recipient)"
                    minlength="42"
                    maxlength="42"
                    v-model="model.recipient"
+                   v-if="recipientButtons[2].state"
                    required/>
-            <b-button variant="link"
-                      @click="useCurrentEthAccount"
-                      v-if="account">
-              use current account
-            </b-button>
 
-            <span v-if="model.recipient && formState.recipient.$dirty" class="float-right">
+            <span v-if="model.recipient && (formState.recipient.$dirty || formState.recipient.$touched)" class="float-right">
             <span class="text-danger" v-if="!validateAddress(model.recipient)">
               <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
               </font-awesome-icon> Invalid recipient
@@ -457,13 +464,6 @@
               </font-awesome-icon> Valid recipient
             </span>
           </span>
-
-            <!--          <field-messages-->
-            <!--            name="recipient" show="$touched || $submitted" class="form-control-feedback">-->
-            <!--            <div slot="required" class="text-danger">-->
-            <!--              ETH Address is required-->
-            <!--            </div>-->
-            <!--          </field-messages>-->
           </div>
         </validate>
 
@@ -582,7 +582,15 @@
         },
     })
     export default class AssetNFTGenerator extends Vue {
-        isConnected!: boolean;
+      recipientButtons: any = [
+        { caption: 'Current Account', state: false },
+        { caption: 'Escrow Contract', state: false },
+        { caption: 'Custom', state: true },
+      ];
+
+      validateAddress: any;
+
+      isConnected!: boolean;
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
@@ -641,12 +649,39 @@
         isCheckingTokenId: boolean = false;
         showIPFSData: boolean = false;
 
+        recipientChanged(idx: any) {
+          if (idx == 0) {
+            this.useCurrentEthAccount();
+            this.formState.recipient.$valid=true;
+            this.formState.recipient.$touched=true;
+          } else if (idx == 1) {
+            this.useEscrowAccount();
+            this.formState.recipient.$valid=true;
+            this.formState.recipient.$touched=true;
+          } else if (idx == 2) {
+            this.model.recipient = '';
+            this.formState.recipient.$valid=false;
+            this.formState.recipient.$touched=true;
+          }
+
+          this.recipientButtons = this.recipientButtons.map((button: any, mapIdx: number) => {
+            return {
+              caption: button.caption,
+              state: mapIdx == idx
+            }
+          });
+        }
+
         toggleShowIPFSData() {
             this.showIPFSData = !this.showIPFSData;
         }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
+        }
+
+        useEscrowAccount() {
+          this.model.recipient = '0xescrow';
         }
 
         onFileAdded(file: any) {
@@ -821,6 +856,19 @@
             return '';
         }
 
+        fieldClassNameRecipient(field: any): string {
+            if (!field) {
+                return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$valid && this.validateAddress(this.model.recipient)) {
+                return 'text-success';
+            }
+            if ((field.$touched || field.$submitted) && (field.$invalid || !this.validateAddress(this.model.recipient))) {
+                return 'text-danger';
+            }
+            return '';
+        }
+
         inputClassName(field: any): string {
             if (!field) {
                 return '';
@@ -846,7 +894,8 @@
                 !this.file && !this.fileBuffer ||
                 !this.account ||
                 !this.canUserMint ||
-                this.tokenIdAlreadyAssigned;
+                this.tokenIdAlreadyAssigned ||
+                !this.validateAddress(this.model.recipient);
         }
 
         get canUserMint(): boolean {
