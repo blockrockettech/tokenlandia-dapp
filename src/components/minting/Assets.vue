@@ -449,7 +449,7 @@
           :generalFormStateInvalid="tokenIdAlreadyAssigned"
           invalidFormStateText="Please complete the form and image upload above before you can mint."
           :ipfsDataHash="ipfsDataHash"
-          :ipfsPayload="getIpfsPayload('TBC')" />
+          :ipfsPayload="getIpfsPayload" />
       </vue-form>
     </div>
   </div>
@@ -474,7 +474,7 @@
     import FormFooter from "@/components/FormFooter.vue";
 
     import countryCodes from '../../../static/country_codes.json';
-    import ipfsHttpClient from 'ipfs-http-client';
+    import InfuraIpfsService from "@/services/infura.ipfs.service";
 
     interface Model {
         coo: string,
@@ -526,7 +526,7 @@
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
-        ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
+        ipfsService = new InfuraIpfsService();
 
         formState: any = {};
 
@@ -637,37 +637,7 @@
             return padding + number;
         }
 
-        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
-            try {
-                const results = await this.ipfs.add(buffer, {pin: true});
-
-                if (results && Array.isArray(results) && results.length > 0) {
-                    const result = results[0];
-                    const hash = result && result.hash ? result.hash : 'unsuccessful';
-
-                    if (hash === 'unsuccessful') {
-                        alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
-                    }
-
-                    return hash;
-                }
-            } catch (e) {
-                alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
-            }
-
-            return 'unsuccessful';
-        }
-
-        async uploadImageToIpfs(): Promise<string> {
-            return this.pushBufferToIpfs(this.fileBuffer, 'image');
-        }
-
-        async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
-            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            return this.pushBufferToIpfs(buffer, 'token data');
-        }
-
-        getIpfsPayload(imageIpfsUrl: string): any {
+        getIpfsPayload(imageIpfsUrl: string | undefined): any {
            const cleanModel = _(this.model)
              .omitBy(_.isUndefined)
              .omitBy(_.isNull)
@@ -696,7 +666,7 @@
             return {
                 name,
                 description,
-                image: imageIpfsUrl,
+                image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
                 type: 'PHYSICAL_ASSET',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
@@ -746,7 +716,7 @@
                 this.mintingTransactionHash = '';
                 this.saving = true;
 
-                const imageIpfsHash = await this.uploadImageToIpfs();
+                const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
                 if (imageIpfsHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -754,7 +724,7 @@
 
                 const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
                 const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                this.ipfsDataHash = await this.pushJsonToIpfs(ipfsPayload);
+                this.ipfsDataHash = await this.ipfsService.pushJsonToIpfs(ipfsPayload);
                 if (this.ipfsDataHash === 'unsuccessful') {
                     this.saving = false;
                     return;

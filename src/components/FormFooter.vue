@@ -46,7 +46,7 @@
 
             <b-alert class="text-left" variant="light" :show="showIPFSData">
               <div class="small text-muted mb-2">IPFS MetaData</div>
-              <pre>{{ipfsPayload}}</pre>
+              <pre>{{ipfsPayload()}}</pre>
               <div>
                 <a class="btn btn-link"
                    v-if="ipfsDataHash && ipfsDataHash !== 'unsuccessful'"

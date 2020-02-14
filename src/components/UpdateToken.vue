@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-3">
+        <div class="col-md-4 col-lg-3">
           <b-card title="Name:" body-bg-variant="primary" class="text-white min-height-card">
             <b-card-body class="text-white">
               <div>
@@ -46,7 +46,7 @@
             </b-card-body>
           </b-card>
         </div>
-        <div class="col-lg-3">
+        <div class="col-md-4 col-lg-3">
           <b-card title="Token ID:" body-bg-variant="primary" class="text-white min-height-card">
             <b-card-body class="text-white">
               <div>
@@ -55,7 +55,7 @@
             </b-card-body>
           </b-card>
         </div>
-        <div class="col-lg-3">
+        <div class="col-md-4 col-lg-3">
           <b-card title="Product ID:" body-bg-variant="primary" class="text-white min-height-card">
             <b-card-body class="text-white">
               <div>
@@ -64,8 +64,8 @@
             </b-card-body>
           </b-card>
         </div>
-        <div class="col-lg-3">
-          <b-card no-body title="Image:" bg-variant="primary" class="text-white min-height-card p-2">
+        <div class="col-md-4 col-lg-3">
+          <b-card no-body title="Image:" bg-variant="primary" class="text-white min-height-card p-1">
             <img :src="ipfsData.image" style="max-height: 150px;" class="m-auto"/>
           </b-card>
         </div>
@@ -227,14 +227,14 @@
 
             <FormFooter
               :saving="saving"
-              :transactionHash="null"
+              :transactionHash="transactionHash"
               :isActionBtnDisabled="false"
               actionBtnTxt="Update"
               :formState="formState"
               :generalFormStateInvalid="false"
               invalidFormStateText="Please complete the form above before you can update."
-              :ipfsDataHash="null"
-              :ipfsPayload="{}" />
+              :ipfsDataHash="ipfsDataHash"
+              :ipfsPayload="getIpfsPayload" />
           </vue-form>
         </div>
       </div>
@@ -244,11 +244,16 @@
 
 <script>
     import axios from "axios";
+    import InfuraIpfsService from "@/services/infura.ipfs.service";
 
     // @ts-ignore
     import Datepicker from 'vuejs-datepicker';
     import SmallSpinner from "./SmallSpinner";
     import FormFooter from "@/components/FormFooter.vue";
+    import moment from "moment";
+    import _ from "lodash";
+
+    const ipfsService = new InfuraIpfsService();
 
     export default {
         name: "UpdateToken",
@@ -264,6 +269,8 @@
             ownerOf: '',
             noResultFound: false,
             foundTokenId: '',
+            transactionHash: '',
+            ipfsDataHash: null,
             model: {
               purchase_location: '',
               purchase_date: '',
@@ -323,8 +330,71 @@
               from: today
             }
           },
-          onSubmit() {
-            alert('update clicked');
+          getIpfsPayload() {
+            const newPayload = {...this.ipfsData ? this.ipfsData : {}};
+            if (newPayload.attributes) {
+              const cleanAttributes = _(newPayload.attributes)
+                .omitBy(_.isUndefined)
+                .omitBy(_.isNull)
+                .omitBy((value) => {
+                  return value.trim ? value.trim() === '' : false
+                })
+                .value();
+
+              newPayload.attributes = {
+                ...cleanAttributes,
+                ...this.model
+              }
+            }
+
+            if (newPayload.attributes.purchase_date) {
+              newPayload.attributes.purchase_date = moment(newPayload.attributes.purchase_date).format('YYYY-MM-DD');
+            }
+
+            if (newPayload.attributes.customisation_date) {
+              newPayload.attributes.customisation_date = moment(newPayload.attributes.customisation_date).format('YYYY-MM-DD');
+            }
+
+            return newPayload;
+          },
+          async onSubmit() {
+            if (this.transactionHash.length > 0) {
+              console.log("Already submitted");
+              return;
+            }
+
+            if (this.formState.$valid) {
+
+              this.transactionHash = '';
+              this.saving = true;
+
+              const ipfsPayload = this.getIpfsPayload();
+              this.ipfsDataHash = await ipfsService.pushJsonToIpfs(ipfsPayload);
+              if (this.ipfsDataHash === 'unsuccessful') {
+                this.saving = false;
+                return;
+              }
+
+              console.log(this.ipfsDataHash);
+
+              // this.$store.dispatch('mintToken', {
+              //   tokenId: this.tokenId,
+              //   recipient: this.account,
+              //   productCode: this.productCode,
+              //   ipfsHash: this.ipfsDataHash,
+              // })
+              //   .then((hash) => {
+              //     this.mintingTransactionHash = hash;
+              //   })
+              //   .catch((error) => {
+              //     console.log(error);
+              //   })
+              //   .finally(() => {
+              //     this.saving = false;
+              //   });
+            } else {
+              console.log(this.formState.$error);
+            }
           }
         }
     }
