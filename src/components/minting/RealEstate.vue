@@ -571,7 +571,7 @@
       }
 
       useEscrowAccount() {
-        this.model.recipient = '0xescrow';
+        this.model.recipient = '0xf4Ea1d9Fe1B0c0C8906341887A608b0b2878bAB8';
       }
 
         toggleShowIPFSData() {
