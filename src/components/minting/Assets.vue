@@ -695,7 +695,9 @@
         }
 
         // eslint-disable-next-line class-methods-use-this
-        prependPadding(number: string, maxLength: number): string {
+        prependPadding(number: string | undefined, maxLength: number): string {
+            if (!number) return '';
+
             let padding: string = '';
             for (let i: number = 0; i < (maxLength - number.length); i += 1) {
                 padding += '0';
@@ -734,24 +736,30 @@
         }
 
         getIpfsPayload(imageIpfsUrl: string): any {
+           const cleanModel = _(this.model)
+             .omitBy(_.isUndefined)
+             .omitBy(_.isNull)
+             .omitBy((value: any) => {
+               return value.trim ? value.trim() === '' : false
+             })
+             .value();
+
             const {
                 name,
                 description,
                 series,
                 design,
-                purchase_date,
-                customisation_date,
                 recipient,
-                ...basicModel
-            } = this.model;
+                ...strippedDownModel
+            } = cleanModel;
 
-            const cleanModel = _(basicModel)
-                .omitBy(_.isUndefined)
-                .omitBy(_.isNull)
-                .omitBy((value: any) => {
-                    return value.trim ? value.trim() === '' : false
-                })
-                .value();
+            if (strippedDownModel.purchase_date) {
+                strippedDownModel.purchase_date = moment(strippedDownModel.purchase_date).format('YYYY-MM-DD');
+            }
+
+            if (strippedDownModel.customisation_date) {
+                strippedDownModel.customisation_date = moment(strippedDownModel.customisation_date).format('YYYY-MM-DD');
+            }
 
             return {
                 name,
@@ -760,13 +768,11 @@
                 type: 'PHYSICAL_ASSET',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
-                    ...cleanModel,
+                    ...strippedDownModel,
                     product_id: this.productId,
                     series: this.prependPadding(series, 3),
-                    design: this.prependPadding(design, 4),
-                    purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
-                    customization_date: moment(customisation_date).format('YYYY-MM-DD'),
-                },
+                    design: this.prependPadding(design, 4)
+                }
             };
         }
 
