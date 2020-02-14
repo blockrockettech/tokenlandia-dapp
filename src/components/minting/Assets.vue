@@ -255,25 +255,22 @@
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.purchLocation)">
-          <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
+        <div class="form-group row">
+          <label for="purchaseLocation" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.purchase_location }">
+            Purchase Location
+          </label>
           <div class="col-sm-9">
             <input type="text"
-                   name="purchLocation"
-                   id="purchLocation"
+                   name="purchaseLocation"
+                   maxlength="40"
+                   id="purchaseLocation"
                    class="form-control"
-                   :class="inputClassName(formState.purchLocation)"
-                   required v-model="model.purchase_location"/>
-
-            <field-messages
-              name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Purchase Location is a required field</div>
-            </field-messages>
+                   v-model="model.purchase_location"/>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field">
+        <div class="form-group row">
           <label for="purchDate" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.purchase_date }">
             Purchase Date
@@ -289,37 +286,25 @@
                         :disabled-dates="disabledDates()"
                         v-model="model.purchase_date">
             </datepicker>
-
-            <field-messages
-              name="purchDate" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Purchase Date is a required field</div>
-            </field-messages>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.customiseLocation)">
-          <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
+        <div class="form-group row">
+          <label for="customiseLocation" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.customization_location }">
             Customization Location
           </label>
           <div class="col-sm-9">
             <input type="text"
                    name="customiseLocation"
+                   maxlength="40"
                    id="customiseLocation"
                    class="form-control"
-                   :class="inputClassName(formState.customiseLocation)"
-                   required v-model="model.customization_location"/>
-
-            <field-messages
-              name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Customization Location is a required field
-              </div>
-            </field-messages>
+                   v-model="model.customization_location"/>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field">
+        <div class="form-group row">
           <label for="customiseDate" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.customisation_date }">
             Customization Date
@@ -335,37 +320,25 @@
                         format="yyyy-MM-dd"
                         v-model="model.customisation_date">
             </datepicker>
-
-            <field-messages
-              name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Customization Date is a required field
-              </div>
-            </field-messages>
           </div>
-        </validate>
+        </div>
 
         <h4 class="heading text-left my-3">Materials Used</h4>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.material1)">
-          <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
+        <div class="form-group row">
+          <label for="material1" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_1 }">
+            Material 1
+          </label>
           <div class="col-sm-9">
             <input type="text"
-                   name="material1"
+                   name="material2"
                    maxlength="40"
                    id="material1"
                    class="form-control"
-                   :class="inputClassName(formState.material1)"
-                   required v-model="model.material_1"/>
-            <field-messages
-              name="material1" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                One material is required
-              </div>
-            </field-messages>
+                   v-model="model.material_1"/>
           </div>
-        </validate>
+        </div>
 
         <div class="form-group row">
           <label for="material2" class="col-sm-3 col-form-label text-right"
