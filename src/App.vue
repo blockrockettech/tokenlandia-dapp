@@ -14,12 +14,12 @@
 
         <ul class="list-unstyled components heading menu-text">
           <li>
-            <a href="#" class="dropdown-toggle" @click="toggleMintingSubmenu">
+            <a href="#" class="dropdown-toggle" @click="toggleSubmenu('minting')">
               Minting
               <font-awesome-icon icon="caret-down" class="ml-auto">
               </font-awesome-icon>
             </a>
-            <ul class="collapse list-unstyled txt" id="homeSubmenu" v-bind:class="{'show': mintingExpanded}">
+            <ul class="collapse list-unstyled heading" id="homeSubmenu" v-bind:class="{'show': expanded.minting}">
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/assets' }">
                 <router-link to="/">General Products</router-link>
               </li>
@@ -28,8 +28,20 @@
               </li>
             </ul>
           </li>
-          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/verify' }">
-            <router-link to="/verify">Verify</router-link>
+          <li>
+            <a href="#" class="dropdown-toggle" @click="toggleSubmenu('token_management')">
+              Token Management
+              <font-awesome-icon icon="caret-down" class="ml-auto">
+              </font-awesome-icon>
+            </a>
+            <ul class="collapse list-unstyled heading" id="tokenManagementSubmenu" v-bind:class="{'show': expanded.token_management}">
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/manage/verify' }">
+                <router-link to="/manage/verify">Verify</router-link>
+              </li>
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/manage/update' }">
+                <router-link to="/manage/update">Update</router-link>
+              </li>
+            </ul>
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/account' }">
             <router-link to="/account">Account</router-link>
@@ -54,7 +66,7 @@
 
         <hr/>
 
-        <footer class="footer mt-5">
+        <footer class="footer mt-5 p-4">
           Built by <a href="https://blockrocket.tech" target="_blank">BlockRocket</a>
           <br/>
           <current-network class="mt-3"></current-network>
@@ -91,7 +103,10 @@
         data() {
             return {
                 collapsed: false,
-                mintingExpanded: true
+                expanded: {
+                  minting: true,
+                  token_management: true
+                }
             };
         },
         computed: {
@@ -112,8 +127,8 @@
             toggleSidebarCollapse() {
                 this.collapsed = !this.collapsed;
             },
-            toggleMintingSubmenu() {
-              this.mintingExpanded = !this.mintingExpanded;
+            toggleSubmenu(menu) {
+              this.expanded[menu] = !this.expanded[menu];
             },
             onLogin() {
                 web3Connect.toggleModal();
