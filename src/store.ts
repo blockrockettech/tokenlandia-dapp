@@ -87,7 +87,7 @@ export default new Vuex.Store({
         return address;
       }
     },
-    canAccountMint: state => state.account && state.accountProperties.canMint,
+    canAccountMint: state => state.account && state.accountProperties.canMint === true,
   },
   actions: {
 
@@ -203,6 +203,21 @@ export default new Vuex.Store({
     mintToken({state}, {tokenId, recipient, productCode, ipfsHash}) {
       return new Promise((resolve, reject) => {
         state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)
+          .send({
+            from: state.account
+          })
+          .once('transactionHash', (hash: string) => {
+            // @ts-ignore
+            state.notifyInstance.hash(hash);
+            resolve(hash);
+          })
+          .on('error', reject);
+      });
+    },
+
+    updateTokenIPFSHash({state}, {tokenId, ipfsHash}) {
+      return new Promise((resolve, reject) => {
+        state.tokenLandiaContract.methods.updateIpfsHash(tokenId, ipfsHash)
           .send({
             from: state.account
           })

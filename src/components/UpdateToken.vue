@@ -2,243 +2,279 @@
   <div class="txt">
     <h1 class="heading">Update General Product Token</h1>
     <hr/>
-    <div class="row">
-      <div class="col">
-        <b-form inline class="my-2">
-
-          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
-            <b-input placeholder="1..."
-                     v-model="tokenId">
-            </b-input>
-          </b-input-group>
-
-          <b-button class="ml-2"
-                    @click="performTokenSearch"
-                    variant="primary"
-                    v-if="!searching"
-                    :disabled="!tokenId">
-            Search
-          </b-button>
-
-          <b-button class="ml-2"
-                    variant="primary"
-                    v-if="searching && tokenId" disabled>
-            <SmallSpinner/>
-          </b-button>
-        </b-form>
+    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to use this page.</div>
+    <div class="alert alert-warning" v-else-if="!canAccountMint">
+      <div>
+        It doesn't look like you have the permissions to update token information. Double check you're using the correct account.
+      </div>
+      <div class="mt-4">
+        You are logged in as {{account}}
       </div>
     </div>
-    <div v-if="ipfsData && ipfsDataRetrieved">
+    <div v-else-if="canAccountMint">
       <div class="row">
         <div class="col">
-          <div class="my-3">
-            <h3 class="text-left">Token Summary</h3>
+          <b-form inline class="my-2">
+
+            <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
+              <b-input placeholder="1..."
+                       v-model="tokenId">
+              </b-input>
+            </b-input-group>
+
+            <b-button class="ml-2"
+                      @click="performTokenSearch"
+                      variant="primary"
+                      v-if="!searching"
+                      :disabled="!tokenId">
+              Search
+            </b-button>
+
+            <b-button class="ml-2"
+                      variant="primary"
+                      v-if="searching && tokenId" disabled>
+              <SmallSpinner/>
+            </b-button>
+          </b-form>
+        </div>
+      </div>
+      <div v-if="ipfsData && ipfsDataRetrieved">
+        <div class="row">
+          <div class="col">
+            <div class="my-3">
+              <h3 class="text-left">Token Summary</h3>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4 col-lg-3">
-          <b-card title="Name:" body-bg-variant="primary" class="text-white min-height-card">
-            <b-card-body class="text-white">
-              <div>
-                {{ipfsData.name}}
-              </div>
-            </b-card-body>
-          </b-card>
-        </div>
-        <div class="col-md-4 col-lg-3">
-          <b-card title="Token ID:" body-bg-variant="primary" class="text-white min-height-card">
-            <b-card-body class="text-white">
-              <div>
-                {{foundTokenId}}
-              </div>
-            </b-card-body>
-          </b-card>
-        </div>
-        <div class="col-md-4 col-lg-3">
-          <b-card title="Product ID:" body-bg-variant="primary" class="text-white min-height-card">
-            <b-card-body class="text-white">
-              <div>
-                {{ipfsData.attributes.product_id}}
-              </div>
-            </b-card-body>
-          </b-card>
-        </div>
-        <div class="col-md-4 col-lg-3">
-          <b-card no-body title="Image:" bg-variant="primary" class="text-white min-height-card p-1">
-            <img :src="ipfsData.image" style="max-height: 150px;" class="m-auto"/>
-          </b-card>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="my-4">
-            <h3 class="text-left">Update Provenance Information</h3>
+        <div class="row">
+          <div class="col-md-4 col-lg-3">
+            <b-card title="Name:" body-bg-variant="primary" class="text-white min-height-card">
+              <b-card-body class="text-white">
+                <div>
+                  {{ipfsData.name}}
+                </div>
+              </b-card-body>
+            </b-card>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <b-card title="Token ID:" body-bg-variant="primary" class="text-white min-height-card">
+              <b-card-body class="text-white">
+                <div>
+                  {{foundTokenId}}
+                </div>
+              </b-card-body>
+            </b-card>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <b-card title="Product ID:" body-bg-variant="primary" class="text-white min-height-card">
+              <b-card-body class="text-white">
+                <div>
+                  {{ipfsData.attributes.product_id}}
+                </div>
+              </b-card-body>
+            </b-card>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <b-card no-body title="Image:" bg-variant="primary" class="text-white min-height-card p-1">
+              <img :src="ipfsData.image" style="max-height: 150px;" class="m-auto"/>
+            </b-card>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <vue-form :state="formState" @submit.prevent="onSubmit">
-            <validate auto-label class="form-group row required-field"
-                      :class="fieldClassName(formState.purchLocation)">
-              <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="purchLocation"
-                       id="purchLocation"
-                       class="form-control"
-                       :class="inputClassName(formState.purchLocation)"
-                       required v-model="model.purchase_location"/>
-
-                <field-messages
-                  name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-                  <div slot="required" class="text-danger">Purchase Location is a required field</div>
-                </field-messages>
-              </div>
-            </validate>
-
-            <div class="form-group row">
-              <label for="purchDate" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.purchase_date }">
-                Purchase Date
-              </label>
-              <div class="col-sm-9">
-                <datepicker name="purchDate"
-                            id="purchDate"
-                            placeholder="YYYY-MM-DD"
-                            input-class="form-control bg-white"
-                            :typeable="false"
-                            :required="true"
-                            format="yyyy-MM-dd"
-                            :disabled-dates="disabledDates()"
-                            v-model="model.purchase_date">
-                </datepicker>
-              </div>
+        <div class="row">
+          <div class="col">
+            <div class="my-4">
+              <h3 class="text-left">Update Provenance Information</h3>
             </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <vue-form :state="formState" @submit.prevent="onSubmit">
+              <validate auto-label class="form-group row required-field"
+                        :class="fieldClassName(formState.purchLocation)">
+                <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="purchLocation"
+                         id="purchLocation"
+                         class="form-control"
+                         :class="inputClassName(formState.purchLocation)"
+                         required v-model="model.purchase_location"/>
 
-            <div class="form-group row">
-              <label for="customiseLocation" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.customization_location }">
-                Customization Location
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="customiseLocation"
-                       maxlength="40"
-                       id="customiseLocation"
-                       class="form-control"
-                       v-model="model.customization_location"/>
+                  <field-messages
+                    name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
+                    <div slot="required" class="text-danger">Purchase Location is a required field</div>
+                  </field-messages>
+                </div>
+              </validate>
+
+              <validate auto-label class="form-group row required-field">
+                <label for="purchDate" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.purchase_date }">
+                  Purchase Date
+                </label>
+                <div class="col-sm-9">
+                  <datepicker name="purchDate"
+                              id="purchDate"
+                              placeholder="YYYY-MM-DD"
+                              input-class="form-control bg-white"
+                              :typeable="false"
+                              :required="true"
+                              format="yyyy-MM-dd"
+                              :disabled-dates="disabledDates()"
+                              v-model="model.purchase_date">
+                  </datepicker>
+
+                  <field-messages
+                    name="purchDate" show="$touched || $submitted" class="form-control-feedback">
+                    <div slot="required" class="text-danger">Purchase Date is a required field</div>
+                  </field-messages>
+                </div>
+              </validate>
+
+              <validate auto-label class="form-group row required-field"
+                        :class="fieldClassName(formState.customiseLocation)">
+                <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
+                  Customization Location
+                </label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="customiseLocation"
+                         id="customiseLocation"
+                         class="form-control"
+                         :class="inputClassName(formState.customiseLocation)"
+                         required v-model="model.customization_location"/>
+
+                  <field-messages
+                    name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
+                    <div slot="required" class="text-danger">
+                      Customization Location is a required field
+                    </div>
+                  </field-messages>
+                </div>
+              </validate>
+
+              <validate auto-label class="form-group row required-field">
+                <label for="customiseDate" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.customisation_date }">
+                  Customization Date
+                </label>
+                <div class="col-sm-9">
+                  <datepicker name="customiseDate"
+                              id="customiseDate"
+                              placeholder="YYYY-MM-DD"
+                              input-class="form-control bg-white"
+                              :typeable="false"
+                              :required="true"
+                              :disabled-dates="disabledDates()"
+                              format="yyyy-MM-dd"
+                              v-model="model.customisation_date">
+                  </datepicker>
+
+                  <field-messages
+                    name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
+                    <div slot="required" class="text-danger">
+                      Customization Date is a required field
+                    </div>
+                  </field-messages>
+                </div>
+              </validate>
+
+              <h4 class="heading text-left my-3">Materials Used</h4>
+
+              <validate auto-label class="form-group row required-field"
+                        :class="fieldClassName(formState.material1)">
+                <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="material1"
+                         maxlength="40"
+                         id="material1"
+                         class="form-control"
+                         :class="inputClassName(formState.material1)"
+                         required v-model="model.material_1"/>
+                  <field-messages
+                    name="material1" show="$touched || $submitted" class="form-control-feedback">
+                    <div slot="required" class="text-danger">
+                      One material is required
+                    </div>
+                  </field-messages>
+                </div>
+              </validate>
+
+              <div class="form-group row">
+                <label for="material2" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.material_2 }">
+                  Material 2
+                </label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="material2"
+                         maxlength="40"
+                         id="material2"
+                         class="form-control"
+                         v-model="model.material_2"/>
+                </div>
               </div>
-            </div>
 
-            <div class="form-group row">
-              <label for="customiseDate" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.customisation_date }">
-                Customization Date
-              </label>
-              <div class="col-sm-9">
-                <datepicker name="customiseDate"
-                            id="customiseDate"
-                            placeholder="YYYY-MM-DD"
-                            input-class="form-control bg-white"
-                            :typeable="false"
-                            :required="true"
-                            :disabled-dates="disabledDates()"
-                            format="yyyy-MM-dd"
-                            v-model="model.customisation_date">
-                </datepicker>
+              <div class="form-group row">
+                <label for="material3" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.material_3 }">
+                  Material 3
+                </label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="material3"
+                         maxlength="40"
+                         id="material3"
+                         class="form-control"
+                         v-model="model.material_3"/>
+                </div>
               </div>
-            </div>
 
-            <h4 class="heading text-left my-3">Materials Used</h4>
-
-            <div class="form-group row">
-              <label for="material1" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.material_1 }">
-                Material 1
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="material2"
-                       maxlength="40"
-                       id="material1"
-                       class="form-control"
-                       v-model="model.material_1"/>
+              <div class="form-group row">
+                <label for="material4" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.material_4 }">
+                  Material 4
+                </label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         name="material4"
+                         maxlength="40"
+                         id="material4"
+                         class="form-control"
+                         v-model="model.material_4"/>
+                </div>
               </div>
-            </div>
 
-            <div class="form-group row">
-              <label for="material2" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.material_2 }">
-                Material 2
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="material2"
-                       maxlength="40"
-                       id="material2"
-                       class="form-control"
-                       v-model="model.material_2"/>
+              <div class="form-group row">
+                <label for="material5" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.material_5 }">
+                  Material 5
+                </label>
+                <div class="col-sm-9">
+                  <input type="text"
+                         maxlength="40"
+                         name="material5"
+                         id="material5"
+                         class="form-control"
+                         v-model="model.material_5"/>
+                </div>
               </div>
-            </div>
 
-            <div class="form-group row">
-              <label for="material3" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.material_3 }">
-                Material 3
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="material3"
-                       maxlength="40"
-                       id="material3"
-                       class="form-control"
-                       v-model="model.material_3"/>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <label for="material4" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.material_4 }">
-                Material 4
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       name="material4"
-                       maxlength="40"
-                       id="material4"
-                       class="form-control"
-                       v-model="model.material_4"/>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <label for="material5" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.material_5 }">
-                Material 5
-              </label>
-              <div class="col-sm-9">
-                <input type="text"
-                       maxlength="40"
-                       name="material5"
-                       id="material5"
-                       class="form-control"
-                       v-model="model.material_5"/>
-              </div>
-            </div>
-
-            <FormFooter
-              :saving="saving"
-              :transactionHash="transactionHash"
-              :isActionBtnDisabled="isUpdateBtnDisabled"
-              actionBtnTxt="Update"
-              :formState="formState"
-              :generalFormStateInvalid="false"
-              invalidFormStateText="Please complete the form above before you can update."
-              :ipfsDataHash="ipfsDataHash"
-              :ipfsPayload="getIpfsPayload" />
-          </vue-form>
+              <FormFooter
+                :saving="saving"
+                :transactionHash="transactionHash"
+                :isActionBtnDisabled="isUpdateBtnDisabled"
+                actionBtnTxt="Update"
+                :formState="formState"
+                :generalFormStateInvalid="isUpdateBtnDisabled"
+                invalidFormStateText="Please complete the form above before you can update."
+                transactionInflightText="Update being submitted to chain..."
+                :ipfsDataHash="ipfsDataHash"
+                :ipfsPayload="getIpfsPayload" />
+            </vue-form>
+          </div>
         </div>
       </div>
     </div>
@@ -290,7 +326,7 @@
           }
         },
         computed: {
-          ...mapGetters(['canAccountMint']),
+          ...mapGetters(['canAccountMint', 'accountProperties']),
           ...mapState(['account']),
           isUpdateBtnDisabled() {
             return this.formState.$invalid && !this.account && !this.canAccountMint;
@@ -390,23 +426,19 @@
                 return;
               }
 
-              console.log(this.ipfsDataHash);
-
-              // this.$store.dispatch('mintToken', {
-              //   tokenId: this.tokenId,
-              //   recipient: this.account,
-              //   productCode: this.productCode,
-              //   ipfsHash: this.ipfsDataHash,
-              // })
-              //   .then((hash) => {
-              //     this.mintingTransactionHash = hash;
-              //   })
-              //   .catch((error) => {
-              //     console.log(error);
-              //   })
-              //   .finally(() => {
-              //     this.saving = false;
-              //   });
+              this.$store.dispatch('updateTokenIPFSHash', {
+                tokenId: this.foundTokenId,
+                ipfsHash: this.ipfsDataHash,
+              })
+                .then((hash) => {
+                  this.transactionHash = hash;
+                })
+                .catch((error) => {
+                  console.log(error);
+                })
+                .finally(() => {
+                  this.saving = false;
+                });
             } else {
               console.log(this.formState.$error);
             }

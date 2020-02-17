@@ -26,7 +26,7 @@
             <div v-else-if="transactionHash">
               <txs-link :hash="transactionHash" containerClass="alert alert-success">
                 <template>
-                  Minting in progress...
+                  {{transactionInflightText}}
                 </template>
               </txs-link>
             </div>
@@ -73,7 +73,8 @@
           'generalFormStateInvalid',
           'invalidFormStateText',
           'ipfsDataHash',
-          'ipfsPayload'
+          'ipfsPayload',
+          'transactionInflightText'
         ],
         components: {SmallSpinner, TxsLink},
         data() {

@@ -4,13 +4,11 @@
 
     <hr/>
 
-    <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning"
-         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
+    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
+    <div class="alert alert-warning" v-else-if="!canAccountMint">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
-    <div v-else>
-
+    <div v-else-if="canAccountMint">
       <h4 class="my-3">
         Unique Identifier:
         <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
@@ -452,7 +450,7 @@
 
     import developerCodes from '../../../static/developer_codes.json';
     import cityCodes from '../../../static/city_codes.json';
-    import ipfsHttpClient from 'ipfs-http-client';
+    import InfuraIpfsService from "@/services/infura.ipfs.service";
 
     interface Model {
         developer: string,
@@ -474,7 +472,13 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected', 'accountProperties', 'validateAddress', 'checksumAddress']),
+            ...mapGetters([
+              'isConnected',
+              'accountProperties',
+              'validateAddress',
+              'checksumAddress',
+              'canAccountMint'
+            ]),
             ...mapState(['account', 'networkId']),
         },
         components: {
@@ -493,11 +497,13 @@
 
       validateAddress: any;
 
+      canAccountMint: any;
+
         isConnected!: boolean;
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
-        ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
+      ipfsService = new InfuraIpfsService();
 
         formState: any = {};
 
@@ -601,36 +607,6 @@
             return padding + number;
         }
 
-        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
-            try {
-                const results = await this.ipfs.add(buffer, {pin: true});
-
-                if (results && Array.isArray(results) && results.length > 0) {
-                    const result = results[0];
-                    const hash = result && result.hash ? result.hash : 'unsuccessful';
-
-                    if (hash === 'unsuccessful') {
-                        alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
-                    }
-
-                    return hash;
-                }
-            } catch (e) {
-                alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
-            }
-
-            return 'unsuccessful';
-        }
-
-        async uploadImageToIpfs(): Promise<string> {
-            return this.pushBufferToIpfs(this.fileBuffer, 'image');
-        }
-
-        async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
-            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            return this.pushBufferToIpfs(buffer, 'token data');
-        }
-
         getIpfsPayload(imageIpfsUrl: string): any {
             const {
                 description,
@@ -704,7 +680,7 @@
                 this.mintingTransactionHash = '';
                 this.saving = true;
 
-                const imageIpfsHash = await this.uploadImageToIpfs();
+                const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
                 if (imageIpfsHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -712,7 +688,7 @@
 
                 const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
                 const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                this.ipfsDataHash = await this.pushJsonToIpfs(ipfsPayload);
+                this.ipfsDataHash = await this.ipfsService.pushJsonToIpfs(ipfsPayload);
                 if (this.ipfsDataHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -789,13 +765,9 @@
             return this.formState.$invalid ||
                 !this.file && !this.fileBuffer ||
                 !this.account ||
-                !this.canUserMint ||
+                !this.canAccountMint ||
                 this.tokenIdAlreadyAssigned ||
               !this.validateAddress(this.model.recipient);
-        }
-
-        get canUserMint(): boolean {
-            return this.account && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

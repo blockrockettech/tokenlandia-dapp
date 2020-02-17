@@ -3,12 +3,11 @@
     <h1 class="heading">General Products</h1>
     <hr/>
 
-    <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning"
-         v-else-if="!canAccountMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
+    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
+    <div class="alert alert-warning" v-else-if="!canAccountMint">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
-    <div v-else>
+    <div v-else-if="canAccountMint">
       <h4 class="heading mb-4">Unique Identifier:
         <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
@@ -448,6 +447,7 @@
           :formState="formState"
           :generalFormStateInvalid="tokenIdAlreadyAssigned"
           invalidFormStateText="Please complete the form and image upload above before you can mint."
+          transactionInflightText="Minting in progress..."
           :ipfsDataHash="ipfsDataHash"
           :ipfsPayload="getIpfsPayload" />
       </vue-form>
