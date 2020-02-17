@@ -4,13 +4,11 @@
 
     <hr/>
 
-    <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning"
-         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
+    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
+    <div class="alert alert-warning" v-else-if="!canAccountMint">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
-    <div v-else>
-
+    <div v-else-if="canAccountMint">
       <h4 class="my-3">
         Unique Identifier:
         <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
@@ -373,61 +371,17 @@
           </div>
         </validate>
 
-        <div class="row">
-          <div class="col-12">
-            <div class="mt-4">
-              <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit"
-                          class="btn-block btn-lg"
-                          variant="primary"
-                          :disabled="isMintingDisabled">
-                  Mint
-                </b-button>
-                <p class="mt-2 text-danger" v-if="(formState.$invalid || tokenIdAlreadyAssigned) && formState.$dirty">
-                  Please complete the form and image upload above before you can mint.
-                </p>
-              </div>
-              <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  <SmallSpinner/>
-                  Uploading data to IPFS...
-                </b-button>
-              </div>
-              <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  Please authorize this transaction...
-                </b-button>
-              </div>
-              <div v-else-if="mintingTransactionHash">
-                <txs-link :hash="mintingTransactionHash" containerClass="alert alert-success">
-                  <template>
-                    Minting in progress...
-                  </template>
-                </txs-link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <b-card header-tag="header" class="mt-3" no-body>
-          <template v-slot:header>
-            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
-              <span class="mr-2">View IPFS MetaData</span>
-              <font-awesome-icon icon="caret-down" class="ml-auto">
-              </font-awesome-icon>
-            </b-button>
-          </template>
-
-          <b-alert class="text-left" variant="light" :show="showIPFSData">
-            <div class="small text-muted mb-2">IPFS MetaData</div>
-            <pre>{{this.getIpfsPayload('TBC')}}</pre>
-            <div>
-              <a class="btn btn-link"
-                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-            </div>
-          </b-alert>
-        </b-card>
+        <FormFooter
+          :saving="saving"
+          :transactionHash="mintingTransactionHash"
+          :isActionBtnDisabled="isMintingDisabled"
+          actionBtnTxt="Mint"
+          :formState="formState"
+          :generalFormStateInvalid="tokenIdAlreadyAssigned"
+          invalidFormStateText="Please complete the form and image upload above before you can mint."
+          transactionInflightText="Minting in progress..."
+          :ipfsDataHash="ipfsDataHash"
+          :ipfsPayload="getIpfsPayload" />
       </vue-form>
     </div>
   </div>
@@ -449,10 +403,11 @@
 
     import SmallSpinner from '@/components/SmallSpinner.vue';
     import TxsLink from "@/components/TxsLink.vue";
+    import FormFooter from "@/components/FormFooter.vue";
 
     import developerCodes from '../../../static/developer_codes.json';
     import cityCodes from '../../../static/city_codes.json';
-    import ipfsHttpClient from 'ipfs-http-client';
+    import InfuraIpfsService from "@/services/infura.ipfs.service";
 
     interface Model {
         developer: string,
@@ -474,7 +429,14 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected', 'accountProperties', 'validateAddress', 'checksumAddress']),
+            ...mapGetters([
+              'isConnected',
+              'accountProperties',
+              'validateAddress',
+              'checksumAddress',
+              'canAccountMint',
+              'escrowAccountAddress'
+            ]),
             ...mapState(['account', 'networkId']),
         },
         components: {
@@ -482,6 +444,7 @@
             SmallSpinner,
             Datepicker,
             vueDropzone: vue2Dropzone,
+            FormFooter
         },
     })
     export default class RealEstateNFTGenerator extends Vue {
@@ -492,12 +455,15 @@
       ];
 
       validateAddress: any;
+      escrowAccountAddress: any;
+
+      canAccountMint: any;
 
         isConnected!: boolean;
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
-        ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
+      ipfsService = new InfuraIpfsService();
 
         formState: any = {};
 
@@ -524,7 +490,7 @@
             thumbnailHeight: 120,
             thumbnailWidth: 120,
             autoProcessQueue: false,
-            maxFilesize: 20,
+            maxFilesize: 5,
             maxFiles: 1,
             minFiles: 1,
             addRemoveLinks: true,
@@ -571,12 +537,8 @@
       }
 
       useEscrowAccount() {
-        this.model.recipient = '0xescrow';
+        this.model.recipient = this.escrowAccountAddress;
       }
-
-        toggleShowIPFSData() {
-            this.showIPFSData = !this.showIPFSData;
-        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
@@ -601,37 +563,7 @@
             return padding + number;
         }
 
-        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
-            try {
-                const results = await this.ipfs.add(buffer, {pin: true});
-
-                if (results && Array.isArray(results) && results.length > 0) {
-                    const result = results[0];
-                    const hash = result && result.hash ? result.hash : 'unsuccessful';
-
-                    if (hash === 'unsuccessful') {
-                        alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
-                    }
-
-                    return hash;
-                }
-            } catch (e) {
-                alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
-            }
-
-            return 'unsuccessful';
-        }
-
-        async uploadImageToIpfs(): Promise<string> {
-            return this.pushBufferToIpfs(this.fileBuffer, 'image');
-        }
-
-        async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
-            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            return this.pushBufferToIpfs(buffer, 'token data');
-        }
-
-        getIpfsPayload(imageIpfsUrl: string): any {
+        getIpfsPayload(imageIpfsUrl: string | undefined): any {
             const {
                 description,
                 purchase_date,
@@ -653,7 +585,7 @@
             return {
                 name: property_address,
                 description,
-                image: imageIpfsUrl,
+                image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
                 type: 'REAL_ESTATE',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
@@ -704,7 +636,7 @@
                 this.mintingTransactionHash = '';
                 this.saving = true;
 
-                const imageIpfsHash = await this.uploadImageToIpfs();
+                const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
                 if (imageIpfsHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -712,7 +644,7 @@
 
                 const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
                 const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                this.ipfsDataHash = await this.pushJsonToIpfs(ipfsPayload);
+                this.ipfsDataHash = await this.ipfsService.pushJsonToIpfs(ipfsPayload);
                 if (this.ipfsDataHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -720,7 +652,7 @@
 
                 this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
-                    recipient: this.account,
+                    recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
                 })
@@ -789,13 +721,9 @@
             return this.formState.$invalid ||
                 !this.file && !this.fileBuffer ||
                 !this.account ||
-                !this.canUserMint ||
+                !this.canAccountMint ||
                 this.tokenIdAlreadyAssigned ||
               !this.validateAddress(this.model.recipient);
-        }
-
-        get canUserMint(): boolean {
-            return this.account && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

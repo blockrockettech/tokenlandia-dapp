@@ -3,12 +3,11 @@
     <h1 class="heading">General Products</h1>
     <hr/>
 
-    <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
-    <div class="alert alert-warning"
-         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
+    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
+    <div class="alert alert-warning" v-else-if="!canAccountMint">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
-    <div v-else>
+    <div v-else-if="canAccountMint">
       <h4 class="heading mb-4">Unique Identifier:
         <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
         <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
@@ -255,25 +254,22 @@
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.purchLocation)">
-          <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
+        <div class="form-group row">
+          <label for="purchaseLocation" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.purchase_location }">
+            Purchase Location
+          </label>
           <div class="col-sm-9">
             <input type="text"
-                   name="purchLocation"
-                   id="purchLocation"
+                   name="purchaseLocation"
+                   maxlength="40"
+                   id="purchaseLocation"
                    class="form-control"
-                   :class="inputClassName(formState.purchLocation)"
-                   required v-model="model.purchase_location"/>
-
-            <field-messages
-              name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Purchase Location is a required field</div>
-            </field-messages>
+                   v-model="model.purchase_location"/>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field">
+        <div class="form-group row">
           <label for="purchDate" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.purchase_date }">
             Purchase Date
@@ -289,39 +285,27 @@
                         :disabled-dates="disabledDates()"
                         v-model="model.purchase_date">
             </datepicker>
-
-            <field-messages
-              name="purchDate" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Purchase Date is a required field</div>
-            </field-messages>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.customiseLocation)">
-          <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
+        <div class="form-group row">
+          <label for="customiseLocation" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.customization_location }">
             Customization Location
           </label>
           <div class="col-sm-9">
             <input type="text"
                    name="customiseLocation"
+                   maxlength="40"
                    id="customiseLocation"
                    class="form-control"
-                   :class="inputClassName(formState.customiseLocation)"
-                   required v-model="model.customization_location"/>
-
-            <field-messages
-              name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Customization Location is a required field
-              </div>
-            </field-messages>
+                   v-model="model.customization_location"/>
           </div>
-        </validate>
+        </div>
 
-        <validate auto-label class="form-group row required-field">
+        <div class="form-group row">
           <label for="customiseDate" class="col-sm-3 col-form-label text-right"
-                 v-bind:class="{ 'text-success': model.customisation_date }">
+                 v-bind:class="{ 'text-success': model.customization_date }">
             Customization Date
           </label>
           <div class="col-sm-9">
@@ -333,39 +317,27 @@
                         :required="true"
                         :disabled-dates="disabledDates()"
                         format="yyyy-MM-dd"
-                        v-model="model.customisation_date">
+                        v-model="model.customization_date">
             </datepicker>
-
-            <field-messages
-              name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Customization Date is a required field
-              </div>
-            </field-messages>
           </div>
-        </validate>
+        </div>
 
         <h4 class="heading text-left my-3">Materials Used</h4>
 
-        <validate auto-label class="form-group row required-field"
-                  :class="fieldClassName(formState.material1)">
-          <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
+        <div class="form-group row">
+          <label for="material1" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.material_1 }">
+            Material 1
+          </label>
           <div class="col-sm-9">
             <input type="text"
-                   name="material1"
+                   name="material2"
                    maxlength="40"
                    id="material1"
                    class="form-control"
-                   :class="inputClassName(formState.material1)"
-                   required v-model="model.material_1"/>
-            <field-messages
-              name="material1" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                One material is required
-              </div>
-            </field-messages>
+                   v-model="model.material_1"/>
           </div>
-        </validate>
+        </div>
 
         <div class="form-group row">
           <label for="material2" class="col-sm-3 col-form-label text-right"
@@ -467,59 +439,17 @@
           </div>
         </validate>
 
-        <div class="row">
-          <div class="col-12">
-            <div class="mt-4">
-              <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit" class="btn-block btn-lg" variant="primary"
-                          :disabled="isMintingDisabled">
-                  Mint
-                </b-button>
-                <p class="mt-2 text-danger" v-if="(formState.$invalid || tokenIdAlreadyAssigned) && formState.$dirty">
-                  Please complete the form and image upload above before you can mint.
-                </p>
-              </div>
-              <div class="py-2 text-center" v-else-if="saving && !ipfsDataHash">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  <SmallSpinner/>
-                  Uploading data to IPFS...
-                </b-button>
-              </div>
-              <div class="py-2 text-center" v-else-if="ipfsDataHash && saving">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  Please authorize this transaction...
-                </b-button>
-              </div>
-              <div v-else-if="mintingTransactionHash">
-                <txs-link :hash="mintingTransactionHash" containerClass="alert alert-success">
-                  <template>
-                    Minting in progress...
-                  </template>
-                </txs-link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <b-card header-tag="header" class="mt-3" no-body>
-          <template v-slot:header>
-            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
-              <span class="mr-2">View IPFS MetaData</span>
-              <font-awesome-icon icon="caret-down" class="ml-auto">
-              </font-awesome-icon>
-            </b-button>
-          </template>
-
-          <b-alert class="text-left" variant="light" :show="showIPFSData">
-            <div class="small text-muted mb-2">IPFS MetaData</div>
-            <pre>{{this.getIpfsPayload('TBC')}}</pre>
-            <div>
-              <a class="btn btn-link"
-                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-            </div>
-          </b-alert>
-        </b-card>
+        <FormFooter
+          :saving="saving"
+          :transactionHash="mintingTransactionHash"
+          :isActionBtnDisabled="isMintingDisabled"
+          actionBtnTxt="Mint"
+          :formState="formState"
+          :generalFormStateInvalid="tokenIdAlreadyAssigned"
+          invalidFormStateText="Please complete the form and image upload above before you can mint."
+          transactionInflightText="Minting in progress..."
+          :ipfsDataHash="ipfsDataHash"
+          :ipfsPayload="getIpfsPayload" />
       </vue-form>
     </div>
   </div>
@@ -541,9 +471,10 @@
 
     import SmallSpinner from '@/components/SmallSpinner.vue';
     import TxsLink from "@/components/TxsLink.vue";
+    import FormFooter from "@/components/FormFooter.vue";
 
     import countryCodes from '../../../static/country_codes.json';
-    import ipfsHttpClient from 'ipfs-http-client';
+    import InfuraIpfsService from "@/services/infura.ipfs.service";
 
     interface Model {
         coo: string,
@@ -556,7 +487,7 @@
         purchase_location: string,
         purchase_date: string,
         customization_location: string,
-        customisation_date: string,
+        customization_date: string,
         brand: string,
         model: string,
         artist: string,
@@ -571,7 +502,14 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected', 'accountProperties', 'validateAddress', 'checksumAddress']),
+            ...mapGetters([
+              'isConnected',
+              'accountProperties',
+              'validateAddress',
+              'checksumAddress',
+              'canAccountMint',
+              'escrowAccountAddress'
+            ]),
             ...mapState(['account']),
         },
         components: {
@@ -579,6 +517,7 @@
             SmallSpinner,
             Datepicker,
             vueDropzone: vue2Dropzone,
+            FormFooter
         },
     })
     export default class AssetNFTGenerator extends Vue {
@@ -589,12 +528,15 @@
       ];
 
       validateAddress: any;
+      escrowAccountAddress: any;
+
+      canAccountMint: any;
 
       isConnected!: boolean;
 
         baseIpfsUrl: string = 'https://ipfs.infura.io/ipfs/';
 
-        ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
+        ipfsService = new InfuraIpfsService();
 
         formState: any = {};
 
@@ -609,7 +551,7 @@
             purchase_location: '',
             purchase_date: '',
             customization_location: '',
-            customisation_date: '',
+            customization_date: '',
             brand: '',
             model: '',
             artist: '',
@@ -627,7 +569,7 @@
             thumbnailHeight: 120,
             thumbnailWidth: 120,
             autoProcessQueue: false,
-            maxFilesize: 20,
+            maxFilesize: 5,
             maxFiles: 1,
             minFiles: 1,
             addRemoveLinks: true,
@@ -672,16 +614,12 @@
           });
         }
 
-        toggleShowIPFSData() {
-            this.showIPFSData = !this.showIPFSData;
-        }
-
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
         }
 
         useEscrowAccount() {
-          this.model.recipient = '0xescrow';
+          this.model.recipient = this.escrowAccountAddress;
         }
 
         onFileAdded(file: any) {
@@ -695,7 +633,9 @@
         }
 
         // eslint-disable-next-line class-methods-use-this
-        prependPadding(number: string, maxLength: number): string {
+        prependPadding(number: string | undefined, maxLength: number): string {
+            if (!number) return '';
+
             let padding: string = '';
             for (let i: number = 0; i < (maxLength - number.length); i += 1) {
                 padding += '0';
@@ -703,70 +643,44 @@
             return padding + number;
         }
 
-        async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
-            try {
-                const results = await this.ipfs.add(buffer, {pin: true});
+        getIpfsPayload(imageIpfsUrl: string | undefined): any {
+           const cleanModel = _(this.model)
+             .omitBy(_.isUndefined)
+             .omitBy(_.isNull)
+             .omitBy((value: any) => {
+               return value.trim ? value.trim() === '' : false
+             })
+             .value();
 
-                if (results && Array.isArray(results) && results.length > 0) {
-                    const result = results[0];
-                    const hash = result && result.hash ? result.hash : 'unsuccessful';
-
-                    if (hash === 'unsuccessful') {
-                        alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
-                    }
-
-                    return hash;
-                }
-            } catch (e) {
-                alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
-            }
-
-            return 'unsuccessful';
-        }
-
-        async uploadImageToIpfs(): Promise<string> {
-            return this.pushBufferToIpfs(this.fileBuffer, 'image');
-        }
-
-        async pushJsonToIpfs(ipfsPayload: any): Promise<string> {
-            const buffer = Buffer.from(JSON.stringify(ipfsPayload));
-            return this.pushBufferToIpfs(buffer, 'token data');
-        }
-
-        getIpfsPayload(imageIpfsUrl: string): any {
             const {
                 name,
                 description,
                 series,
                 design,
-                purchase_date,
-                customisation_date,
                 recipient,
-                ...basicModel
-            } = this.model;
+                ...strippedDownModel
+            } = cleanModel;
 
-            const cleanModel = _(basicModel)
-                .omitBy(_.isUndefined)
-                .omitBy(_.isNull)
-                .omitBy((value: any) => {
-                    return value.trim ? value.trim() === '' : false
-                })
-                .value();
+            if (strippedDownModel.purchase_date) {
+                strippedDownModel.purchase_date = moment(strippedDownModel.purchase_date).format('YYYY-MM-DD');
+            }
+
+            if (strippedDownModel.customization_date) {
+                strippedDownModel.customization_date = moment(strippedDownModel.customization_date).format('YYYY-MM-DD');
+            }
 
             return {
                 name,
                 description,
-                image: imageIpfsUrl,
+                image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
                 type: 'PHYSICAL_ASSET',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
-                    ...cleanModel,
+                    ...strippedDownModel,
                     product_id: this.productId,
                     series: this.prependPadding(series, 3),
-                    design: this.prependPadding(design, 4),
-                    purchase_date: moment(purchase_date).format('YYYY-MM-DD'),
-                    customization_date: moment(customisation_date).format('YYYY-MM-DD'),
-                },
+                    design: this.prependPadding(design, 4)
+                }
             };
         }
 
@@ -808,7 +722,7 @@
                 this.mintingTransactionHash = '';
                 this.saving = true;
 
-                const imageIpfsHash = await this.uploadImageToIpfs();
+                const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
                 if (imageIpfsHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -816,7 +730,7 @@
 
                 const imageIpfsUrl = `${this.baseIpfsUrl}${imageIpfsHash}`;
                 const ipfsPayload = this.getIpfsPayload(imageIpfsUrl);
-                this.ipfsDataHash = await this.pushJsonToIpfs(ipfsPayload);
+                this.ipfsDataHash = await this.ipfsService.pushJsonToIpfs(ipfsPayload);
                 if (this.ipfsDataHash === 'unsuccessful') {
                     this.saving = false;
                     return;
@@ -824,7 +738,7 @@
 
                 this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
-                    recipient: this.account,
+                    recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
                 })
@@ -893,13 +807,9 @@
             return this.formState.$invalid ||
                 !this.file && !this.fileBuffer ||
                 !this.account ||
-                !this.canUserMint ||
+                !this.canAccountMint ||
                 this.tokenIdAlreadyAssigned ||
                 !this.validateAddress(this.model.recipient);
-        }
-
-        get canUserMint(): boolean {
-            return this.account && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

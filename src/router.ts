@@ -13,12 +13,20 @@ export default new Router({
       redirect: { name: 'mint-assets' }
     },
     {
-      path: '/verify',
-      name: 'verify',
+      path: '/manage/verify',
+      name: 'manage-verify',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/Verify.vue'),
+    },
+    {
+      path: '/manage/update',
+      name: 'manage-update',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "about" */ './views/Update.vue'),
     },
     {
       path: '/user-access',
