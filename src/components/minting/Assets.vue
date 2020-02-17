@@ -507,7 +507,8 @@
               'accountProperties',
               'validateAddress',
               'checksumAddress',
-              'canAccountMint'
+              'canAccountMint',
+              'escrowAccountAddress'
             ]),
             ...mapState(['account']),
         },
@@ -527,6 +528,7 @@
       ];
 
       validateAddress: any;
+      escrowAccountAddress: any;
 
       canAccountMint: any;
 
@@ -612,16 +614,13 @@
           });
         }
 
-        toggleShowIPFSData() {
-            this.showIPFSData = !this.showIPFSData;
-        }
-
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
         }
 
         useEscrowAccount() {
-          this.model.recipient = '0xf4Ea1d9Fe1B0c0C8906341887A608b0b2878bAB8';
+          this.model.recipient = this.escrowAccountAddress;
+          console.log(this.model.recipient);
         }
 
         onFileAdded(file: any) {
@@ -740,7 +739,7 @@
 
                 this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
-                    recipient: this.account,
+                    recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
                 })

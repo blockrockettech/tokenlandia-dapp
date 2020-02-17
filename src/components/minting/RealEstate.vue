@@ -434,7 +434,8 @@
               'accountProperties',
               'validateAddress',
               'checksumAddress',
-              'canAccountMint'
+              'canAccountMint',
+              'escrowAccountAddress'
             ]),
             ...mapState(['account', 'networkId']),
         },
@@ -454,6 +455,7 @@
       ];
 
       validateAddress: any;
+      escrowAccountAddress: any;
 
       canAccountMint: any;
 
@@ -535,12 +537,8 @@
       }
 
       useEscrowAccount() {
-        this.model.recipient = '0xf4Ea1d9Fe1B0c0C8906341887A608b0b2878bAB8';
+        this.model.recipient = this.escrowAccountAddress;
       }
-
-        toggleShowIPFSData() {
-            this.showIPFSData = !this.showIPFSData;
-        }
 
         useCurrentEthAccount() {
             this.model.recipient = this.account ? this.account : '';
@@ -654,7 +652,7 @@
 
                 this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
-                    recipient: this.account,
+                    recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
                 })

@@ -11,6 +11,7 @@ import * as Web3 from 'web3';
 const {getWhitelistedAddresses} = require("./utils");
 const {getNetworkName} = require("@blockrocket/utils");
 const TokenlandiaJson = require("./truffleconf/token/Tokenlandia.json");
+const TrustedNftEscrowJson = require("./truffleconf/escrow/TrustedNftEscrow.json");
 
 Vue.use(Vuex);
 
@@ -36,6 +37,7 @@ export default new Vuex.Store({
     web3: null,
     notifyInstance: null,
     tokenLandiaContract: tokenLandiaContract,
+    escrowContractAddress: ''
   },
   mutations: {
     networkDetails(state, {networkId, networkName, etherscanBase, openseaBase}) {
@@ -48,6 +50,10 @@ export default new Vuex.Store({
       if (TokenlandiaJson.networks[state.networkId]) {
         // @ts-ignore
         state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
+      }
+
+      if (TrustedNftEscrowJson.networks[state.networkId]) {
+        state.escrowContractAddress = TrustedNftEscrowJson.networks[state.networkId].address;
       }
     },
     account(state, account) {
@@ -88,6 +94,7 @@ export default new Vuex.Store({
       }
     },
     canAccountMint: state => state.account && state.accountProperties.canMint === true,
+    escrowAccountAddress: state => state.escrowContractAddress
   },
   actions: {
 
