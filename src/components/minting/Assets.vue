@@ -5,7 +5,7 @@
 
     <div class="alert alert-warning" v-if="!this.account">You must "Login" to mint new tokens</div>
     <div class="alert alert-warning"
-         v-else-if="!canUserMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
+         v-else-if="!canAccountMint && accountProperties.canMint === false && !accountProperties.staticWeb3">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
     <div v-else>
@@ -502,7 +502,13 @@
 
     @Component({
         computed: {
-            ...mapGetters(['isConnected', 'accountProperties', 'validateAddress', 'checksumAddress']),
+            ...mapGetters([
+              'isConnected',
+              'accountProperties',
+              'validateAddress',
+              'checksumAddress',
+              'canAccountMint'
+            ]),
             ...mapState(['account']),
         },
         components: {
@@ -521,6 +527,8 @@
       ];
 
       validateAddress: any;
+
+      canAccountMint: any;
 
       isConnected!: boolean;
 
@@ -801,13 +809,9 @@
             return this.formState.$invalid ||
                 !this.file && !this.fileBuffer ||
                 !this.account ||
-                !this.canUserMint ||
+                !this.canAccountMint ||
                 this.tokenIdAlreadyAssigned ||
                 !this.validateAddress(this.model.recipient);
-        }
-
-        get canUserMint(): boolean {
-            return this.account && this.accountProperties.canMint;
         }
 
         get productIdValid(): boolean {

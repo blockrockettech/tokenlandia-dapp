@@ -80,20 +80,23 @@
       <div class="row">
         <div class="col">
           <vue-form :state="formState" @submit.prevent="onSubmit">
-            <div class="form-group row">
-              <label for="purchaseLocation" class="col-sm-3 col-form-label text-right"
-                     v-bind:class="{ 'text-success': model.purchase_location }">
-                Purchase Location
-              </label>
+            <validate auto-label class="form-group row required-field"
+                      :class="fieldClassName(formState.purchLocation)">
+              <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
               <div class="col-sm-9">
                 <input type="text"
-                       name="purchaseLocation"
-                       maxlength="40"
-                       id="purchaseLocation"
+                       name="purchLocation"
+                       id="purchLocation"
                        class="form-control"
-                       v-model="model.purchase_location"/>
+                       :class="inputClassName(formState.purchLocation)"
+                       required v-model="model.purchase_location"/>
+
+                <field-messages
+                  name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
+                  <div slot="required" class="text-danger">Purchase Location is a required field</div>
+                </field-messages>
               </div>
-            </div>
+            </validate>
 
             <div class="form-group row">
               <label for="purchDate" class="col-sm-3 col-form-label text-right"
@@ -228,7 +231,7 @@
             <FormFooter
               :saving="saving"
               :transactionHash="transactionHash"
-              :isActionBtnDisabled="false"
+              :isActionBtnDisabled="isUpdateBtnDisabled"
               actionBtnTxt="Update"
               :formState="formState"
               :generalFormStateInvalid="false"
@@ -252,6 +255,7 @@
     import FormFooter from "@/components/FormFooter.vue";
     import moment from "moment";
     import _ from "lodash";
+    import {mapState, mapGetters} from "vuex";
 
     const ipfsService = new InfuraIpfsService();
 
@@ -283,6 +287,13 @@
               material_5: ''
             },
             formState: {}
+          }
+        },
+        computed: {
+          ...mapGetters(['canAccountMint']),
+          ...mapState(['account']),
+          isUpdateBtnDisabled() {
+            return this.formState.$invalid && !this.account && !this.canAccountMint;
           }
         },
         methods: {
@@ -330,21 +341,25 @@
               from: today
             }
           },
+          cleanJsonObject(object) {
+            return _(object)
+              .omitBy(_.isUndefined)
+              .omitBy(_.isNull)
+              .omitBy((value) => {
+                return value.trim ? value.trim() === '' : false
+              })
+              .value();
+          },
           getIpfsPayload() {
             const newPayload = {...this.ipfsData ? this.ipfsData : {}};
             if (newPayload.attributes) {
-              const cleanAttributes = _(newPayload.attributes)
-                .omitBy(_.isUndefined)
-                .omitBy(_.isNull)
-                .omitBy((value) => {
-                  return value.trim ? value.trim() === '' : false
-                })
-                .value();
+              const cleanAttributes = this.cleanJsonObject(newPayload.attributes);
+              const cleanModel = this.cleanJsonObject(this.model);
 
               newPayload.attributes = {
                 ...cleanAttributes,
-                ...this.model
-              }
+                ...cleanModel
+              };
             }
 
             if (newPayload.attributes.purchase_date) {
@@ -395,7 +410,32 @@
             } else {
               console.log(this.formState.$error);
             }
-          }
+          },
+          // eslint-disable-next-line class-methods-use-this
+          fieldClassName(field) {
+            if (!field) {
+              return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$valid) {
+              return 'text-success';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+              return 'text-danger';
+            }
+            return '';
+          },
+          inputClassName(field) {
+            if (!field) {
+              return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$valid) {
+              return 'border-success';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+              return 'border-danger';
+            }
+            return '';
+          },
         }
     }
 </script>

@@ -87,6 +87,7 @@ export default new Vuex.Store({
         return address;
       }
     },
+    canAccountMint: state => state.account && state.accountProperties.canMint,
   },
   actions: {
 
