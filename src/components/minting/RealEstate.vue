@@ -371,61 +371,17 @@
           </div>
         </validate>
 
-        <div class="row">
-          <div class="col-12">
-            <div class="mt-4">
-              <div class="py-2 text-center" v-if="!saving && !mintingTransactionHash">
-                <b-button type="submit"
-                          class="btn-block btn-lg"
-                          variant="primary"
-                          :disabled="isMintingDisabled">
-                  Mint
-                </b-button>
-                <p class="mt-2 text-danger" v-if="(formState.$invalid || tokenIdAlreadyAssigned) && formState.$dirty">
-                  Please complete the form and image upload above before you can mint.
-                </p>
-              </div>
-              <div class="py-2 text-center" v-else-if="saving && !mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  <SmallSpinner/>
-                  Uploading data to IPFS...
-                </b-button>
-              </div>
-              <div class="py-2 text-center" v-else-if="mintingTransactionHash">
-                <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
-                  Please authorize this transaction...
-                </b-button>
-              </div>
-              <div v-else-if="mintingTransactionHash">
-                <txs-link :hash="mintingTransactionHash" containerClass="alert alert-success">
-                  <template>
-                    Minting in progress...
-                  </template>
-                </txs-link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <b-card header-tag="header" class="mt-3" no-body>
-          <template v-slot:header>
-            <b-button variant="light" @click="toggleShowIPFSData" class="py-0">
-              <span class="mr-2">View IPFS MetaData</span>
-              <font-awesome-icon icon="caret-down" class="ml-auto">
-              </font-awesome-icon>
-            </b-button>
-          </template>
-
-          <b-alert class="text-left" variant="light" :show="showIPFSData">
-            <div class="small text-muted mb-2">IPFS MetaData</div>
-            <pre>{{this.getIpfsPayload('TBC')}}</pre>
-            <div>
-              <a class="btn btn-link"
-                 v-if="ipfsDataHash !== '' && ipfsDataHash !== 'unsuccessful'"
-                 :href="baseIpfsUrl + ipfsDataHash" target="_blank">IPFS Link</a>
-            </div>
-          </b-alert>
-        </b-card>
+        <FormFooter
+          :saving="saving"
+          :transactionHash="mintingTransactionHash"
+          :isActionBtnDisabled="isMintingDisabled"
+          actionBtnTxt="Mint"
+          :formState="formState"
+          :generalFormStateInvalid="tokenIdAlreadyAssigned"
+          invalidFormStateText="Please complete the form and image upload above before you can mint."
+          transactionInflightText="Minting in progress..."
+          :ipfsDataHash="ipfsDataHash"
+          :ipfsPayload="getIpfsPayload" />
       </vue-form>
     </div>
   </div>
@@ -447,6 +403,7 @@
 
     import SmallSpinner from '@/components/SmallSpinner.vue';
     import TxsLink from "@/components/TxsLink.vue";
+    import FormFooter from "@/components/FormFooter.vue";
 
     import developerCodes from '../../../static/developer_codes.json';
     import cityCodes from '../../../static/city_codes.json';
@@ -486,6 +443,7 @@
             SmallSpinner,
             Datepicker,
             vueDropzone: vue2Dropzone,
+            FormFooter
         },
     })
     export default class RealEstateNFTGenerator extends Vue {
@@ -530,7 +488,7 @@
             thumbnailHeight: 120,
             thumbnailWidth: 120,
             autoProcessQueue: false,
-            maxFilesize: 20,
+            maxFilesize: 5,
             maxFiles: 1,
             minFiles: 1,
             addRemoveLinks: true,
@@ -607,7 +565,7 @@
             return padding + number;
         }
 
-        getIpfsPayload(imageIpfsUrl: string): any {
+        getIpfsPayload(imageIpfsUrl: string | undefined): any {
             const {
                 description,
                 purchase_date,
@@ -629,7 +587,7 @@
             return {
                 name: property_address,
                 description,
-                image: imageIpfsUrl,
+                image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
                 type: 'REAL_ESTATE',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {

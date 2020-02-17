@@ -4,12 +4,7 @@
     <hr/>
     <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to use this page.</div>
     <div class="alert alert-warning" v-else-if="!canAccountMint">
-      <div>
-        It doesn't look like you have the permissions to update token information. Double check you're using the correct account.
-      </div>
-      <div class="mt-4">
-        You are logged in as {{account}}
-      </div>
+      It doesn't look like you have the permissions to update token information. Double check you're using the correct account.
     </div>
     <div v-else-if="canAccountMint">
       <div class="row">
@@ -156,7 +151,7 @@
 
               <validate auto-label class="form-group row required-field">
                 <label for="customiseDate" class="col-sm-3 col-form-label text-right"
-                       v-bind:class="{ 'text-success': model.customisation_date }">
+                       v-bind:class="{ 'text-success': model.customization_date }">
                   Customization Date
                 </label>
                 <div class="col-sm-9">
@@ -168,7 +163,7 @@
                               :required="true"
                               :disabled-dates="disabledDates()"
                               format="yyyy-MM-dd"
-                              v-model="model.customisation_date">
+                              v-model="model.customization_date">
                   </datepicker>
 
                   <field-messages
@@ -184,7 +179,10 @@
 
               <validate auto-label class="form-group row required-field"
                         :class="fieldClassName(formState.material1)">
-                <label for="material1" class="col-sm-3 col-form-label text-right">Material 1</label>
+                <label for="material1" class="col-sm-3 col-form-label text-right"
+                       v-bind:class="{ 'text-success': model.material_1 }">
+                  Material 1
+                </label>
                 <div class="col-sm-9">
                   <input type="text"
                          name="material1"
@@ -315,7 +313,7 @@
               purchase_location: '',
               purchase_date: '',
               customization_location: '',
-              customisation_date: '',
+              customization_date: '',
               material_1: '',
               material_2: '',
               material_3: '',
@@ -333,12 +331,29 @@
           }
         },
         methods: {
-          performTokenSearch() {
-            this.ipfsDataRetrieved = false;
-            this.searching = true;
+          resetData() {
+            this.searching = false;
             this.attributes = {};
             this.ownerOf = '';
             this.noResultFound = false;
+            this.ipfsDataRetrieved = false;
+            this.transactionHash = '';
+            this.ipfsDataHash = null;
+            this.model = {
+              purchase_location: '',
+              purchase_date: '',
+              customization_location: '',
+              customization_date: '',
+              material_1: '',
+              material_2: '',
+              material_3: '',
+              material_4: '',
+              material_5: ''
+            };
+          },
+          performTokenSearch() {
+            this.resetData();
+            this.searching = true;
 
             const isTokenIdSearch = this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId));
             if (isTokenIdSearch) {
@@ -353,12 +368,41 @@
                 this.ownerOf = ownerOf;
                 this.productId = "";
                 this.tokenId = "";
-                this.currentTokenId = tokenId;
 
                 axios.get(attributes._ipfsUrl)
                   .then((response) => {
                     if (response && response.status === 200) {
                       this.ipfsData = response.data;
+
+                      // Pre-populate any existing information
+                      const attributes = this.ipfsData.attributes;
+                      const {
+                        customization_date,
+                        purchase_date,
+                        ...prepopulatedAttributes
+                      } = _.pick(attributes, Object.keys(this.model));
+
+                      let convertedCustomizationDate = customization_date;
+                      if (!convertedCustomizationDate) {
+                        convertedCustomizationDate = '';
+                      } else {
+                        convertedCustomizationDate = moment(convertedCustomizationDate, 'YYYY-MM-DD').toDate()
+                      }
+
+                      let convertedPurchaseDate = purchase_date;
+                      if (!convertedPurchaseDate) {
+                        convertedPurchaseDate = '';
+                      } else {
+                        convertedPurchaseDate = moment(convertedPurchaseDate, 'YYYY-MM-DD').toDate()
+                      }
+
+                      this.model = {
+                        ...this.model,
+                        ...prepopulatedAttributes,
+                        customization_date: convertedCustomizationDate,
+                        purchase_date: convertedPurchaseDate
+                      };
+
                       this.ipfsDataRetrieved = true;
                       this.searching = false;
                     } else {
@@ -402,8 +446,8 @@
               newPayload.attributes.purchase_date = moment(newPayload.attributes.purchase_date).format('YYYY-MM-DD');
             }
 
-            if (newPayload.attributes.customisation_date) {
-              newPayload.attributes.customisation_date = moment(newPayload.attributes.customisation_date).format('YYYY-MM-DD');
+            if (newPayload.attributes.customization_date) {
+              newPayload.attributes.customization_date = moment(newPayload.attributes.customization_date).format('YYYY-MM-DD');
             }
 
             return newPayload;

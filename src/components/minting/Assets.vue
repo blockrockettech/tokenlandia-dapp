@@ -305,7 +305,7 @@
 
         <div class="form-group row">
           <label for="customiseDate" class="col-sm-3 col-form-label text-right"
-                 v-bind:class="{ 'text-success': model.customisation_date }">
+                 v-bind:class="{ 'text-success': model.customization_date }">
             Customization Date
           </label>
           <div class="col-sm-9">
@@ -317,7 +317,7 @@
                         :required="true"
                         :disabled-dates="disabledDates()"
                         format="yyyy-MM-dd"
-                        v-model="model.customisation_date">
+                        v-model="model.customization_date">
             </datepicker>
           </div>
         </div>
@@ -487,7 +487,7 @@
         purchase_location: string,
         purchase_date: string,
         customization_location: string,
-        customisation_date: string,
+        customization_date: string,
         brand: string,
         model: string,
         artist: string,
@@ -549,7 +549,7 @@
             purchase_location: '',
             purchase_date: '',
             customization_location: '',
-            customisation_date: '',
+            customization_date: '',
             brand: '',
             model: '',
             artist: '',
@@ -567,7 +567,7 @@
             thumbnailHeight: 120,
             thumbnailWidth: 120,
             autoProcessQueue: false,
-            maxFilesize: 20,
+            maxFilesize: 5,
             maxFiles: 1,
             minFiles: 1,
             addRemoveLinks: true,
@@ -667,8 +667,8 @@
                 strippedDownModel.purchase_date = moment(strippedDownModel.purchase_date).format('YYYY-MM-DD');
             }
 
-            if (strippedDownModel.customisation_date) {
-                strippedDownModel.customisation_date = moment(strippedDownModel.customisation_date).format('YYYY-MM-DD');
+            if (strippedDownModel.customization_date) {
+                strippedDownModel.customization_date = moment(strippedDownModel.customization_date).format('YYYY-MM-DD');
             }
 
             return {
