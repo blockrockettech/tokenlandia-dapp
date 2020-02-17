@@ -620,7 +620,6 @@
 
         useEscrowAccount() {
           this.model.recipient = this.escrowAccountAddress;
-          console.log(this.model.recipient);
         }
 
         onFileAdded(file: any) {
