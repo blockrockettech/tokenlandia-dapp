@@ -124,39 +124,55 @@
 
         <h4 class="my-3 text-left">Product Information and Provenance</h4>
 
-        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.name)">
-          <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="name"
-                   maxlength="125"
-                   id="name"
-                   class="form-control"
-                   :class="inputClassName(formState.name)"
-                   required v-model="model.name"/>
+        <validate auto-label class="form-group required-field" :class="fieldClassName(formState.name)">
+          <div class="row">
+            <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="name"
+                     maxlength="125"
+                     id="name"
+                     class="form-control"
+                     :class="inputClassName(formState.name)"
+                     required v-model="model.name"/>
 
-            <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Name is a required field</div>
-            </field-messages>
+              <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Name is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.name.length}}/125)</span>
+            </div>
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.description)">
-          <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
-          <div class="col-sm-9">
+          <div class="row">
+            <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
+            <div class="col-sm-9">
             <textarea id="description"
                       name="description"
                       class="form-control"
                       :class="inputClassName(formState.description)"
                       maxlength="300"
                       required
-                      v-model.lazy="model.description">
+                      v-model="model.description">
               </textarea>
-            <field-messages
-              name="description" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Description is a required field</div>
-            </field-messages>
+              <field-messages
+                name="description" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Description is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.description.length}}/300)</span>
+            </div>
           </div>
         </validate>
 
