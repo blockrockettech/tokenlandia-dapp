@@ -198,9 +198,20 @@
     }
 
     convertStringToPascalCase(original: string) {
-        return original.replace(/(\w)(\w*)/g, (g0, g1, g2) => {
+        let convertedString = original.replace(/(\w)(\w*)/g, (g0, g1, g2) => {
             return g1.toUpperCase() + g2.toLowerCase();
         });
+
+        switch(convertedString) {
+          case 'Coo':
+            return 'COO';
+          case 'Product Id':
+            return 'Product ID';
+          case 'Token Id':
+            return 'Token ID';
+        }
+
+        return convertedString;
     }
 
     get results(): boolean {

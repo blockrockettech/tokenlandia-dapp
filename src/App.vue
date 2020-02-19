@@ -44,10 +44,10 @@
             </ul>
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/account' }">
-            <router-link to="/account">Account</router-link>
+            <router-link to="/account">Token Transfers</router-link>
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
-            <router-link to="/user-access">Access</router-link>
+            <router-link to="/user-access">User Access</router-link>
           </li>
           <li class="mt-2 centre-li">
             <b-button @click="onLogin" v-if="!account" variant="primary">
