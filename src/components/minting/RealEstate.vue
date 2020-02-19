@@ -337,6 +337,7 @@
         <validate auto-label class="form-group row required-field" :class="fieldClassNameRecipient(formState.recipient)">
           <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
           <div class="col-sm-9 text-left">
+
             <b-button-group size="md">
               <b-button
                 v-for="(btn, idx) in recipientButtons"
@@ -350,15 +351,18 @@
             <input type="text"
                    name="recipient"
                    id="recipient"
-                   class="form-control d-inline-block mt-2"
-                   :class="inputClassName(formState.recipient)"
                    minlength="42"
                    maxlength="42"
                    v-model="model.recipient"
-                   v-if="recipientButtons[2].state"
+                   v-bind:class="{
+                     'd-none': !recipientButtons[2].state,
+                     'd-inline-block form-control mt-2': recipientButtons[2].state,
+                     'border-success': formState.recipient && (formState.recipient.$touched || formState.recipient.$submitted) && formState.recipient.$valid,
+                     'border-danger': formState.recipient && (formState.recipient.$touched || formState.recipient.$submitted) && formState.recipient.$invalid
+                   }"
                    required/>
 
-            <span v-if="model.recipient && (formState.recipient.$dirty || formState.recipient.$touched)" class="float-right">
+            <span v-if="model.recipient" class="float-right">
               <span class="text-danger" v-if="!validateAddress(model.recipient)">
                 <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
                 </font-awesome-icon> Invalid recipient
@@ -449,9 +453,9 @@
     })
     export default class RealEstateNFTGenerator extends Vue {
       recipientButtons: any = [
+        { caption: 'Escrow Contract', state: true },
         { caption: 'Current Account', state: false },
-        { caption: 'Escrow Contract', state: false },
-        { caption: 'Custom', state: true },
+        { caption: 'Custom', state: false },
       ];
 
       validateAddress: any;
@@ -514,12 +518,16 @@
         showIPFSData: boolean = false;
 
       recipientChanged(idx: any) {
+        if (!this.formState.recipient) {
+          this.formState.recipient = {};
+        }
+
         if (idx == 0) {
-          this.useCurrentEthAccount();
+          this.useEscrowAccount();
           this.formState.recipient.$valid=true;
           this.formState.recipient.$touched=true;
         } else if (idx == 1) {
-          this.useEscrowAccount();
+          this.useCurrentEthAccount();
           this.formState.recipient.$valid=true;
           this.formState.recipient.$touched=true;
         } else if (idx == 2) {
@@ -620,6 +628,13 @@
                 }
             }
         }
+
+      @Watch('escrowAccountAddress')
+      async onEscrowAccountAddressAdded(newVal: any, oldVal: any) {
+        if (newVal !== oldVal) {
+          this.model.recipient = this.escrowAccountAddress;
+        }
+      }
 
         async onSubmit() {
             if (this.mintingTransactionHash.length > 0) {
