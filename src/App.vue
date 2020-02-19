@@ -43,8 +43,8 @@
               </li>
             </ul>
           </li>
-          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/account' }">
-            <router-link to="/account">Token Transfers</router-link>
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/token-transfers' }">
+            <router-link to="/token-transfers">Token Transfers</router-link>
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">User Access</router-link>
