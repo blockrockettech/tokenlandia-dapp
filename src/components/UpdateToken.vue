@@ -268,7 +268,7 @@
                 :formState="formState"
                 :generalFormStateInvalid="isUpdateBtnDisabled"
                 invalidFormStateText="Please complete the form above before you can update."
-                transactionInflightText="Update being submitted to chain..."
+                :transactionInflightText="transactionText"
                 :ipfsDataHash="ipfsDataHash"
                 :ipfsPayload="getIpfsPayload" />
             </vue-form>
@@ -308,6 +308,7 @@
             noResultFound: false,
             foundTokenId: '',
             transactionHash: '',
+            transactionText: '',
             ipfsDataHash: null,
             model: {
               purchase_location: '',
@@ -461,6 +462,7 @@
             if (this.formState.$valid) {
 
               this.transactionHash = '';
+              this.transactionText = 'Update being submitted to chain...';
               this.saving = true;
 
               const ipfsPayload = this.getIpfsPayload();
@@ -473,16 +475,14 @@
               this.$store.dispatch('updateTokenIPFSHash', {
                 tokenId: this.foundTokenId,
                 ipfsHash: this.ipfsDataHash,
-              })
-                .then((hash) => {
+                onceTxHash: hash => {
                   this.transactionHash = hash;
-                })
-                .catch((error) => {
-                  console.log(error);
-                })
-                .finally(() => {
+                },
+                onceReceipt: () => {
+                  this.transactionText = 'Update successful!';
                   this.saving = false;
-                });
+                }
+              });
             } else {
               console.log(this.formState.$error);
             }

@@ -399,7 +399,7 @@
           :formState="formState"
           :generalFormStateInvalid="tokenIdAlreadyAssigned"
           invalidFormStateText="Please complete the form and image upload above before you can mint."
-          transactionInflightText="Minting in progress..."
+          :transactionInflightText="transactionText"
           :ipfsDataHash="ipfsDataHash"
           :ipfsPayload="getIpfsPayload" />
       </vue-form>
@@ -531,7 +531,8 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
-        showIPFSData: boolean = false;
+
+        transactionText: string = "";
 
       recipientChanged(idx: any) {
         if (!this.formState.recipient) {
@@ -665,6 +666,7 @@
             if (this.formState.$valid) {
 
                 this.mintingTransactionHash = '';
+                this.transactionText = 'Minting in progress...';
                 this.saving = true;
 
                 const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
@@ -681,21 +683,19 @@
                     return;
                 }
 
-                this.$store.dispatch('mintToken', {
-                    tokenId: this.tokenId,
-                    recipient: this.model.recipient,
-                    productCode: this.productCode,
-                    ipfsHash: this.ipfsDataHash,
-                })
-                    .then((hash) => {
-                        this.mintingTransactionHash = hash;
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-                    .finally(() => {
-                        this.saving = false;
-                    });
+              this.$store.dispatch('mintToken', {
+                tokenId: this.tokenId,
+                recipient: this.model.recipient,
+                productCode: this.productCode,
+                ipfsHash: this.ipfsDataHash,
+                onceTxHash: (hash: any) => {
+                  this.mintingTransactionHash = hash;
+                },
+                onceReceipt: (receipt: any) => {
+                  this.transactionText = 'Minting success!';
+                  this.saving = false;
+                }
+              });
             } else {
                 console.log(this.formState.$error);
             }

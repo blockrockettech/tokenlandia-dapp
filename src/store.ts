@@ -213,13 +213,15 @@ export default new Vuex.Store({
           from: state.account
         })
         .once('transactionHash', (hash: any) => {
+          // @ts-ignore
+          state.notifyInstance.hash(hash);
           onceTxHash(hash);
       }).once('receipt', (receipt: any) => {
         onceReceipt(receipt);
       });
     },
 
-    updateTokenIPFSHash({state}, {tokenId, ipfsHash}) {
+    updateTokenIPFSHash({state}, {tokenId, ipfsHash, onceTxHash, onceReceipt}) {
       return new Promise((resolve, reject) => {
         state.tokenLandiaContract.methods.updateIpfsHash(tokenId, ipfsHash)
           .send({
@@ -228,9 +230,11 @@ export default new Vuex.Store({
           .once('transactionHash', (hash: string) => {
             // @ts-ignore
             state.notifyInstance.hash(hash);
-            resolve(hash);
+            onceTxHash(hash);
           })
-          .on('error', reject);
+          .once('receipt', (receipt: any) => {
+            onceReceipt(receipt);
+          });
       });
     },
 
