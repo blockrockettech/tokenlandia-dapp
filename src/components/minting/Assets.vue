@@ -796,21 +796,35 @@
                     return;
                 }
 
-                this.$store.dispatch('mintToken', {
+            // .once('transactionHash', (hash: string) => {
+            //     // @ts-ignore
+            //     state.notifyInstance.hash(hash);
+            //     resolve(hash);
+            //   })
+            //     .on('error', reject);
+
+            // .then((hash) => {
+            //     this.mintingTransactionHash = hash;
+            //   })
+            //     .catch((error) => {
+            //       console.log(error);
+            //     })
+            //     .finally(() => {
+            //       this.saving = false;
+            //     });
+
+              this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
                     recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
-                })
-                    .then((hash) => {
-                        this.mintingTransactionHash = hash;
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-                    .finally(() => {
-                        this.saving = false;
-                    });
+                    onceTxHash: (hash: any) => {
+                      console.log(hash);
+                    },
+                    onceReceipt: (receipt: any) => {
+                      console.log(receipt);
+                    }
+                });
             } else {
                 console.log(this.formState.$error);
             }

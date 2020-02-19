@@ -207,18 +207,15 @@ export default new Vuex.Store({
       return state.tokenLandiaContract.methods.attributes(tokenId).call();
     },
 
-    mintToken({state}, {tokenId, recipient, productCode, ipfsHash}) {
-      return new Promise((resolve, reject) => {
-        state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)
-          .send({
-            from: state.account
-          })
-          .once('transactionHash', (hash: string) => {
-            // @ts-ignore
-            state.notifyInstance.hash(hash);
-            resolve(hash);
-          })
-          .on('error', reject);
+    mintToken({state}, {tokenId, recipient, productCode, ipfsHash, onceTxHash, onceReceipt}) {
+      state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)
+        .send({
+          from: state.account
+        })
+        .once('transactionHash', (hash: any) => {
+          onceTxHash(hash);
+      }).once('receipt', (receipt: any) => {
+        onceReceipt(receipt);
       });
     },
 
