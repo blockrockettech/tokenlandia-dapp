@@ -26,7 +26,7 @@
 
         <div class="my-3">
           <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.developer)">
-            <label for="developer">Developer</label>
+            <label for="developer">Developer *</label>
             <select name="developer"
                     id="developer"
                     class="form-control"
@@ -38,7 +38,7 @@
           </validate>
 
           <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.city)">
-            <label for="city">City</label>
+            <label for="city">City *</label>
             <select name="city"
                     id="city"
                     class="form-control"
@@ -50,7 +50,7 @@
           </validate>
 
           <validate auto-label class="form-group required-field d-inline-block mr-3" :class="fieldClassName(formState.address)">
-            <label for="address">Address</label>
+            <label for="address">Address *</label>
             <input type="text"
                    name="address"
                    id="address"
@@ -62,7 +62,7 @@
           </validate>
 
           <validate auto-label class="form-group required-field d-inline-block" :class="fieldClassName(formState.tokenId)">
-            <label for="tokenId">Token ID</label>
+            <label for="tokenId">Token ID *</label>
             <input type="number"
                    min="1"
                    step="1"
@@ -115,41 +115,57 @@
 
         <h4 class="my-3 text-left">Information and Provenance</h4>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.property_address)">
-          <label for="property_address" class="col-sm-3 col-form-label text-right text-right">Property Address</label>
-          <div class="col-sm-9">
+          <div class="row">
+            <label for="property_address" class="col-sm-3 col-form-label text-right text-right">Property Address *</label>
+            <div class="col-sm-9">
               <textarea id="property_address"
                         name="property_address"
                         class="form-control"
                         maxlength="45"
                         required
                         :class="inputClassName(formState.property_address)"
-                        v-model.lazy="model.property_address">
+                        v-model="model.property_address">
                 </textarea>
-            <field-messages
-              name="property_address" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Property Address is a required field</div>
-            </field-messages>
+              <field-messages
+                name="property_address" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Property Address is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.property_address.length}}/45)</span>
+            </div>
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.description)">
-          <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
-          <div class="col-sm-9">
+          <div class="row">
+            <label for="description" class="col-sm-3 col-form-label text-right">Description *</label>
+            <div class="col-sm-9">
               <textarea id="description"
                         name="description"
                         class="form-control"
                         maxlength="60"
                         required
                         :class="inputClassName(formState.description)"
-                        v-model.lazy="model.description">
+                        v-model="model.description">
                 </textarea>
-            <field-messages
-              name="description" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Description is a required field</div>
-            </field-messages>
+              <field-messages
+                name="description" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Description is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.description.length}}/60)</span>
+            </div>
           </div>
         </validate>
 
@@ -157,7 +173,7 @@
           <label for="dropzone"
                  class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': file && fileBuffer }">
-            Image
+            Image *
           </label>
           <div class="col-sm-9">
             <vue-dropzone
@@ -176,7 +192,7 @@
         </div>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.year_built)">
-          <label for="year_built" class="col-sm-3 col-form-label text-right">Year Built</label>
+          <label for="year_built" class="col-sm-3 col-form-label text-right">Year Built *</label>
           <div class="col-sm-9">
             <input type="number"
                    name="year_built"
@@ -195,7 +211,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.community_name)">
-          <label for="community_name" class="col-sm-3 col-form-label text-right">Community Name</label>
+          <label for="community_name" class="col-sm-3 col-form-label text-right">Community Name *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="community_name"
@@ -214,7 +230,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.developer_full_name)">
-          <label for="developer_full_name" class="col-sm-3 col-form-label text-right">Developer</label>
+          <label for="developer_full_name" class="col-sm-3 col-form-label text-right">Developer *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="developer_full_name"
@@ -237,7 +253,7 @@
           <label for="purchDate"
                  class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.purchase_date }">
-            Purchase Date
+            Purchase Date *
           </label>
           <div class="col-sm-9">
             <datepicker name="purchDate"
@@ -260,7 +276,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.maintenance_costs)">
-          <label for="maintenance_costs" class="col-sm-3 col-form-label text-right">Maintenance Costs</label>
+          <label for="maintenance_costs" class="col-sm-3 col-form-label text-right">Maintenance Costs *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="maintenance_costs"
@@ -278,7 +294,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.insurance_costs)">
-          <label for="insurance_costs" class="col-sm-3 col-form-label text-right">Insurance Costs</label>
+          <label for="insurance_costs" class="col-sm-3 col-form-label text-right">Insurance Costs *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="insurance_costs"
@@ -296,7 +312,7 @@
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.taxes)">
           <label for="taxes" class="col-sm-3 col-form-label text-right">
-            Taxes
+            Taxes *
           </label>
           <div class="col-sm-9">
             <input type="text"
@@ -316,7 +332,7 @@
         </validate>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.rental_income)">
-          <label for="rental_income" class="col-sm-3 col-form-label text-right">Rental Income</label>
+          <label for="rental_income" class="col-sm-3 col-form-label text-right">Rental Income *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="rental_income"
@@ -335,7 +351,7 @@
         <h4 class="my-3 text-left">Recipient</h4>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassNameRecipient(formState.recipient)">
-          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
+          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address *</label>
           <div class="col-sm-9 text-left">
 
             <b-button-group size="md">

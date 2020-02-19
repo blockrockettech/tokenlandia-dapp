@@ -448,7 +448,7 @@
         <h4 class="heading text-left my-3">Recipient</h4>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassNameRecipient(formState.recipient)">
-          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
+          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address *</label>
           <div class="col-sm-9 text-left">
 
             <b-button-group size="md">
