@@ -25,7 +25,7 @@
       <vue-form :state="formState" @submit.prevent="onSubmit">
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="coo">Country of Origin</label>
+          <label for="coo">Country of Origin *</label>
           <select name="coo"
                   id="coo"
                   class="form-control"
@@ -37,7 +37,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="initials">Artist Initials</label>
+          <label for="initials">Artist Initials *</label>
           <input type="text"
                  name="initials"
                  id="initials"
@@ -47,7 +47,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="series">Series</label>
+          <label for="series">Series *</label>
           <input type="number"
                  name="series"
                  id="series"
@@ -59,7 +59,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="design">Design</label>
+          <label for="design">Design *</label>
           <input type="number"
                  name="design"
                  id="design"
@@ -71,7 +71,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block">
-          <label for="tokenId">Token ID</label>
+          <label for="tokenId">Token ID *</label>
           <input type="number"
                  min="1"
                  step="1"
@@ -126,7 +126,7 @@
 
         <validate auto-label class="form-group required-field" :class="fieldClassName(formState.name)">
           <div class="row">
-            <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
+            <label for="name" class="col-sm-3 col-form-label text-right">Name *</label>
             <div class="col-sm-9">
               <input type="text"
                      name="name"
@@ -152,7 +152,7 @@
         <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.description)">
           <div class="row">
-            <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
+            <label for="description" class="col-sm-3 col-form-label text-right">Description *</label>
             <div class="col-sm-9">
             <textarea id="description"
                       name="description"
@@ -180,7 +180,7 @@
           <label for="dropzone"
                  class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': file && fileBuffer }">
-            Image
+            Image *
           </label>
           <div class="col-sm-9">
             <vue-dropzone
@@ -200,7 +200,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.artist)">
-          <label for="artist" class="col-sm-3 col-form-label text-right">Artist</label>
+          <label for="artist" class="col-sm-3 col-form-label text-right">Artist *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="artist"
@@ -234,7 +234,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.brand)">
-          <label for="brand" class="col-sm-3 col-form-label text-right">Brand</label>
+          <label for="brand" class="col-sm-3 col-form-label text-right">Brand *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="brand"
@@ -253,7 +253,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.model)">
-          <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
+          <label for="model" class="col-sm-3 col-form-label text-right">Model *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="model"
@@ -340,10 +340,10 @@
 
         <h4 class="heading text-left my-3">Materials Used</h4>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material1" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_1 }">
-            Material 1
+            Material 1 *
           </label>
           <div class="col-sm-9">
             <input type="text"
@@ -354,8 +354,14 @@
                    v-model="model.material_1"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_1.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material2" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_2 }">
             Material 2
@@ -369,8 +375,14 @@
                    v-model="model.material_2"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_2.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material3" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_3 }">
             Material 3
@@ -384,8 +396,14 @@
                    v-model="model.material_3"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_3.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material4" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_4 }">
             Material 4
@@ -399,8 +417,14 @@
                    v-model="model.material_4"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_4.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material5" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_5 }">
             Material 5
@@ -412,6 +436,12 @@
                    id="material5"
                    class="form-control"
                    v-model="model.material_5"/>
+          </div>
+        </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_5.length}}/40)</span>
           </div>
         </div>
 
