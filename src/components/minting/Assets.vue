@@ -343,7 +343,7 @@
         <div class="form-group row mb-0">
           <label for="material1" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_1 }">
-            Material 1 *
+            Material 1
           </label>
           <div class="col-sm-9">
             <input type="text"
