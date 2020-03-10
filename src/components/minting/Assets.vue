@@ -25,7 +25,7 @@
       <vue-form :state="formState" @submit.prevent="onSubmit">
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="coo">Country of Origin</label>
+          <label for="coo">Country of Origin *</label>
           <select name="coo"
                   id="coo"
                   class="form-control"
@@ -37,7 +37,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="initials">Artist Initials</label>
+          <label for="initials">Artist Initials *</label>
           <input type="text"
                  name="initials"
                  id="initials"
@@ -47,7 +47,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="series">Series</label>
+          <label for="series">Series *</label>
           <input type="number"
                  name="series"
                  id="series"
@@ -59,7 +59,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
-          <label for="design">Design</label>
+          <label for="design">Design *</label>
           <input type="number"
                  name="design"
                  id="design"
@@ -71,7 +71,7 @@
         </validate>
 
         <validate auto-label class="form-group required-field d-inline-block">
-          <label for="tokenId">Token ID</label>
+          <label for="tokenId">Token ID *</label>
           <input type="number"
                  min="1"
                  step="1"
@@ -124,39 +124,55 @@
 
         <h4 class="my-3 text-left">Product Information and Provenance</h4>
 
-        <validate auto-label class="form-group row required-field" :class="fieldClassName(formState.name)">
-          <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="name"
-                   maxlength="125"
-                   id="name"
-                   class="form-control"
-                   :class="inputClassName(formState.name)"
-                   required v-model="model.name"/>
+        <validate auto-label class="form-group required-field" :class="fieldClassName(formState.name)">
+          <div class="row">
+            <label for="name" class="col-sm-3 col-form-label text-right">Name *</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="name"
+                     maxlength="125"
+                     id="name"
+                     class="form-control"
+                     :class="inputClassName(formState.name)"
+                     required v-model="model.name"/>
 
-            <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Name is a required field</div>
-            </field-messages>
+              <field-messages name="name" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Name is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.name.length}}/125)</span>
+            </div>
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.description)">
-          <label for="description" class="col-sm-3 col-form-label text-right">Description</label>
-          <div class="col-sm-9">
+          <div class="row">
+            <label for="description" class="col-sm-3 col-form-label text-right">Description *</label>
+            <div class="col-sm-9">
             <textarea id="description"
                       name="description"
                       class="form-control"
                       :class="inputClassName(formState.description)"
                       maxlength="300"
                       required
-                      v-model.lazy="model.description">
+                      v-model="model.description">
               </textarea>
-            <field-messages
-              name="description" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">Description is a required field</div>
-            </field-messages>
+              <field-messages
+                name="description" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">Description is a required field</div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.description.length}}/300)</span>
+            </div>
           </div>
         </validate>
 
@@ -164,7 +180,7 @@
           <label for="dropzone"
                  class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': file && fileBuffer }">
-            Image
+            Image *
           </label>
           <div class="col-sm-9">
             <vue-dropzone
@@ -184,7 +200,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.artist)">
-          <label for="artist" class="col-sm-3 col-form-label text-right">Artist</label>
+          <label for="artist" class="col-sm-3 col-form-label text-right">Artist *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="artist"
@@ -218,7 +234,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.brand)">
-          <label for="brand" class="col-sm-3 col-form-label text-right">Brand</label>
+          <label for="brand" class="col-sm-3 col-form-label text-right">Brand *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="brand"
@@ -237,7 +253,7 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.model)">
-          <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
+          <label for="model" class="col-sm-3 col-form-label text-right">Model *</label>
           <div class="col-sm-9">
             <input type="text"
                    name="model"
@@ -324,10 +340,10 @@
 
         <h4 class="heading text-left my-3">Materials Used</h4>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material1" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_1 }">
-            Material 1
+            Material 1 *
           </label>
           <div class="col-sm-9">
             <input type="text"
@@ -338,8 +354,14 @@
                    v-model="model.material_1"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_1.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material2" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_2 }">
             Material 2
@@ -353,8 +375,14 @@
                    v-model="model.material_2"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_2.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material3" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_3 }">
             Material 3
@@ -368,8 +396,14 @@
                    v-model="model.material_3"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_3.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material4" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_4 }">
             Material 4
@@ -383,8 +417,14 @@
                    v-model="model.material_4"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_4.length}}/40)</span>
+          </div>
+        </div>
 
-        <div class="form-group row">
+        <div class="form-group row mb-0">
           <label for="material5" class="col-sm-3 col-form-label text-right"
                  v-bind:class="{ 'text-success': model.material_5 }">
             Material 5
@@ -398,11 +438,17 @@
                    v-model="model.material_5"/>
           </div>
         </div>
+        <div class="row my-1">
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-9 text-muted text-left small">
+            <span>({{model.material_5.length}}/40)</span>
+          </div>
+        </div>
 
         <h4 class="heading text-left my-3">Recipient</h4>
 
         <validate auto-label class="form-group row required-field" :class="fieldClassNameRecipient(formState.recipient)">
-          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address</label>
+          <label for="recipient" class="col-sm-3 col-form-label text-right">ETH Address *</label>
           <div class="col-sm-9 text-left">
 
             <b-button-group size="md">
@@ -418,24 +464,27 @@
             <input type="text"
                    name="recipient"
                    id="recipient"
-                   class="form-control d-inline-block mt-2"
-                   :class="inputClassName(formState.recipient)"
                    minlength="42"
                    maxlength="42"
                    v-model="model.recipient"
-                   v-if="recipientButtons[2].state"
+                   v-bind:class="{
+                     'd-none': !recipientButtons[2].state,
+                     'd-inline-block form-control mt-2': recipientButtons[2].state,
+                     'border-success': formState.recipient && (formState.recipient.$touched || formState.recipient.$submitted) && formState.recipient.$valid,
+                     'border-danger': formState.recipient && (formState.recipient.$touched || formState.recipient.$submitted) && formState.recipient.$invalid
+                   }"
                    required/>
 
-            <span v-if="model.recipient && (formState.recipient.$dirty || formState.recipient.$touched)" class="float-right">
-            <span class="text-danger" v-if="!validateAddress(model.recipient)">
-              <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
-              </font-awesome-icon> Invalid recipient
+            <span v-if="model.recipient" class="float-right">
+              <span class="text-danger" v-if="!validateAddress(model.recipient)">
+                <font-awesome-icon icon="times-circle" class="text-danger ml-2" size="lg">
+                </font-awesome-icon> Invalid recipient
+              </span>
+              <span class="text-success" v-if="validateAddress(model.recipient)">
+                <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
+                </font-awesome-icon> Valid recipient
+              </span>
             </span>
-            <span class="text-success" v-if="validateAddress(model.recipient)">
-              <font-awesome-icon icon="check-circle" class="text-success ml-2" size="lg">
-              </font-awesome-icon> Valid recipient
-            </span>
-          </span>
           </div>
         </validate>
 
@@ -447,7 +496,7 @@
           :formState="formState"
           :generalFormStateInvalid="tokenIdAlreadyAssigned"
           invalidFormStateText="Please complete the form and image upload above before you can mint."
-          transactionInflightText="Minting in progress..."
+          :transactionInflightText="transactionText"
           :ipfsDataHash="ipfsDataHash"
           :ipfsPayload="getIpfsPayload" />
       </vue-form>
@@ -522,9 +571,9 @@
     })
     export default class AssetNFTGenerator extends Vue {
       recipientButtons: any = [
+        { caption: 'Escrow Contract', state: true },
         { caption: 'Current Account', state: false },
-        { caption: 'Escrow Contract', state: false },
-        { caption: 'Custom', state: true },
+        { caption: 'Custom', state: false },
       ];
 
       validateAddress: any;
@@ -589,15 +638,20 @@
         saving: boolean = false;
         tokenIdAlreadyAssigned: boolean = false;
         isCheckingTokenId: boolean = false;
-        showIPFSData: boolean = false;
+
+        transactionText: string = "";
 
         recipientChanged(idx: any) {
+          if (!this.formState.recipient) {
+            this.formState.recipient = {};
+          }
+
           if (idx == 0) {
-            this.useCurrentEthAccount();
+            this.useEscrowAccount();
             this.formState.recipient.$valid=true;
             this.formState.recipient.$touched=true;
           } else if (idx == 1) {
-            this.useEscrowAccount();
+            this.useCurrentEthAccount();
             this.formState.recipient.$valid=true;
             this.formState.recipient.$touched=true;
           } else if (idx == 2) {
@@ -707,6 +761,13 @@
             }
         }
 
+        @Watch('escrowAccountAddress')
+        async onEscrowAccountAddressAdded(newVal: any, oldVal: any) {
+          if (newVal !== oldVal) {
+            this.model.recipient = this.escrowAccountAddress;
+          }
+        }
+
         async onSubmit() {
             if (this.mintingTransactionHash.length > 0) {
                 console.log("Already submitted");
@@ -720,6 +781,7 @@
             if (this.formState.$valid) {
 
                 this.mintingTransactionHash = '';
+                this.transactionText = 'Minting in progress...';
                 this.saving = true;
 
                 const imageIpfsHash = await this.ipfsService.uploadImageToIpfs(this.fileBuffer);
@@ -736,21 +798,19 @@
                     return;
                 }
 
-                this.$store.dispatch('mintToken', {
+              this.$store.dispatch('mintToken', {
                     tokenId: this.tokenId,
                     recipient: this.model.recipient,
                     productCode: this.productCode,
                     ipfsHash: this.ipfsDataHash,
-                })
-                    .then((hash) => {
-                        this.mintingTransactionHash = hash;
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-                    .finally(() => {
-                        this.saving = false;
-                    });
+                    onceTxHash: (hash: any) => {
+                      this.mintingTransactionHash = hash;
+                    },
+                    onceReceipt: (receipt: any) => {
+                      this.transactionText = 'Minting success!';
+                      this.saving = false;
+                    }
+                });
             } else {
                 console.log(this.formState.$error);
             }
@@ -851,16 +911,8 @@
   .generator-container {
   }
 
-  .dropzone {
-    max-height: 125px !important;
-    padding-top: 8px !important;
-  }
-
-  #collapse-raw-data {
-  }
-
-  .collapse-raw-link {
-    cursor: pointer;
+  .display-none-important {
+    display: none !important;
   }
 
   @media only screen and (max-width: 1200px) {

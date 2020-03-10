@@ -12,21 +12,21 @@
                 {{invalidFormStateText}}
               </p>
             </div>
-            <div class="py-2 text-center" v-else-if="saving && !ipfsDataHash">
+            <div class="py-2 text-center" v-else-if="saving && !ipfsDataHash && !transactionHash">
               <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                 <SmallSpinner/>
                 Uploading data to IPFS...
               </b-button>
             </div>
-            <div class="py-2 text-center" v-else-if="ipfsDataHash && saving">
+            <div class="py-2 text-center" v-else-if="saving && ipfsDataHash && !transactionHash">
               <b-button type="button" class="btn-block btn-lg" variant="primary" disabled>
                 Please authorize this transaction...
               </b-button>
             </div>
-            <div v-else-if="transactionHash">
+            <div v-else-if="ipfsDataHash && transactionHash">
               <txs-link :hash="transactionHash" containerClass="alert alert-success">
                 <template>
-                  {{transactionInflightText}}
+                  {{transactionInflightText}} <SmallSpinner v-if="saving && ipfsDataHash && transactionHash"/>
                 </template>
               </txs-link>
             </div>
