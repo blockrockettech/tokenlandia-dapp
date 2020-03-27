@@ -8,6 +8,8 @@ import notifier from "./notifier.js"
 // @ts-ignore
 import * as Web3 from 'web3';
 
+import axios from 'axios';
+
 const {getWhitelistedAddresses} = require("./utils");
 const {getNetworkName} = require("@blockrocket/utils");
 const TokenlandiaJson = require("./truffleconf/token/Tokenlandia.json");
@@ -37,6 +39,7 @@ export default new Vuex.Store({
     web3: null,
     notifyInstance: null,
     tokenLandiaContract: tokenLandiaContract,
+    tokenLandiaContractAddress: '',
     escrowContractAddress: ''
   },
   mutations: {
@@ -48,8 +51,9 @@ export default new Vuex.Store({
       state.notifyInstance = notifier(networkId);
 
       if (TokenlandiaJson.networks[state.networkId]) {
+        state.tokenLandiaContractAddress = TokenlandiaJson.networks[state.networkId].address;
         // @ts-ignore
-        state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, TokenlandiaJson.networks[state.networkId].address);
+        state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, state.tokenLandiaContractAddress);
       }
 
       if (TrustedNftEscrowJson.networks[state.networkId]) {
@@ -136,7 +140,7 @@ export default new Vuex.Store({
 
     setupStaticWeb3({dispatch, commit}) {
       console.log(`No web3 provider found, defaulting to static web3 instance`);
-      const web3 = new Web3(new Web3.providers.HttpProvider(`https://rinkeby.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
+      const web3 = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/27742a31ed334a5cb63ef2560e01b621`));
       // @ts-ignore
       window.web3 = web3;
       dispatch('initWeb3', web3);
@@ -186,6 +190,15 @@ export default new Vuex.Store({
         return state.tokenLandiaContract.methods.tokenIdForProductId(productId).call();
       } catch (e) {
         return Promise.reject(null);
+      }
+    },
+
+    getTokenIdOrProductCodeInfo({state}, tokenIdOrProductCode) {
+      try {
+        return axios.get(`https://api-56b6el2v7a-uc.a.run.app/v1/network/${state.networkId}/asset/info/${tokenIdOrProductCode}`)
+          .then((res) => res.data)
+      } catch (e) {
+        return Promise.reject(false);
       }
     },
 

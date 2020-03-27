@@ -75,10 +75,10 @@
               <td>Description:</td>
               <td>{{tokenData.description}}</td>
             </tr>
-              <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
-                <td>{{convertStringToPascalCase(attributeKey.replace('_', ' '))}}:</td>
-                <td>{{tokenData.attributes[attributeKey]}}</td>
-              </tr>
+            <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
+              <td>{{convertStringToPascalCase(attributeKey.replace('_', ' '))}}:</td>
+              <td>{{tokenData.attributes[attributeKey]}}</td>
+            </tr>
             <tr v-if="tokenData.materialsUsed">
               <td>Materials Used:</td>
               <td>{{tokenData.materialsUsed}}</td>
@@ -95,10 +95,38 @@
             <a :href="openSeaTokenLink(currentTokenId)" target="_blank">→ view token on OpenSea</a>
           </div>
           <div class="small mt-1">
-            <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on Etherscan</a>
+            <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on
+              Etherscan</a>
           </div>
           <div class="small mt-1">
             <a :href="attributes._ipfsUrl" target="_blank">→ view token data on IPFS</a>
+          </div>
+          <div class="text-left small">
+            <hr/>
+            <div class="mt-1">
+              <span class="text-muted">1. Date created:</span> {{dateCreated}}
+              <CopyIcon :text="dateCreated"></CopyIcon>
+            </div>
+            <div class="mt-1">
+              <span class="text-muted">2. Transaction hash:</span> {{transactionHash}}
+              <CopyIcon :text="transactionHash"></CopyIcon>
+            </div>
+            <div class="mt-1">
+              <span class="text-muted">3. Contract address:</span> {{tokenLandiaContractAddress}}
+              <CopyIcon :text="tokenLandiaContractAddress"></CopyIcon>
+            </div>
+            <div class="mt-1">
+              <span class="text-muted">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
+              <CopyIcon :text="etherscanTokenLink(currentTokenId)"></CopyIcon>
+            </div>
+            <div class="mt-1">
+              <span class="text-muted">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
+              <CopyIcon :text="openSeaTokenLink(currentTokenId)"></CopyIcon>
+            </div>
+            <div class="mt-1">
+              <span class="text-muted">6. IPFS Data:</span> {{attributes._ipfsUrl}}
+              <CopyIcon :text="attributes._ipfsUrl"></CopyIcon>
+            </div>
           </div>
         </div>
       </div>
@@ -109,22 +137,25 @@
       </p>
     </div>
     <div v-if="noResultFound" class="mt-4">
-        No results found
+      No results found
     </div>
   </div>
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {mapGetters} from "vuex";
+  import {mapGetters, mapState} from "vuex";
   import axios from 'axios';
 
   import Spinner from './Spinner.vue';
   import SmallSpinner from "@/components/SmallSpinner.vue";
+  import CopyIcon from "@/components/CopyIcon.vue";
+  import moment from "moment";
 
   @Component({
-    components: {SmallSpinner, Spinner},
+    components: {CopyIcon, SmallSpinner, Spinner},
     computed: {
+      ...mapState(['tokenLandiaContractAddress']),
       ...mapGetters(['etherscanTokenLink', 'openSeaTokenLink']),
     }
   })
@@ -139,6 +170,8 @@
 
     attributes: any = {};
     ownerOf: string = '';
+    dateCreated: string = '';
+    transactionHash: string = '';
 
     ipfsData: any = {};
     ipfsDataRetrieved: boolean = false;
@@ -183,6 +216,13 @@
 
     findInformationForTokenId(tokenId: any) {
       this.foundTokenId = tokenId;
+
+      this.$store.dispatch('getTokenIdOrProductCodeInfo', tokenId)
+        .then((results) => {
+          this.transactionHash = results.etherscan_transaction_hash;
+          this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
+        });
+
       this.$store.dispatch('findInformationForTokenId', tokenId)
         .then(({attributes, ownerOf}) => {
           this.attributes = attributes;
@@ -198,20 +238,20 @@
     }
 
     convertStringToPascalCase(original: string) {
-        let convertedString = original.replace(/(\w)(\w*)/g, (g0, g1, g2) => {
-            return g1.toUpperCase() + g2.toLowerCase();
-        });
+      let convertedString = original.replace(/(\w)(\w*)/g, (g0, g1, g2) => {
+        return g1.toUpperCase() + g2.toLowerCase();
+      });
 
-        switch(convertedString) {
-          case 'Coo':
-            return 'COO';
-          case 'Product Id':
-            return 'Product ID';
-          case 'Token Id':
-            return 'Token ID';
-        }
+      switch (convertedString) {
+        case 'Coo':
+          return 'COO';
+        case 'Product Id':
+          return 'Product ID';
+        case 'Token Id':
+          return 'Token ID';
+      }
 
-        return convertedString;
+      return convertedString;
     }
 
     get results(): boolean {
@@ -231,10 +271,10 @@
     }
 
     get tokenData() {
-        const data: any = {
-            ...this.ipfsData,
-            materialsUsed: [],
-        };
+      const data: any = {
+        ...this.ipfsData,
+        materialsUsed: [],
+      };
 
       Object.keys(data.attributes).forEach(key => {
         if (key.indexOf('material') !== -1) {
@@ -243,18 +283,20 @@
       });
 
       if (data.materialsUsed.length) {
-          data.materialsUsed = data.materialsUsed.join(', ');
+        data.materialsUsed = data.materialsUsed.join(', ');
 
-          const newAttributes: any = {};
-          Object.keys(data.attributes)
-              .filter(key => key.indexOf('material') === -1)
-              .forEach(key => {newAttributes[key] = data.attributes[key]});
-          data.attributes = newAttributes;
+        const newAttributes: any = {};
+        Object.keys(data.attributes)
+          .filter(key => key.indexOf('material') === -1)
+          .forEach(key => {
+            newAttributes[key] = data.attributes[key]
+          });
+        data.attributes = newAttributes;
       } else {
-          data.materialsUsed = null;
+        data.materialsUsed = null;
       }
 
-        return data;
+      return data;
     }
   }
 </script>

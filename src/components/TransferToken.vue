@@ -38,7 +38,7 @@
       </b-button>
       <div v-if="transfering">
         <small>
-          <a :href="`https://rinkeby.etherscan.io/tx/${txHash}`" target="_blank">
+          <a :href="`https://etherscan.io/tx/${txHash}`" target="_blank">
             View TX in flight
           </a>
         </small>

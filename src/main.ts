@@ -2,8 +2,9 @@ import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
 import VueForm from 'vue-form';
 import VueMoment from 'vue-moment';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import VueClipboard from 'vue-clipboard2'
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -14,6 +15,7 @@ import {
   faCheckCircle,
   faTimesCircle,
   faCaretDown,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faFileUpload);
@@ -21,6 +23,7 @@ library.add(faBars);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
 library.add(faCaretDown);
+library.add(faCopy);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
@@ -34,6 +37,9 @@ Vue.use(VueForm, {
     invalid: 'form-control-danger',
   },
 });
+
+VueClipboard.config.autoSetContainer = true;
+Vue.use(VueClipboard);
 
 new Vue({
   router,

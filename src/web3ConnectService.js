@@ -6,7 +6,7 @@ import Portis from "@portis/web3";
 
 // @ts-ignore
 const web3Connect = new Web3Connect.Core({
-  network: "rinkeby", // optional
+  network: "mainnet", // optional
   providerOptions: {
     portis: {
       package: Portis, // required
