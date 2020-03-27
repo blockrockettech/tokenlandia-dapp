@@ -104,27 +104,27 @@
           <div class="text-left small">
             <hr/>
             <div class="mt-1">
-              <span class="text-muted">1. Date created:</span> {{dateCreated}}
+              <span class="font-weight-bold">1. Date Created:</span> {{dateCreated}}
               <CopyIcon :text="dateCreated"></CopyIcon>
             </div>
             <div class="mt-1">
-              <span class="text-muted">2. Transaction hash:</span> {{transactionHash}}
+              <span class=" font-weight-bold">2. Transaction Hash:</span> {{transactionHash}}
               <CopyIcon :text="transactionHash"></CopyIcon>
             </div>
             <div class="mt-1">
-              <span class="text-muted">3. Contract address:</span> {{tokenLandiaContractAddress}}
+              <span class=" font-weight-bold">3. Contract Address:</span> {{tokenLandiaContractAddress}}
               <CopyIcon :text="tokenLandiaContractAddress"></CopyIcon>
             </div>
             <div class="mt-1">
-              <span class="text-muted">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
+              <span class=" font-weight-bold">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
               <CopyIcon :text="etherscanTokenLink(currentTokenId)"></CopyIcon>
             </div>
             <div class="mt-1">
-              <span class="text-muted">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
+              <span class=" font-weight-bold">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
               <CopyIcon :text="openSeaTokenLink(currentTokenId)"></CopyIcon>
             </div>
             <div class="mt-1">
-              <span class="text-muted">6. IPFS Data:</span> {{attributes._ipfsUrl}}
+              <span class=" font-weight-bold">6. IPFS Data:</span> {{attributes._ipfsUrl}}
               <CopyIcon :text="attributes._ipfsUrl"></CopyIcon>
             </div>
           </div>

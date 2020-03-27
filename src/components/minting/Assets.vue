@@ -3,7 +3,7 @@
     <h1 class="heading">General Products</h1>
     <hr/>
 
-    <div class="alert alert-warning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
+    <div class="alert alert-wning" v-if="!account || accountProperties.staticWeb3">You must "Login" to mint new tokens</div>
     <div class="alert alert-warning" v-else-if="!canAccountMint">
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
@@ -200,20 +200,14 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.artist)">
-          <label for="artist" class="col-sm-3 col-form-label text-right">Artist *</label>
+          <label for="artist" class="col-sm-3 col-form-label text-right">Artist</label>
           <div class="col-sm-9">
             <input type="text"
                    name="artist"
                    id="artist"
                    class="form-control"
                    :class="inputClassName(formState.artist)"
-                   required v-model="model.artist"/>
-            <field-messages
-              name="artist" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Artist is a required field
-              </div>
-            </field-messages>
+                   v-model="model.artist"/>
           </div>
         </validate>
 
@@ -727,7 +721,7 @@
                 name,
                 description,
                 image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
-                type: 'PHYSICAL_ASSET',
+                type: 'GENERAL_ASSET',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
                     ...strippedDownModel,
