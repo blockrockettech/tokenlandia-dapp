@@ -219,7 +219,7 @@
 
       this.$store.dispatch('getTokenIdOrProductCodeInfo', tokenId)
         .then((results) => {
-          this.transactionHash = results.etherscan_transaction_hash;
+          this.transactionHash = results.transaction_hash;
           this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
         });
 
