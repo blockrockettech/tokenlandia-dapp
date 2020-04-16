@@ -205,6 +205,7 @@
             <input type="text"
                    name="artist"
                    id="artist"
+                   maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.artist)"
                    v-model="model.artist"/>
@@ -220,6 +221,7 @@
             <input type="text"
                    name="artist_assistant"
                    id="artist_assistant"
+                   maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.artist_assistant)"
                    v-model.lazy="model.artist_assistant"/>
@@ -233,6 +235,7 @@
             <input type="text"
                    name="brand"
                    id="brand"
+                   maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.brand)"
                    required v-model="model.brand"/>
@@ -247,20 +250,15 @@
 
         <validate auto-label class="form-group row required-field"
                   :class="fieldClassName(formState.model)">
-          <label for="model" class="col-sm-3 col-form-label text-right">Model *</label>
+          <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
           <div class="col-sm-9">
             <input type="text"
                    name="model"
                    id="model"
+                   maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.model)"
-                   required v-model="model.model"/>
-            <field-messages
-              name="model" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Model is a required field
-              </div>
-            </field-messages>
+                   v-model="model.model"/>
           </div>
         </validate>
 
@@ -272,7 +270,7 @@
           <div class="col-sm-9">
             <input type="text"
                    name="purchaseLocation"
-                   maxlength="40"
+                   maxlength="125"
                    id="purchaseLocation"
                    class="form-control"
                    v-model="model.purchase_location"/>
@@ -306,7 +304,7 @@
           <div class="col-sm-9">
             <input type="text"
                    name="customiseLocation"
-                   maxlength="40"
+                   maxlength="125"
                    id="customiseLocation"
                    class="form-control"
                    v-model="model.customization_location"/>
