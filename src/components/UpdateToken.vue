@@ -85,8 +85,8 @@
         <div class="row">
           <div class="col">
             <vue-form :state="formState" @submit.prevent="onSubmit">
-              <validate auto-label class="form-group row required-field"
-                        :class="fieldClassName(formState.purchLocation)">
+
+              <div class="form-group row">
                 <label for="purchLocation" class="col-sm-3 col-form-label text-right">Purchase Location</label>
                 <div class="col-sm-9">
                   <input type="text"
@@ -94,16 +94,11 @@
                          id="purchLocation"
                          class="form-control"
                          :class="inputClassName(formState.purchLocation)"
-                         required v-model="model.purchase_location"/>
-
-                  <field-messages
-                    name="purchLocation" show="$touched || $submitted" class="form-control-feedback">
-                    <div slot="required" class="text-danger">Purchase Location is a required field</div>
-                  </field-messages>
+                         v-model="model.purchase_location"/>
                 </div>
-              </validate>
+              </div>
 
-              <validate auto-label class="form-group row required-field">
+              <div class="form-group row">
                 <label for="purchDate" class="col-sm-3 col-form-label text-right"
                        v-bind:class="{ 'text-success': model.purchase_date }">
                   Purchase Date
@@ -114,21 +109,15 @@
                               placeholder="YYYY-MM-DD"
                               input-class="form-control bg-white"
                               :typeable="false"
-                              :required="true"
+                              :clear-button="true"
                               format="yyyy-MM-dd"
                               :disabled-dates="disabledDates()"
                               v-model="model.purchase_date">
                   </datepicker>
-
-                  <field-messages
-                    name="purchDate" show="$touched || $submitted" class="form-control-feedback">
-                    <div slot="required" class="text-danger">Purchase Date is a required field</div>
-                  </field-messages>
                 </div>
-              </validate>
+              </div>
 
-              <validate auto-label class="form-group row required-field"
-                        :class="fieldClassName(formState.customiseLocation)">
+              <div class="form-group row required-field">
                 <label for="customiseLocation" class="col-sm-3 col-form-label text-right">
                   Customization Location
                 </label>
@@ -138,18 +127,11 @@
                          id="customiseLocation"
                          class="form-control"
                          :class="inputClassName(formState.customiseLocation)"
-                         required v-model="model.customization_location"/>
-
-                  <field-messages
-                    name="customiseLocation" show="$touched || $submitted" class="form-control-feedback">
-                    <div slot="required" class="text-danger">
-                      Customization Location is a required field
-                    </div>
-                  </field-messages>
+                         v-model="model.customization_location"/>
                 </div>
-              </validate>
+              </div>
 
-              <validate auto-label class="form-group row required-field">
+              <div class="form-group row">
                 <label for="customiseDate" class="col-sm-3 col-form-label text-right"
                        v-bind:class="{ 'text-success': model.customization_date }">
                   Customization Date
@@ -160,25 +142,17 @@
                               placeholder="YYYY-MM-DD"
                               input-class="form-control bg-white"
                               :typeable="false"
-                              :required="true"
+                              :clear-button="true"
                               :disabled-dates="disabledDates()"
                               format="yyyy-MM-dd"
                               v-model="model.customization_date">
                   </datepicker>
-
-                  <field-messages
-                    name="customiseDate" show="$touched || $submitted" class="form-control-feedback">
-                    <div slot="required" class="text-danger">
-                      Customization Date is a required field
-                    </div>
-                  </field-messages>
                 </div>
-              </validate>
+              </div>
 
               <h4 class="heading text-left my-3">Materials Used</h4>
 
-              <validate auto-label class="form-group row required-field"
-                        :class="fieldClassName(formState.material1)">
+              <div class="form-group row">
                 <label for="material1" class="col-sm-3 col-form-label text-right"
                        v-bind:class="{ 'text-success': model.material_1 }">
                   Material 1
@@ -190,15 +164,9 @@
                          id="material1"
                          class="form-control"
                          :class="inputClassName(formState.material1)"
-                         required v-model="model.material_1"/>
-                  <field-messages
-                    name="material1" show="$touched || $submitted" class="form-control-feedback">
-                    <div slot="required" class="text-danger">
-                      One material is required
-                    </div>
-                  </field-messages>
+                         v-model="model.material_1"/>
                 </div>
-              </validate>
+              </div>
 
               <div class="form-group row">
                 <label for="material2" class="col-sm-3 col-form-label text-right"
@@ -441,6 +409,14 @@
                 ...cleanAttributes,
                 ...cleanModel
               };
+
+              // Allow removals to apply a deletion rule to the data blob
+              const updatableFields = ['purchase_location', 'purchase_date', 'customization_location', 'customization_date', 'material_1', 'material_2', 'material_3', 'material_4', 'material_5'];
+              _.forEach(updatableFields, (field) => {
+                if (!cleanModel[field] && newPayload.attributes[field]) {
+                  delete newPayload.attributes[field];
+                }
+              });
             }
 
             if (newPayload.attributes.purchase_date) {
