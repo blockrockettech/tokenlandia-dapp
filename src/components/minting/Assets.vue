@@ -8,20 +8,6 @@
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
     <div v-else-if="canAccountMint">
-      <h4 class="heading mb-4">Unique Identifier:
-        <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
-        <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
-        <span>-</span>
-        <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
-        <span>-</span>
-        <span v-bind:class="{ 'text-danger': series === '{SERIES}' }">{{series}}</span>
-        <span>-</span>
-        <span v-bind:class="{ 'text-danger': design === '{DESIGN}' }">{{design}}</span>
-        <span>-</span>
-        <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
-      </span>
-      </h4>
-
       <vue-form :state="formState" @submit.prevent="onSubmit">
 
         <validate auto-label class="form-group required-field d-inline-block mr-3">
@@ -93,6 +79,20 @@
             Token ID not assigned
           </div>
         </div>
+
+        <h4 class="heading my-3">Unique Identifier:
+          <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
+          <span v-bind:class="{ 'text-danger': coo === '{COO}' }">{{coo}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': initials === '{INITIALS}' }">{{initials}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': series === '{SERIES}' }">{{series}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': design === '{DESIGN}' }">{{design}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
+        </span>
+        </h4>
 
         <h4 class="my-3 text-left">Token Information</h4>
         <field class="form-group row">
