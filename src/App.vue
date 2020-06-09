@@ -61,6 +61,9 @@
                 </a>
               </strong>
             </div>
+            <b-button @click="onLogout" v-if="account" variant="primary">
+              Logout
+            </b-button>
           </li>
         </ul>
 
@@ -133,6 +136,10 @@
             onLogin() {
                 web3Connect.toggleModal();
             },
+            onLogout() {
+                web3Connect.clearCachedProvider();
+                this.$store.dispatch('setupStaticWeb3');
+            },
             dotDotDotAddress: function () {
                 return this.account.substr(0, 6) + '...' + this.account.substr(this.account.length - 6, this.account.length);
             }
@@ -141,7 +148,15 @@
             web3Connect.on('connect', provider => {
                 this.$store.dispatch('bootstrap', provider);
             });
-            this.$store.dispatch('setupStaticWeb3');
+
+            // If the user has a provider selected then attempt to auto trigger it
+            const selectedCacheProvider = web3Connect.cachedProvider;
+            if (selectedCacheProvider === "injected") {
+              console.log("Cache provider bootstrap - injected web3 provider");
+              web3Connect.connectTo(selectedCacheProvider);
+            }else{
+              this.$store.dispatch('setupStaticWeb3');
+            }
         }
     };
 </script>
