@@ -1,27 +1,37 @@
-import ipfsHttpClient from 'ipfs-http-client';
+const ipfsClient = require('ipfs-http-client');
 import {Buffer} from "buffer";
+
+const promiseRetry = require('promise-retry');
+
 export default class InfuraIpfsService {
-  ipfs = ipfsHttpClient('ipfs.infura.io', '5001', {protocol: 'https'});
+
+  ipfs = ipfsClient({
+    host: 'ipfs.infura.io',
+    port: '5001',
+    protocol: 'https',
+    timeout: '2m'
+  });
 
   async pushBufferToIpfs(buffer: any, tryingToUpload: string): Promise<string> {
-    try {
-      const results = await this.ipfs.add(buffer, {pin: true});
 
-      if (results && Array.isArray(results) && results.length > 0) {
-        const result = results[0];
-        const hash = result && result.hash ? result.hash : 'unsuccessful';
-
-        if (hash === 'unsuccessful') {
-          alert(`Failed to upload ${tryingToUpload} to IPFS due to: No hash returned`);
-        }
-
-        return hash;
-      }
-    } catch (e) {
-      alert(`Failed to upload ${tryingToUpload} to IPFS due to: ${e}`);
+    const addBuffer = (): Promise<string> => {
+      return this.ipfs.add(buffer, {pin: true});
     }
 
-    return 'unsuccessful';
+    return promiseRetry(function (retry: any, number: any) {
+      console.log('IPFS pinning - attempt number', number);
+      return addBuffer().catch(retry);
+    }, {retries: 7})
+      .then(
+        function (results: any) {
+          const result = results[0];
+          return result && result.hash ? result.hash : 'unsuccessful';
+        },
+        function (err: any) {
+          alert(`Failed to upload ${tryingToUpload} to IPFS - retries exceed - pls try again: ${err}`);
+          return 'unsuccessful';
+        }
+      );
   }
 
   async uploadImageToIpfs(fileBuffer: any): Promise<string> {

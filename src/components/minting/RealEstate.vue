@@ -9,18 +9,6 @@
       It doesn't look like you can mint. Double check you're using the correct account.
     </div>
     <div v-else-if="canAccountMint">
-      <h4 class="my-3">
-        Unique Identifier:
-        <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
-          <span v-bind:class="{ 'text-danger': developer === '{DEVELOPER}' }">{{developer}}</span>
-          <span>-</span>
-          <span v-bind:class="{ 'text-danger': city === '{CITY}' }">{{city}}</span>
-          <span>-</span>
-          <span v-bind:class="{ 'text-danger': address === '{ADDRESS}' }">{{address}}</span>
-          <span>-</span>
-          <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
-        </span>
-      </h4>
 
       <vue-form :state="formState" @submit.prevent="onSubmit">
 
@@ -72,6 +60,19 @@
                    required v-model="model.token_id"/>
           </validate>
         </div>
+
+        <h4 class="my-3">
+          Unique Identifier:
+          <span v-bind:class="{ 'text-success': this.productIdValid, 'text-danger': tokenIdAlreadyAssigned }">
+          <span v-bind:class="{ 'text-danger': developer === '{DEVELOPER}' }">{{developer}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': city === '{CITY}' }">{{city}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': address === '{ADDRESS}' }">{{address}}</span>
+          <span>-</span>
+          <span v-bind:class="{ 'text-danger': tokenId === '{TOKEN_ID}' }">{{tokenId}}</span>
+        </span>
+        </h4>
 
         <div v-if="model.token_id && formState.tokenId.$dirty && !isCheckingTokenId ">
           <div class="text-danger" v-if="tokenIdAlreadyAssigned">
