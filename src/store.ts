@@ -13,11 +13,13 @@ import axios from 'axios';
 const {getWhitelistedAddresses} = require("./utils");
 const {getNetworkName} = require("@blockrocket/utils");
 const TokenlandiaJson = require("./truffleconf/token/Tokenlandia.json");
+const VideoLatinoJson = require("./truffleconf/token/VideoLatino.json");
 const TrustedNftEscrowJson = require("./truffleconf/escrow/TrustedNftEscrow.json");
 
 Vue.use(Vuex);
 
 let tokenLandiaContract: any = {};
+let videoLatinoContract: any = {};
 
 export default new Vuex.Store({
   plugins: [createLogger()],
@@ -40,7 +42,9 @@ export default new Vuex.Store({
     notifyInstance: null,
     tokenLandiaContract: tokenLandiaContract,
     tokenLandiaContractAddress: '',
-    escrowContractAddress: ''
+    escrowContractAddress: '',
+    videoLatinoContract: videoLatinoContract,
+    videoLatinoContractAddress: ''
   },
   mutations: {
     networkDetails(state, {networkId, networkName, etherscanBase, openseaBase}) {
@@ -54,6 +58,12 @@ export default new Vuex.Store({
         state.tokenLandiaContractAddress = TokenlandiaJson.networks[state.networkId].address;
         // @ts-ignore
         state.tokenLandiaContract = new state.web3.eth.Contract(TokenlandiaJson.abi, state.tokenLandiaContractAddress);
+      }
+
+      if (VideoLatinoJson.networks[state.networkId]) {
+        state.videoLatinoContractAddress = VideoLatinoJson.networks[state.networkId].address;
+        // @ts-ignore
+        state.videoLatinoContract = new state.web3.eth.Contract(VideoLatinoJson.abi, state.videoLatinoContractAddress);
       }
 
       if (TrustedNftEscrowJson.networks[state.networkId]) {
@@ -98,7 +108,13 @@ export default new Vuex.Store({
       }
     },
     canAccountMint: state => state.account && state.accountProperties.canMint === true,
-    escrowAccountAddress: state => state.escrowContractAddress
+    escrowAccountAddress: state => state.escrowContractAddress,
+    tokens: state => {
+      return [
+        {name: 'Tokenlandia', address: state.tokenLandiaContractAddress},
+        {name: 'Video Latino', address: state.videoLatinoContractAddress}
+      ];
+    },
   },
   actions: {
 
@@ -265,17 +281,31 @@ export default new Vuex.Store({
       });
     },
 
-    checkIsAdmin({state, commit, dispatch}, ethAddress) {
+    checkIsAdmin({state, commit, dispatch}, {ethAddress, selectedToken}) {
       try {
-        return state.tokenLandiaContract.methods.isWhitelistAdmin(ethAddress).call();
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        return tokenContract.methods.isWhitelistAdmin(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
     },
 
-    checkCanMint({state, commit, dispatch}, ethAddress) {
+    checkCanMint({state, commit, dispatch}, {ethAddress, selectedToken}) {
       try {
-        return state.tokenLandiaContract.methods.isWhitelisted(ethAddress).call();
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        return tokenContract.methods.isWhitelisted(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
@@ -289,9 +319,16 @@ export default new Vuex.Store({
       }
     },
 
-    addWhitelisted({state}, ethAddress) {
+    addWhitelisted({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        state.tokenLandiaContract.methods.addWhitelisted(ethAddress)
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        tokenContract.methods.addWhitelisted(ethAddress)
           .send({
             from: state.account
           })
@@ -304,9 +341,16 @@ export default new Vuex.Store({
       });
     },
 
-    removeWhitelisted({state}, ethAddress) {
+    removeWhitelisted({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        state.tokenLandiaContract.methods.removeWhitelisted(ethAddress)
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        tokenContract.methods.removeWhitelisted(ethAddress)
           .send({
             from: state.account
           })
@@ -319,9 +363,16 @@ export default new Vuex.Store({
       });
     },
 
-    addWhitelistAdmin({state}, ethAddress) {
+    addWhitelistAdmin({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        state.tokenLandiaContract.methods.addWhitelistAdmin(ethAddress)
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        tokenContract.methods.addWhitelistAdmin(ethAddress)
           .send({
             from: state.account
           })
@@ -334,9 +385,16 @@ export default new Vuex.Store({
       });
     },
 
-    renounceWhitelistAdmin({state}) {
+    renounceWhitelistAdmin({state}, selectedToken) {
       return new Promise((resolve, reject) => {
-        state.tokenLandiaContract.methods.renounceWhitelistAdmin()
+        // @ts-ignore
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
+        tokenContract.methods.renounceWhitelistAdmin()
           .send({
             from: state.account
           })
@@ -349,14 +407,20 @@ export default new Vuex.Store({
       });
     },
 
-    fetchAllWhitelistedAddresses({state}) {
+    fetchAllWhitelistedAddresses({state}, selectedToken) {
       return new Promise((resolve, reject) => {
         const options = {
           fromBlock: 0, // FIXME deployed block
           toBlock: 'latest',
         };
+
         // @ts-ignore
-        const tokenContract = state.tokenLandiaContract;
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
         getWhitelistedAddresses({
           addedEventName: 'WhitelistedAdded',
           removedEventName: 'WhitelistedRemoved',
@@ -364,18 +428,24 @@ export default new Vuex.Store({
           options,
           resolve,
           reject
-        })
+        });
       });
     },
 
-    fetchAllAdminWhitelistedAddresses({state}) {
+    fetchAllAdminWhitelistedAddresses({state}, selectedToken) {
       return new Promise((resolve, reject) => {
         const options = {
           fromBlock: 0, // FIXME deployed block
           toBlock: 'latest',
         };
+
         // @ts-ignore
-        const tokenContract = state.tokenLandiaContract;
+        const tokenContract =
+          selectedToken === 'Tokenlandia' ?
+            state.tokenLandiaContract
+            :
+            state.videoLatinoContract;
+
         getWhitelistedAddresses({
           addedEventName: 'WhitelistAdminAdded',
           removedEventName: 'WhitelistAdminRemoved',
