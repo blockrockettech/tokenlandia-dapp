@@ -2,142 +2,160 @@
   <div class="txt">
     <h1 class="heading">NFT Verification</h1>
     <hr/>
-    <div class="row">
+    <div class="row text-left my-1">
       <div class="col">
-
-        <b-form inline class="my-2">
-
-          <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
-            <b-input
-              id="productId"
-              class="mb-2 mb-sm-0"
-              placeholder="ABC-001..."
-              v-model="productId"
-            ></b-input>
+          <b-input-group prepend="Token" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
+            <select
+              id="tokenSelect"
+              name="tokenSelect"
+              class="mb-2 mb-sm-0 form-control"
+              @change="resetData"
+              v-model="selectedToken">
+              <option value="">Please select one</option>
+              <option v-for="token in tokenSelectionOptions" :value="token.text">{{token.text}}</option>
+            </select>
           </b-input-group>
+        </div>
 
-          <b-button class="ml-2"
-                    @click="performProductSearch"
-                    v-if="!searching"
-                    variant="primary"
-                    :disabled="!productId">
-            Search
-          </b-button>
-
-          <b-button class="ml-2"
-                    variant="primary"
-                    v-if="searching && productId" disabled>
-            <SmallSpinner/>
-          </b-button>
-        </b-form>
-
-        <b-form inline class="my-2">
-
-          <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
-            <b-input placeholder="1..."
-                     v-model="tokenId">
-            </b-input>
-          </b-input-group>
-
-          <b-button class="ml-2"
-                    @click="performTokenSearch"
-                    variant="primary"
-                    v-if="!searching"
-                    :disabled="!tokenId">
-            Search
-          </b-button>
-
-          <b-button class="ml-2"
-                    variant="primary"
-                    v-if="searching && tokenId" disabled>
-            <SmallSpinner/>
-          </b-button>
-        </b-form>
-      </div>
     </div>
-
-    <div v-if="searching && !noResultFound">
-      <Spinner/>
-    </div>
-
-    <div id="searchResults" v-if="results" class="my-4">
+    <div v-if="selectedToken">
       <div class="row">
-        <div class="col text-left">
-
-          <h4 class="heading text-center">Product ID: {{tokenData.attributes.product_id}}</h4>
-          <table class="table table-striped table-borderless">
-            <tbody>
-            <tr>
-              <td>Name:</td>
-              <td>{{tokenData.name}}</td>
-            </tr>
-            <tr>
-              <td>Description:</td>
-              <td>{{tokenData.description}}</td>
-            </tr>
-            <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
-              <td>{{convertStringToPascalCase(attributeKey.replace('_', ' '))}}:</td>
-              <td>{{tokenData.attributes[attributeKey]}}</td>
-            </tr>
-            <tr v-if="tokenData.materialsUsed">
-              <td>Materials Used:</td>
-              <td>{{tokenData.materialsUsed}}</td>
-            </tr>
-            </tbody>
-          </table>
-
-        </div>
         <div class="col">
-          <div class="img-container">
-            <img class="img" :src="ipfsData.image" alt=""/>
+
+          <b-form inline class="my-2">
+
+            <b-input-group prepend="Product ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
+              <b-input
+                id="productId"
+                class="mb-2 mb-sm-0"
+                placeholder="ABC-001..."
+                v-model="productId"
+              ></b-input>
+            </b-input-group>
+
+            <b-button class="ml-2"
+                      @click="performProductSearch"
+                      v-if="!searching"
+                      variant="primary"
+                      :disabled="!productId">
+              Search
+            </b-button>
+
+            <b-button class="ml-2"
+                      variant="primary"
+                      v-if="searching && productId" disabled>
+              <SmallSpinner/>
+            </b-button>
+          </b-form>
+
+          <b-form inline class="my-2">
+
+            <b-input-group prepend="Token ID" class="mb-2 mr-sm-2 mb-sm-0 fixed-width-input">
+              <b-input placeholder="1..."
+                       v-model="tokenId">
+              </b-input>
+            </b-input-group>
+
+            <b-button class="ml-2"
+                      @click="performTokenSearch"
+                      variant="primary"
+                      v-if="!searching"
+                      :disabled="!tokenId">
+              Search
+            </b-button>
+
+            <b-button class="ml-2"
+                      variant="primary"
+                      v-if="searching && tokenId" disabled>
+              <SmallSpinner/>
+            </b-button>
+          </b-form>
+        </div>
+      </div>
+
+      <div v-if="searching && !noResultFound">
+        <Spinner/>
+      </div>
+
+      <div id="searchResults" v-if="results" class="my-4">
+        <div class="row">
+          <div class="col text-left">
+
+            <h4 class="heading text-center">Product ID: {{tokenData.attributes.product_id}}</h4>
+            <table class="table table-striped table-borderless">
+              <tbody>
+              <tr>
+                <td>Name:</td>
+                <td>{{tokenData.name}}</td>
+              </tr>
+              <tr>
+                <td>Description:</td>
+                <td>{{tokenData.description}}</td>
+              </tr>
+              <tr v-for="(attributeKey,idx) in Object.keys(tokenData.attributes)" :key="idx">
+                <td>{{convertStringToPascalCase(attributeKey.replace('_', ' '))}}:</td>
+                <td>{{tokenData.attributes[attributeKey]}}</td>
+              </tr>
+              <tr v-if="tokenData.materialsUsed">
+                <td>Materials Used:</td>
+                <td>{{tokenData.materialsUsed}}</td>
+              </tr>
+              </tbody>
+            </table>
+
           </div>
-          <div class="small mt-1">
-            <a :href="openSeaTokenLink(currentTokenId)" target="_blank">→ view token on OpenSea</a>
-          </div>
-          <div class="small mt-1">
-            <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on
-              Etherscan</a>
-          </div>
-          <div class="small mt-1">
-            <a :href="attributes._ipfsUrl" target="_blank">→ view token data on IPFS</a>
-          </div>
-          <div class="text-left small">
-            <hr/>
-            <div class="mt-1">
-              <span class="font-weight-bold">1. Date Created:</span> {{dateCreated}}
-              <CopyIcon :text="dateCreated"></CopyIcon>
+          <div class="col">
+            <div class="img-container">
+              <img class="img" :src="ipfsData.image" alt=""/>
             </div>
-            <div class="mt-1">
-              <span class=" font-weight-bold">2. Transaction Hash:</span> {{transactionHash}}
-              <CopyIcon :text="transactionHash"></CopyIcon>
+            <div class="small mt-1">
+              <a :href="openSeaTokenLink(currentTokenId)" target="_blank">→ view token on OpenSea</a>
             </div>
-            <div class="mt-1">
-              <span class=" font-weight-bold">3. Contract Address:</span> {{tokenLandiaContractAddress}}
-              <CopyIcon :text="tokenLandiaContractAddress"></CopyIcon>
+            <div class="small mt-1">
+              <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on
+                Etherscan</a>
             </div>
-            <div class="mt-1">
-              <span class=" font-weight-bold">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
-              <CopyIcon :text="etherscanTokenLink(currentTokenId)"></CopyIcon>
+            <div class="small mt-1">
+              <a :href="attributes._ipfsUrl" target="_blank">→ view token data on IPFS</a>
             </div>
-            <div class="mt-1">
-              <span class=" font-weight-bold">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
-              <CopyIcon :text="openSeaTokenLink(currentTokenId)"></CopyIcon>
-            </div>
-            <div class="mt-1">
-              <span class=" font-weight-bold">6. IPFS Data:</span> {{attributes._ipfsUrl}}
-              <CopyIcon :text="attributes._ipfsUrl"></CopyIcon>
+            <div class="text-left small">
+              <hr/>
+              <div class="mt-1">
+                <span class="font-weight-bold">1. Date Created:</span> {{dateCreated}}
+                <CopyIcon :text="dateCreated"></CopyIcon>
+              </div>
+              <div class="mt-1">
+                <span class=" font-weight-bold">2. Transaction Hash:</span> {{transactionHash}}
+                <CopyIcon :text="transactionHash"></CopyIcon>
+              </div>
+              <div class="mt-1">
+                <span class=" font-weight-bold">3. Contract Address:</span> {{tokenLandiaContractAddress}}
+                <CopyIcon :text="tokenLandiaContractAddress"></CopyIcon>
+              </div>
+              <div class="mt-1">
+                <span class=" font-weight-bold">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
+                <CopyIcon :text="etherscanTokenLink(currentTokenId)"></CopyIcon>
+              </div>
+              <div class="mt-1">
+                <span class=" font-weight-bold">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
+                <CopyIcon :text="openSeaTokenLink(currentTokenId)"></CopyIcon>
+              </div>
+              <div class="mt-1">
+                <span class=" font-weight-bold">6. IPFS Data:</span> {{attributes._ipfsUrl}}
+                <CopyIcon :text="attributes._ipfsUrl"></CopyIcon>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div v-else-if="!results && !searching && !noResultFound" class="mt-4">
-      <p>
-        Please fill in one field from the search form above.
-      </p>
-    </div>
-    <div v-if="noResultFound" class="mt-4">
-      No results found
+      <div v-else-if="!results && !searching && !noResultFound" class="mt-4">
+        <p>
+          Please fill in one field from the search form above.
+        </p>
+      </div>
+      <div v-if="noResultFound" class="mt-4">
+        No results found
+      </div>
     </div>
   </div>
 </template>
@@ -156,7 +174,7 @@
     components: {CopyIcon, SmallSpinner, Spinner},
     computed: {
       ...mapState(['tokenLandiaContractAddress']),
-      ...mapGetters(['etherscanTokenLink', 'openSeaTokenLink']),
+      ...mapGetters(['etherscanTokenLink', 'openSeaTokenLink', 'tokens']),
     }
   })
   export default class VerifyToken extends Vue {
@@ -169,6 +187,7 @@
     foundTokenId: string = '';
 
     attributes: any = {};
+    tokenURI: string = '';
     ownerOf: string = '';
     dateCreated: string = '';
     transactionHash: string = '';
@@ -179,11 +198,31 @@
     etherscanTokenLink!: (tokenId: string) => string;
     openSeaTokenLink!: (tokenId: string) => string;
 
+    selectedToken: any = null;
+
+    get tokenSelectionOptions() {
+      // @ts-ignore
+      return this.tokens.map((token: any) => ({text: token.name}));
+    }
+
+    resetData() {
+      this.productId = '';
+      this.tokenId = '';
+      this.ipfsDataRetrieved = false;
+      this.ipfsData = {};
+      this.searching = false;
+      this.attributes = {};
+      this.ownerOf = '';
+      this.tokenURI = '';
+      this.noResultFound = false;
+    }
+
     performTokenSearch() {
       this.ipfsDataRetrieved = false;
       this.searching = true;
       this.attributes = {};
       this.ownerOf = '';
+      this.tokenURI = '';
       this.noResultFound = false;
 
       const isTokenIdSearch = this.tokenId.trim() !== '' && !isNaN(Number(this.tokenId));
@@ -197,6 +236,7 @@
       this.searching = true;
       this.attributes = {};
       this.ownerOf = '';
+      this.tokenURI = '';
       this.noResultFound = false;
 
       const isProductIdSearch = this.productId.trim() !== '';
@@ -217,16 +257,20 @@
     findInformationForTokenId(tokenId: any) {
       this.foundTokenId = tokenId;
 
-      this.$store.dispatch('getTokenIdOrProductCodeInfo', tokenId)
-        .then((results) => {
-          this.transactionHash = results.transaction_hash;
-          this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
-        });
+      // this.$store.dispatch('getTokenIdOrProductCodeInfo', tokenId)
+      //   .then((results) => {
+      //     this.transactionHash = results.transaction_hash;
+      //     this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
+      //   });
 
-      this.$store.dispatch('findInformationForTokenId', tokenId)
-        .then(({attributes, ownerOf}) => {
+      this.$store.dispatch('findInformationForTokenId', {
+        tokenId,
+        selectedToken: this.selectedToken
+      })
+        .then(({attributes, tokenURI, ownerOf}) => {
           this.attributes = attributes;
           this.ownerOf = ownerOf;
+          this.tokenURI = tokenURI;
           this.productId = "";
           this.tokenId = "";
           this.currentTokenId = tokenId;
@@ -255,8 +299,8 @@
     }
 
     get results(): boolean {
-      if (this.searching && this.attributes && this.attributes._ipfsUrl) {
-        axios.get(this.attributes._ipfsUrl)
+      if (this.searching && this.attributes && this.tokenURI) {
+        axios.get(this.tokenURI)
           .then((response: any) => {
             if (response && response.status === 200) {
               this.ipfsData = response.data;

@@ -205,63 +205,87 @@
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.videoLanguage)">
-          <label for="videoLanguage" class="col-sm-3 col-form-label text-right">Video Language *</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="videoLanguage"
-                   id="videoLanguage"
-                   maxlength="125"
-                   class="form-control"
-                   :class="inputClassName(formState.videoLanguage)"
-                   required v-model="model.video_language"/>
-            <field-messages
-              name="videoLanguage" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Video Language is a required field
-              </div>
-            </field-messages>
+          <div class="row">
+            <label for="videoLanguage" class="col-sm-3 col-form-label text-right">Video Language *</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="videoLanguage"
+                     id="videoLanguage"
+                     maxlength="30"
+                     class="form-control"
+                     :class="inputClassName(formState.videoLanguage)"
+                     required v-model="model.video_language"/>
+              <field-messages
+                name="videoLanguage" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">
+                  Video Language is a required field
+                </div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.video_language.length}}/30)</span>
+            </div>
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.celebrityName)">
-          <label for="celebrityName" class="col-sm-3 col-form-label text-right">Celebrity Name *</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="celebrityName"
-                   id="celebrityName"
-                   maxlength="125"
-                   class="form-control"
-                   :class="inputClassName(formState.celebrityName)"
-                   required v-model="model.celebrity_name"/>
-            <field-messages
-              name="celebrityName" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Celebrity Name is a required field
-              </div>
-            </field-messages>
+          <div class="row">
+            <label for="celebrityName" class="col-sm-3 col-form-label text-right">Celebrity Name *</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="celebrityName"
+                     id="celebrityName"
+                     maxlength="50"
+                     class="form-control"
+                     :class="inputClassName(formState.celebrityName)"
+                     required v-model="model.celebrity_name"/>
+              <field-messages
+                name="celebrityName" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">
+                  Celebrity Name is a required field
+                </div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.celebrity_name.length}}/50)</span>
+            </div>
           </div>
         </validate>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.creationLocation)">
-          <label for="creationLocation" class="col-sm-3 col-form-label text-right">Creation Location *</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="creationLocation"
-                   id="creationLocation"
-                   maxlength="125"
-                   class="form-control"
-                   :class="inputClassName(formState.creationLocation)"
-                   required v-model="model.creation_location"/>
-            <field-messages
-              name="creationLocation" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Creation Location is a required field
-              </div>
-            </field-messages>
+          <div class="row">
+            <label for="creationLocation" class="col-sm-3 col-form-label text-right">Creation Location *</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="creationLocation"
+                     id="creationLocation"
+                     maxlength="125"
+                     class="form-control"
+                     :class="inputClassName(formState.creationLocation)"
+                     required v-model="model.creation_location"/>
+              <field-messages
+                name="creationLocation" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">
+                  Creation Location is a required field
+                </div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.creation_location.length}}/125)</span>
+            </div>
           </div>
         </validate>
 
@@ -284,23 +308,31 @@
           </div>
         </div>
 
-        <validate auto-label class="form-group row required-field"
+        <validate auto-label class="form-group required-field"
                   :class="fieldClassName(formState.businessBrand)">
-          <label for="businessBrand" class="col-sm-3 col-form-label text-right">Business Brand *</label>
-          <div class="col-sm-9">
-            <input type="text"
-                   name="businessBrand"
-                   id="businessBrand"
-                   maxlength="125"
-                   class="form-control"
-                   :class="inputClassName(formState.businessBrand)"
-                   required v-model="model.business_brand"/>
-            <field-messages
-              name="businessBrand" show="$touched || $submitted" class="form-control-feedback">
-              <div slot="required" class="text-danger">
-                Business Brand is a required field
-              </div>
-            </field-messages>
+          <div class="row">
+            <label for="businessBrand" class="col-sm-3 col-form-label text-right">Business Brand *</label>
+            <div class="col-sm-9">
+              <input type="text"
+                     name="businessBrand"
+                     id="businessBrand"
+                     maxlength="50"
+                     class="form-control"
+                     :class="inputClassName(formState.businessBrand)"
+                     required v-model="model.business_brand"/>
+              <field-messages
+                name="businessBrand" show="$touched || $submitted" class="form-control-feedback">
+                <div slot="required" class="text-danger">
+                  Business Brand is a required field
+                </div>
+              </field-messages>
+            </div>
+          </div>
+          <div class="row mt-1">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-9 text-muted text-left small">
+              <span>({{model.business_brand.length}}/50)</span>
+            </div>
           </div>
         </validate>
 

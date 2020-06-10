@@ -9,11 +9,16 @@
           <div class="col-2">
             <label for="tokenSelect">Token</label>
           </div>
-          <div class="col-4">
-            <b-form-select
+          <div class="col-4 form-group">
+            <select
               id="tokenSelect"
-              :options="tokenSelectionOptions"
-              v-model="selectedToken"></b-form-select>
+              name="tokenSelect"
+              class="form-control"
+              @change="resetData"
+              v-model="selectedToken">
+              <option value="">Please select one</option>
+              <option v-for="token in tokenSelectionOptions" :value="token.text">{{token.text}}</option>
+            </select>
           </div>
         </div>
       </div>
@@ -268,6 +273,16 @@
         get tokenSelectionOptions() {
           // @ts-ignore
           return this.tokens.map((token: any) => ({text: token.name}));
+        }
+
+        resetData() {
+          this.allWhitelistedAddresses = [];
+          this.allAdminWhitelistedAddresses = [];
+          this.canMintEthAddress = {value: '', loading: false};
+          this.addRemoveMinterEthAddress = {value: '', loading: false};
+          this.isAdminEthAddress = {value: '', loading: false};
+          this.addAdminEthAddress = {value: '', loading: false};
+          this.renounceAdminHash = '';
         }
 
         clearCanMintResult() {

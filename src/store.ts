@@ -229,15 +229,16 @@ export default new Vuex.Store({
       }
     },
 
-    findInformationForTokenId({state}, tokenId) {
+    findInformationForTokenId({state}, {tokenId, selectedToken}) {
       try {
         return Promise.all([
-          state.tokenLandiaContract.methods.attributes(tokenId).call(),
-          state.tokenLandiaContract.methods.ownerOf(tokenId).call(),
+          getTokenContract(selectedToken, state).methods.attributes(tokenId).call(),
+          getTokenContract(selectedToken, state).methods.tokenURI(tokenId).call(),
+          getTokenContract(selectedToken, state).methods.ownerOf(tokenId).call(),
         ])
-          .then(([attributes, ownerOf]) => {
-            return {attributes, ownerOf};
-          })
+          .then(([attributes, tokenURI, ownerOf]) => {
+            return {attributes, tokenURI, ownerOf};
+          });
       } catch (e) {
         return Promise.reject(false);
       }
