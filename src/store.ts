@@ -21,6 +21,13 @@ Vue.use(Vuex);
 let tokenLandiaContract: any = {};
 let videoLatinoContract: any = {};
 
+function getTokenContract(selectedToken: string, state: any) {
+  return selectedToken === 'Tokenlandia' ?
+    state.tokenLandiaContract
+    :
+    state.videoLatinoContract;
+}
+
 export default new Vuex.Store({
   plugins: [createLogger()],
   state: {
@@ -283,14 +290,7 @@ export default new Vuex.Store({
 
     checkIsAdmin({state, commit, dispatch}, {ethAddress, selectedToken}) {
       try {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        return tokenContract.methods.isWhitelistAdmin(ethAddress).call();
+        return getTokenContract(selectedToken, state).methods.isWhitelistAdmin(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
@@ -298,14 +298,7 @@ export default new Vuex.Store({
 
     checkCanMint({state, commit, dispatch}, {ethAddress, selectedToken}) {
       try {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        return tokenContract.methods.isWhitelisted(ethAddress).call();
+        return getTokenContract(selectedToken, state).methods.isWhitelisted(ethAddress).call();
       } catch (e) {
         return Promise.resolve(false);
       }
@@ -321,14 +314,7 @@ export default new Vuex.Store({
 
     addWhitelisted({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        tokenContract.methods.addWhitelisted(ethAddress)
+        getTokenContract(selectedToken, state).methods.addWhitelisted(ethAddress)
           .send({
             from: state.account
           })
@@ -343,14 +329,7 @@ export default new Vuex.Store({
 
     removeWhitelisted({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        tokenContract.methods.removeWhitelisted(ethAddress)
+        getTokenContract(selectedToken, state).methods.removeWhitelisted(ethAddress)
           .send({
             from: state.account
           })
@@ -365,14 +344,7 @@ export default new Vuex.Store({
 
     addWhitelistAdmin({state}, {ethAddress, selectedToken}) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        tokenContract.methods.addWhitelistAdmin(ethAddress)
+        getTokenContract(selectedToken, state).methods.addWhitelistAdmin(ethAddress)
           .send({
             from: state.account
           })
@@ -387,14 +359,7 @@ export default new Vuex.Store({
 
     renounceWhitelistAdmin({state}, selectedToken) {
       return new Promise((resolve, reject) => {
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
-
-        tokenContract.methods.renounceWhitelistAdmin()
+        getTokenContract(selectedToken, state).methods.renounceWhitelistAdmin()
           .send({
             from: state.account
           })
@@ -414,12 +379,7 @@ export default new Vuex.Store({
           toBlock: 'latest',
         };
 
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
+        const tokenContract = getTokenContract(selectedToken, state);
 
         getWhitelistedAddresses({
           addedEventName: 'WhitelistedAdded',
@@ -439,12 +399,7 @@ export default new Vuex.Store({
           toBlock: 'latest',
         };
 
-        // @ts-ignore
-        const tokenContract =
-          selectedToken === 'Tokenlandia' ?
-            state.tokenLandiaContract
-            :
-            state.videoLatinoContract;
+        const tokenContract = getTokenContract(selectedToken, state);
 
         getWhitelistedAddresses({
           addedEventName: 'WhitelistAdminAdded',
