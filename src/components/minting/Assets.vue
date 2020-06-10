@@ -791,6 +791,7 @@
                 }
 
               this.$store.dispatch('mintToken', {
+                    selectedToken: 'Tokenlandia',
                     tokenId: this.tokenId,
                     recipient: this.model.recipient,
                     productCode: this.productCode,

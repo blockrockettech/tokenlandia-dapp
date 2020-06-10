@@ -247,8 +247,8 @@ export default new Vuex.Store({
       return state.tokenLandiaContract.methods.attributes(tokenId).call();
     },
 
-    mintToken({state}, {tokenId, recipient, productCode, ipfsHash, onceTxHash, onceReceipt}) {
-      state.tokenLandiaContract.methods.mintToken(tokenId, recipient, productCode, ipfsHash)
+    mintToken({state}, {tokenId, recipient, productCode, ipfsHash, onceTxHash, onceReceipt, selectedToken}) {
+      getTokenContract(selectedToken, state).methods.mintToken(tokenId, recipient, productCode, ipfsHash)
         .send({
           from: state.account
         })

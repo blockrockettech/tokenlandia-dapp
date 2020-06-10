@@ -180,7 +180,7 @@
                    maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.videoLink)"
-                   required v-model="model.videoLink"/>
+                   required v-model="model.video_link"/>
             <field-messages
               name="videoLink" show="$touched || $submitted" class="form-control-feedback">
               <div slot="required" class="text-danger">
@@ -197,7 +197,7 @@
                     id="videoCategory"
                     class="form-control"
                     required
-                    v-model="model.videoCategory">
+                    v-model="model.video_category">
               <option value="">Please select one</option>
               <option value="VideoSaludos">VideoSaludos</option>
               <option value="PubliVideos">PubliVideos</option>
@@ -215,7 +215,7 @@
                    maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.videoLanguage)"
-                   required v-model="model.videoLanguage"/>
+                   required v-model="model.video_language"/>
             <field-messages
               name="videoLanguage" show="$touched || $submitted" class="form-control-feedback">
               <div slot="required" class="text-danger">
@@ -235,7 +235,7 @@
                    maxlength="125"
                    class="form-control"
                    :class="inputClassName(formState.celebrityName)"
-                   required v-model="model.celebrityName"/>
+                   required v-model="model.celebrity_name"/>
             <field-messages
               name="celebrityName" show="$touched || $submitted" class="form-control-feedback">
               <div slot="required" class="text-danger">
@@ -245,39 +245,64 @@
           </div>
         </validate>
 
-        <div class="form-group row">
-          <label for="purchaseLocation" class="col-sm-3 col-form-label text-right"
-                 v-bind:class="{ 'text-success': model.purchase_location }">
-            Creation Location
-          </label>
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.creationLocation)">
+          <label for="creationLocation" class="col-sm-3 col-form-label text-right">Creation Location *</label>
           <div class="col-sm-9">
             <input type="text"
-                   name="purchaseLocation"
+                   name="creationLocation"
+                   id="creationLocation"
                    maxlength="125"
-                   id="purchaseLocation"
                    class="form-control"
-                   v-model="model.purchase_location"/>
+                   :class="inputClassName(formState.creationLocation)"
+                   required v-model="model.creation_location"/>
+            <field-messages
+              name="creationLocation" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Creation Location is a required field
+              </div>
+            </field-messages>
           </div>
-        </div>
+        </validate>
 
         <div class="form-group row">
-          <label for="purchDate" class="col-sm-3 col-form-label text-right"
-                 v-bind:class="{ 'text-success': model.purchase_date }">
-            Purchase Date
+          <label for="creationDate" class="col-sm-3 col-form-label text-right"
+                 v-bind:class="{ 'text-success': model.creation_date }">
+            Creation Date *
           </label>
           <div class="col-sm-9">
-            <datepicker name="purchDate"
-                        id="purchDate"
+            <datepicker name="creationDate"
+                        id="creationDate"
                         placeholder="YYYY-MM-DD"
                         input-class="form-control bg-white"
                         :typeable="false"
                         :required="true"
                         format="yyyy-MM-dd"
                         :disabled-dates="disabledDates()"
-                        v-model="model.purchase_date">
+                        v-model="model.creation_date">
             </datepicker>
           </div>
         </div>
+
+        <validate auto-label class="form-group row required-field"
+                  :class="fieldClassName(formState.businessBrand)">
+          <label for="businessBrand" class="col-sm-3 col-form-label text-right">Business Brand *</label>
+          <div class="col-sm-9">
+            <input type="text"
+                   name="businessBrand"
+                   id="businessBrand"
+                   maxlength="125"
+                   class="form-control"
+                   :class="inputClassName(formState.businessBrand)"
+                   required v-model="model.business_brand"/>
+            <field-messages
+              name="businessBrand" show="$touched || $submitted" class="form-control-feedback">
+              <div slot="required" class="text-danger">
+                Business Brand is a required field
+              </div>
+            </field-messages>
+          </div>
+        </validate>
 
         <h4 class="heading text-left my-3">Recipient</h4>
 
@@ -365,14 +390,14 @@
         token_id: string,
         name: string,
         description: string,
-        purchase_location: string,
-        purchase_date: string,
-        brand: string,
-        celebrityName: string,
-        videoLanguage: string,
-        videoLink: string,
+        creation_location: string,
+        creation_date: string,
+        business_brand: string,
+        celebrity_name: string,
+        video_language: string,
+        video_link: string,
         recipient: string,
-        videoCategory: string,
+        video_category: string,
     }
 
     @Component({
@@ -421,14 +446,14 @@
             token_id: '',
             name: '',
             description: '',
-            purchase_location: '',
-            purchase_date: '',
-            brand: '',
-            celebrityName: '',
-            videoLanguage: '',
-            videoLink: '',
+            creation_location: '',
+            creation_date: '',
+            business_brand: '',
+            celebrity_name: '',
+            video_language: '',
+            video_link: '',
             recipient: '',
-            videoCategory: '',
+            video_category: '',
         };
 
         dropzoneOptions: any = {
@@ -531,19 +556,19 @@
                 ...strippedDownModel
             } = cleanModel;
 
-            if (strippedDownModel.purchase_date) {
-                strippedDownModel.purchase_date = moment(strippedDownModel.purchase_date).format('YYYY-MM-DD');
+            if (strippedDownModel.creation_date) {
+                strippedDownModel.creation_date = moment(strippedDownModel.creation_date).format('YYYY-MM-DD');
             }
 
             return {
                 name,
                 description,
                 image: !imageIpfsUrl ? 'TBC' : imageIpfsUrl,
-                type: 'GENERAL_ASSET',
+                type: 'VIDEO_LATINO',
                 created: Math.floor( Date.now() / 1000 ),
                 attributes: {
                     ...strippedDownModel,
-                    product_id: this.productId
+                    video_id: this.productId
                 }
             };
         }
@@ -609,6 +634,7 @@
                 }
 
               this.$store.dispatch('mintToken', {
+                    selectedToken: 'Video Latino',
                     tokenId: this.tokenId,
                     recipient: this.model.recipient,
                     productCode: this.productCode,
@@ -679,7 +705,7 @@
                 !this.account ||
                 !this.canAccountMintVideoLatino ||
                 this.tokenIdAlreadyAssigned ||
-                !this.model.videoCategory ||
+                !this.model.video_category ||
                 !this.validateAddress(this.model.recipient);
         }
 
