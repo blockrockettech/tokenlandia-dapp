@@ -40,7 +40,8 @@ export default new Vuex.Store({
     // Account
     account: null,
     accountProperties: {
-      canMint: null,
+      canMint: null, // if the user can mint tokenlandia
+      canMintVideoLatino: null,
       staticWeb3: false,
     },
 
@@ -83,8 +84,10 @@ export default new Vuex.Store({
     web3(state, web3) {
       state.web3 = web3;
     },
-    updateAccountProperties(state, {canMint}) {
-      state.accountProperties.canMint = canMint;
+    updateAccountProperties(state, mintingCapabilities) {
+      const {canMintTokenlandia, canMintVideoLatino} = mintingCapabilities;
+      state.accountProperties.canMint = canMintTokenlandia;
+      state.accountProperties.canMintVideoLatino = canMintVideoLatino;
       state.accountProperties.staticWeb3 = !state.account;
     },
   },
@@ -115,6 +118,7 @@ export default new Vuex.Store({
       }
     },
     canAccountMint: state => state.account && state.accountProperties.canMint === true,
+    canAccountMintVideoLatino: state => state.account && state.accountProperties.canMintVideoLatino === true,
     escrowAccountAddress: state => state.escrowContractAddress,
     tokens: state => {
       return [
@@ -151,9 +155,9 @@ export default new Vuex.Store({
             const account = accounts[0];
             commit('account', account);
 
-            dispatch('checkCanMint', account)
-              .then(canMint => commit('updateAccountProperties', {canMint}))
-              .catch(() => commit('updateAccountProperties', {canMint: false}));
+            dispatch('checkMintingCapabilitiesForAllTokens', account)
+              .then(mintingCapabilities => commit('updateAccountProperties', mintingCapabilities))
+              .catch(() => commit('updateAccountProperties', {canMintTokenlandia: false, canMintVideoLatino: false}));
           } else {
             console.log(`Error getting accounts`, error);
           }
@@ -304,6 +308,16 @@ export default new Vuex.Store({
       }
     },
 
+    async checkMintingCapabilitiesForAllTokens({state, commit, dispatch}, ethAddress) {
+      try {
+        const canMintTokenlandia = await getTokenContract('Tokenlandia', state).methods.isWhitelisted(ethAddress).call();
+        const canMintVideoLatino = await getTokenContract('Video Latino', state).methods.isWhitelisted(ethAddress).call();
+        return Promise.resolve({canMintTokenlandia, canMintVideoLatino});
+      } catch (e) {
+        return Promise.resolve(false);
+      }
+    },
+
     tokensOfOwner({state, commit, dispatch}, ethAddress) {
       try {
         return state.tokenLandiaContract.methods.tokensOfOwner(ethAddress).call();
@@ -416,6 +430,16 @@ export default new Vuex.Store({
       try {
         // @ts-ignore
         await state.tokenLandiaContract.methods.attributes(tokenId).call();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+
+    async checkVideoLatinoTokenExists({state}, tokenId) {
+      try {
+        // @ts-ignore
+        await state.videoLatinoContract.methods.attributes(tokenId).call();
         return true;
       } catch (e) {
         return false;
