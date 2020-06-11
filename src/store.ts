@@ -96,12 +96,12 @@ export default new Vuex.Store({
       // @ts-ignore
       return window.web3 !== undefined;
     },
-    etherscanTokenLink: state => (tokenId: string) => {
-      const networkAddress = TokenlandiaJson.networks[state.networkId].address;
+    etherscanTokenLink: state => (tokenId: string, selectedToken: string) => {
+      const networkAddress = getTokenContract(selectedToken, state)._address;
       return `${state.etherscanBase}/token/${networkAddress}?a=${tokenId}`;
     },
-    openSeaTokenLink: state => (tokenId: string) => {
-      const networkAddress = TokenlandiaJson.networks[state.networkId].address;
+    openSeaTokenLink: state => (tokenId: string, selectedToken: string) => {
+      const networkAddress = getTokenContract(selectedToken, state)._address;
       return `${state.openseaBase}/assets/${networkAddress}/${tokenId}`;
     },
     accountProperties: state => state.accountProperties,
@@ -220,9 +220,9 @@ export default new Vuex.Store({
       }
     },
 
-    getTokenIdOrProductCodeInfo({state}, tokenIdOrProductCode) {
+    getTokenIdOrProductCodeInfo({state}, {tokenIdOrProductCode, selectedToken}) {
       try {
-        return axios.get(`https://api-56b6el2v7a-uc.a.run.app/v1/network/${state.networkId}/asset/info/${tokenIdOrProductCode}`)
+        return axios.get(`http://api-56b6el2v7a-uc.a.run.app/v1/network/${state.networkId}/asset/${selectedToken.replace(' ', '')}/info/${tokenIdOrProductCode}`)
           .then((res) => res.data)
       } catch (e) {
         return Promise.reject(false);

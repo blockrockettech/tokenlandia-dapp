@@ -81,7 +81,7 @@
         <div class="row">
           <div class="col text-left">
 
-            <h4 class="heading text-center">Product ID: {{tokenData.attributes.product_id}}</h4>
+            <h4 class="heading text-center">Product ID: {{tokenData.attributes.product_id || tokenData.attributes.video_id}}</h4>
             <table class="table table-striped table-borderless">
               <tbody>
               <tr>
@@ -109,14 +109,14 @@
               <img class="img" :src="ipfsData.image" alt=""/>
             </div>
             <div class="small mt-1">
-              <a :href="openSeaTokenLink(currentTokenId)" target="_blank">→ view token on OpenSea</a>
+              <a :href="openSeaTokenLink(currentTokenId, selectedToken)" target="_blank">→ view token on OpenSea</a>
             </div>
             <div class="small mt-1">
-              <a :href="etherscanTokenLink(currentTokenId)" target="_blank">→ view token on
+              <a :href="etherscanTokenLink(currentTokenId, selectedToken)" target="_blank">→ view token on
                 Etherscan</a>
             </div>
             <div class="small mt-1">
-              <a :href="attributes._ipfsUrl" target="_blank">→ view token data on IPFS</a>
+              <a :href="tokenURI" target="_blank">→ view token data on IPFS</a>
             </div>
             <div class="text-left small">
               <hr/>
@@ -133,16 +133,16 @@
                 <CopyIcon :text="tokenLandiaContractAddress"></CopyIcon>
               </div>
               <div class="mt-1">
-                <span class=" font-weight-bold">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId)}}
-                <CopyIcon :text="etherscanTokenLink(currentTokenId)"></CopyIcon>
+                <span class=" font-weight-bold">4. Etherscan:</span> {{etherscanTokenLink(currentTokenId, selectedToken)}}
+                <CopyIcon :text="etherscanTokenLink(currentTokenId, selectedToken)"></CopyIcon>
               </div>
               <div class="mt-1">
-                <span class=" font-weight-bold">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId)}}
-                <CopyIcon :text="openSeaTokenLink(currentTokenId)"></CopyIcon>
+                <span class=" font-weight-bold">5. OpenSea:</span> {{openSeaTokenLink(currentTokenId, selectedToken)}}
+                <CopyIcon :text="openSeaTokenLink(currentTokenId, selectedToken)"></CopyIcon>
               </div>
               <div class="mt-1">
-                <span class=" font-weight-bold">6. IPFS Data:</span> {{attributes._ipfsUrl}}
-                <CopyIcon :text="attributes._ipfsUrl"></CopyIcon>
+                <span class=" font-weight-bold">6. IPFS Data:</span> {{tokenURI}}
+                <CopyIcon :text="tokenURI"></CopyIcon>
               </div>
             </div>
           </div>
@@ -195,8 +195,8 @@
     ipfsData: any = {};
     ipfsDataRetrieved: boolean = false;
 
-    etherscanTokenLink!: (tokenId: string) => string;
-    openSeaTokenLink!: (tokenId: string) => string;
+    etherscanTokenLink!: (tokenId: string, selectedToken: string) => string;
+    openSeaTokenLink!: (tokenId: string, selectedToken: string) => string;
 
     selectedToken: any = null;
 
@@ -214,6 +214,8 @@
       this.attributes = {};
       this.ownerOf = '';
       this.tokenURI = '';
+      this.transactionHash = '';
+      this.dateCreated = '';
       this.noResultFound = false;
     }
 
@@ -257,11 +259,14 @@
     findInformationForTokenId(tokenId: any) {
       this.foundTokenId = tokenId;
 
-      // this.$store.dispatch('getTokenIdOrProductCodeInfo', tokenId)
-      //   .then((results) => {
-      //     this.transactionHash = results.transaction_hash;
-      //     this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
-      //   });
+      this.$store.dispatch('getTokenIdOrProductCodeInfo', {
+        tokenIdOrProductCode: tokenId,
+        selectedToken: this.selectedToken
+      })
+        .then((results) => {
+          this.transactionHash = results.transaction_hash;
+          this.dateCreated = moment.unix(results.created).format('YYYY-MM-DD');
+        });
 
       this.$store.dispatch('findInformationForTokenId', {
         tokenId,

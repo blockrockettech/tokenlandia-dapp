@@ -26,10 +26,9 @@
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/video-latino' }">
                 <router-link to="/mint/video-latino">Video Latino</router-link>
               </li>
-              <!-- Route un-used for now -->
-<!--              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">-->
-<!--                <router-link to="/mint/real-estate">Real Estate</router-link>-->
-<!--              </li>-->
+              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">
+                <router-link to="/mint/real-estate">Real Estate</router-link>
+              </li>
             </ul>
           </li>
           <li>
