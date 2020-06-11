@@ -222,7 +222,7 @@ export default new Vuex.Store({
 
     getTokenIdOrProductCodeInfo({state}, {tokenIdOrProductCode, selectedToken}) {
       try {
-        return axios.get(`http://api-56b6el2v7a-uc.a.run.app/v1/network/${state.networkId}/asset/${selectedToken.replace(' ', '')}/info/${tokenIdOrProductCode}`)
+        return axios.get(`https://api-56b6el2v7a-uc.a.run.app/v1/network/${state.networkId}/asset/${selectedToken.replace(' ', '')}/info/${tokenIdOrProductCode}`)
           .then((res) => res.data)
       } catch (e) {
         return Promise.reject(false);
