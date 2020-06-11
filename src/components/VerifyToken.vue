@@ -245,7 +245,10 @@
 
 
       if (isProductIdSearch) {
-        this.$store.dispatch('tokenIdForProductId', this.productId)
+        this.$store.dispatch('tokenIdForProductId', {
+          productId: this.productId,
+          selectedToken: this.selectedToken
+        })
           .then((tokenId) => {
             this.findInformationForTokenId(tokenId);
           })

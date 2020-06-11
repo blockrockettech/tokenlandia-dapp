@@ -212,9 +212,12 @@ export default new Vuex.Store({
     // Contract calls //
     ////////////////////
 
-    tokenIdForProductId({state}, productId) {
+    tokenIdForProductId({state}, {productId, selectedToken}) {
       try {
-        return state.tokenLandiaContract.methods.tokenIdForProductId(productId).call();
+        return selectedToken === 'Tokenlandia' ?
+          state.tokenLandiaContract.methods.tokenIdForProductId(productId).call()
+          :
+          state.videoLatinoContract.methods.tokenIdForVideoId(productId).call();
       } catch (e) {
         return Promise.reject(null);
       }
