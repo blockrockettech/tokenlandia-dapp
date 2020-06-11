@@ -13,13 +13,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install packages
-      run: npm install
+    - name: Install Project Dependencies
+      run: npm ci
 
-    - name: Deploy web app to staging
-      run: ./firebase_deploy-stage.sh
+    - name: Build the Dapp
+      run: npm run build
+
+    - name: Deploy to Firebase
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
