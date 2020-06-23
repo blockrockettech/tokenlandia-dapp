@@ -4279,8 +4279,7 @@
             }
           ],
           "name": "OwnershipTransferred",
-          "type": "event",
-          "signature": "0xc4201945555ec2e699bd6c3789603ab9ce5991abd7eb7e009d630009991835ff"
+          "type": "event"
         },
         "0x28fa6e16458f9c24aa59ddd4085264573006dbe30304837873c7deafc702b038": {
           "anonymous": false,
@@ -4317,8 +4316,7 @@
             }
           ],
           "name": "Received",
-          "type": "event",
-          "signature": "0x28fa6e16458f9c24aa59ddd4085264573006dbe30304837873c7deafc702b038"
+          "type": "event"
         },
         "0xb9f84b8e65164b14439ae3620df0a4d8786d896996c0282b683f9d8c08f046e8": {
           "anonymous": false,
@@ -4337,8 +4335,7 @@
             }
           ],
           "name": "RelayHubChanged",
-          "type": "event",
-          "signature": "0xb9f84b8e65164b14439ae3620df0a4d8786d896996c0282b683f9d8c08f046e8"
+          "type": "event"
         },
         "0x22380c05984257a1cb900161c713dd71d39e74820f1aea43bd3f1bdd20961299": {
           "anonymous": false,
@@ -4351,8 +4348,7 @@
             }
           ],
           "name": "WhitelistAdminAdded",
-          "type": "event",
-          "signature": "0x22380c05984257a1cb900161c713dd71d39e74820f1aea43bd3f1bdd20961299"
+          "type": "event"
         },
         "0x0a8eb35e5ca14b3d6f28e4abf2f128dbab231a58b56e89beb5d636115001e165": {
           "anonymous": false,
@@ -4365,8 +4361,7 @@
             }
           ],
           "name": "WhitelistAdminRemoved",
-          "type": "event",
-          "signature": "0x0a8eb35e5ca14b3d6f28e4abf2f128dbab231a58b56e89beb5d636115001e165"
+          "type": "event"
         },
         "0xee1504a83b6d4a361f4c1dc78ab59bfa30d6a3b6612c403e86bb01ef2984295f": {
           "anonymous": false,
@@ -4379,8 +4374,7 @@
             }
           ],
           "name": "WhitelistedAdded",
-          "type": "event",
-          "signature": "0xee1504a83b6d4a361f4c1dc78ab59bfa30d6a3b6612c403e86bb01ef2984295f"
+          "type": "event"
         },
         "0x270d9b30cf5b0793bbfd54c9d5b94aeb49462b8148399000265144a8722da6b6": {
           "anonymous": false,
@@ -4393,17 +4387,16 @@
             }
           ],
           "name": "WhitelistedRemoved",
-          "type": "event",
-          "signature": "0x270d9b30cf5b0793bbfd54c9d5b94aeb49462b8148399000265144a8722da6b6"
+          "type": "event"
         }
       },
       "links": {},
-      "address": "0x35F96368Fb58c8816f9751BDa3207572cC1B7473",
-      "transactionHash": "0x2b37a6bb9ad263ced8dfb11bbbb2a77e5900774ffda1e96115ea512ea5410e31"
+      "address": "0xe52527172A155910fe760B59E2A35aea8078388B",
+      "transactionHash": "0xd5c40a64fc728c49e1d2af63bc21c53181b3a7f5b639d56cbbebccb6cc4af881"
     }
   },
-  "schemaVersion": "3.0.22",
-  "updatedAt": "2020-02-17T12:23:43.722Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-06-09T14:39:06.069Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {
