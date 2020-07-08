@@ -331,7 +331,10 @@
           },
           findInformationForTokenId(tokenId) {
             this.foundTokenId = tokenId;
-            this.$store.dispatch('findInformationForTokenId', tokenId)
+            this.$store.dispatch('findInformationForTokenId', {
+              tokenId,
+              selectedToken: 'Tokenlandia'
+            })
               .then(({attributes, ownerOf}) => {
                 this.attributes = attributes;
                 this.ownerOf = ownerOf;
