@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "tokenlandia-admin"
+  },
+  "targets": {
+    "tokenlandia-admin": {
+      "hosting": {
+        "tokenlandia-admin": [
+          "tokenlandia-admin"
+        ]
+      }
+    }
   }
 }
