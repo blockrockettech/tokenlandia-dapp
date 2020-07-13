@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "target": "tokenlandia-admin",
+    "site": "tokenlandia-admin",
     "public": "dist",
     "ignore": [
       "firebase.json",
