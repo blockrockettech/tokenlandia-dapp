@@ -23,9 +23,6 @@
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/assets' }">
                 <router-link to="/">General Products</router-link>
               </li>
-              <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/video-latino' }">
-                <router-link to="/mint/video-latino">Video Latino</router-link>
-              </li>
               <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/mint/real-estate' }">
                 <router-link to="/mint/real-estate">Real Estate</router-link>
               </li>
@@ -51,6 +48,9 @@
           </li>
           <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/user-access' }">
             <router-link to="/user-access">User Access</router-link>
+          </li>
+          <li v-bind:class="{ 'active': this.$router.currentRoute.path === '/manage-api' }">
+            <router-link to="/manage/api">API Management</router-link>
           </li>
           <li class="mt-2 centre-li">
             <b-button @click="onLogin" v-if="!account" variant="primary">
